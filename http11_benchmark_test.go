@@ -8,7 +8,6 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"runtime"
 	"strconv"
 	"sync"
 	"testing"
@@ -286,8 +285,7 @@ func startHTTP11BenchmarkServer(tb testing.TB, transport, implementation string,
 	gate := &http11StartListener{Listener: listener, ready: make(chan struct{})}
 	switch implementation {
 	case "Turbo":
-		workers := runtime.GOMAXPROCS(0)
-		server := newTurbo(gate, workers, workers)
+		server := newTurbo(gate, 32, 1024)
 		server.h = handler
 		tb.Cleanup(func() {
 			if err := server.Close(); err != nil {
