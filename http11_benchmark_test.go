@@ -94,12 +94,13 @@ func BenchmarkTurboProcess(b *testing.B) {
 			request := workload.request()
 			conn := &http11ProcessConn{}
 			server := Turbo{h: workload.handler()}
+			writer := makeResponseWriter()
 			b.ReportAllocs()
 			b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				conn.request.Reset(request)
-				if err := server.process(conn); err != nil {
+				if err := server.process(conn, &writer); err != nil {
 					b.Fatal(err)
 				}
 			}

@@ -8,17 +8,12 @@ import (
 	"net"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 )
 
 var _ http.ResponseWriter = &responseWriter{}
 
-const maxPooledHeaderCapacity = 16 << 10
-
-var responseWriters = sync.Pool{
-	New: func() any { return &responseWriter{headerBuffer: new(bytes.Buffer)} },
-}
+const maxRetainedHeaderCapacity = 16 << 10
 
 var responseHeaderExclusions = map[string]bool{
 	"Connection":        true,
@@ -43,15 +38,10 @@ var bodylessHeaderExclusions = map[string]bool{
 	"Trailer":           true,
 }
 
-func makeResponseWriter() (w *responseWriter) {
-	w = responseWriters.Get().(*responseWriter)
-	values := []string{"close", time.Now().UTC().Format(http.TimeFormat)}
-	// Cap each slice so appending cannot overwrite the other header's value.
-	w.headers = http.Header{
-		"Connection": values[:1:1],
-		"Date":       values[1:2:2],
-	}
-	w.contentLength = -1
+func makeResponseWriter() (w responseWriter) {
+	w.headers = make(http.Header)
+	w.headerBuffer = new(bytes.Buffer)
+	w.populateHeaders()
 	return w
 }
 
@@ -73,16 +63,34 @@ type responseWriter struct {
 	err  error
 }
 
-func (r *responseWriter) release() {
-	buffer := r.headerBuffer
-	if buffer.Cap() > maxPooledHeaderCapacity {
+func (r *responseWriter) populateHeaders() {
+	for key := range r.headers {
+		if key != "Connection" && key != "Date" {
+			delete(r.headers, key)
+		}
+	}
+	r.populateHeader("Connection", "close")
+	r.populateHeader("Date", time.Now().UTC().Format(http.TimeFormat))
+	r.contentLength = -1
+}
+
+func (r *responseWriter) populateHeader(key, value string) {
+	values := r.headers[key]
+	if len(values) == 1 && values[0] == value {
 		return
 	}
-	buffer.Reset()
-	// Handler-visible maps remain owned by the response. Clear all references and
-	// request state before reusing the writer after the handler returns.
-	*r = responseWriter{headerBuffer: buffer}
-	responseWriters.Put(r)
+	r.headers.Set(key, value)
+}
+
+func (r *responseWriter) reset() {
+	buffer := r.headerBuffer
+	if buffer.Cap() > maxRetainedHeaderCapacity {
+		buffer = new(bytes.Buffer)
+	} else {
+		buffer.Reset()
+	}
+	// Retain the worker's header map and buffer while clearing request state.
+	*r = responseWriter{headers: r.headers, headerBuffer: buffer}
 }
 
 func (r *responseWriter) Header() http.Header {

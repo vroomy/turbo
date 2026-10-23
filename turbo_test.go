@@ -90,10 +90,15 @@ func TestTurboProcess(t *testing.T) {
 		{name: "http 1.0", method: http.MethodGet, target: "/legacy", protocol: "HTTP/1.0", body: "legacy", status: http.StatusOK, handler: func(w http.ResponseWriter, _ *http.Request) {
 			_, _ = w.Write([]byte("legacy"))
 		}},
+		{name: "large headers", method: http.MethodGet, target: "/large", body: "large", status: http.StatusOK, handler: func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("X-Large", strings.Repeat("x", 32<<10))
+			_, _ = w.Write([]byte("large"))
+		}},
 		{name: "no content", method: http.MethodGet, target: "/empty", status: http.StatusNoContent, handler: func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusNoContent)
 		}},
 	}
+	writer := makeResponseWriter()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, server := net.Pipe()
@@ -109,6 +114,9 @@ func TestTurboProcess(t *testing.T) {
 				t.Fatal(err)
 			}
 			turbo := Turbo{h: func(w http.ResponseWriter, req *http.Request) {
+				if w != &writer {
+					t.Error("handler did not receive the worker's response writer")
+				}
 				if req.Method != tt.method || req.RequestURI != tt.target || req.Host != "example.com" {
 					t.Errorf("unexpected request: %s %s, Host %q", req.Method, req.RequestURI, req.Host)
 				}
@@ -119,7 +127,7 @@ func TestTurboProcess(t *testing.T) {
 				tt.handler(w, req)
 			}}
 			done := make(chan error, 1)
-			go func() { done <- turbo.process(server) }()
+			go func() { done <- turbo.process(server, &writer) }()
 			protocol := tt.protocol
 			if protocol == "" {
 				protocol = "HTTP/1.1"
@@ -132,6 +140,9 @@ func TestTurboProcess(t *testing.T) {
 			res := readResponse(t, in, tt.method)
 			if res.StatusCode != tt.status {
 				t.Errorf("status = %d, want %d", res.StatusCode, tt.status)
+			}
+			if tt.target != "/large" && res.Header.Get("X-Large") != "" {
+				t.Error("header from previous response was retained")
 			}
 			assertResponseBody(t, res, tt.body)
 			if extra, err := io.ReadAll(in); err != nil || len(extra) != 0 {
@@ -167,6 +178,7 @@ func TestTurboProcessErrors(t *testing.T) {
 		{name: "read error survives close failure", request: request, readErr: readFailure, closeErr: closeFailure, wantErr: readFailure},
 		{name: "write error survives close failure", request: request, failWrite: 2, writeErr: writeFailure, closeErr: closeFailure, wantErr: writeFailure, wantHandler: true},
 	}
+	writer := makeResponseWriter()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			conn := newTurboTestConn(tt.request)
@@ -179,7 +191,7 @@ func TestTurboProcessErrors(t *testing.T) {
 				called = true
 				_, _ = w.Write([]byte("response"))
 			}}
-			err := server.process(conn)
+			err := server.process(conn, &writer)
 			if tt.wantErr != nil && !errors.Is(err, tt.wantErr) {
 				t.Errorf("process error = %v, want %v", err, tt.wantErr)
 			}
@@ -208,6 +220,7 @@ func TestTurboRequestBodyLifecycle(t *testing.T) {
 		{name: "handler replaces body", body: "body", replace: true},
 		{name: "client never sends declared body"},
 	}
+	writer := makeResponseWriter()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, conn := net.Pipe()
@@ -235,7 +248,7 @@ func TestTurboRequestBodyLifecycle(t *testing.T) {
 				}
 			}}
 			done := make(chan error, 1)
-			go func() { done <- server.process(conn) }()
+			go func() { done <- server.process(conn, &writer) }()
 			request := "POST / HTTP/1.1\r\nHost: example.com\r\nContent-Length: 4\r\n\r\n" + tt.body
 			if _, err := io.WriteString(client, request); err != nil {
 				t.Fatal(err)
@@ -285,7 +298,15 @@ func TestTurboWorkers(t *testing.T) {
 				}
 			})
 			started := make(chan struct{}, count)
+			var writer http.ResponseWriter
 			server.h = func(w http.ResponseWriter, req *http.Request) {
+				if tt.workers == 1 {
+					if writer == nil {
+						writer = w
+					} else if w != writer {
+						t.Error("worker replaced its response writer between requests")
+					}
+				}
 				started <- struct{}{}
 				<-release
 				_, _ = io.WriteString(w, req.RequestURI)

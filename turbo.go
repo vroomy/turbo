@@ -91,14 +91,16 @@ func (t *Turbo) listen() {
 func (t *Turbo) work() {
 	var err error
 	defer t.workers.Done()
+	res := makeResponseWriter()
 	for c := range t.conns {
-		if err = t.process(c); err != nil {
+		if err = t.process(c, &res); err != nil {
 			log.Printf("error processing connection: %v\n", err)
 		}
 	}
 }
 
-func (t *Turbo) process(c net.Conn) (err error) {
+func (t *Turbo) process(c net.Conn, res *responseWriter) (err error) {
+	defer res.reset()
 	var req *http.Request
 	var body io.ReadCloser
 	r := requestReaders.Get().(*bufio.Reader)
@@ -114,8 +116,7 @@ func (t *Turbo) process(c net.Conn) (err error) {
 	}
 	body = req.Body
 
-	res := makeResponseWriter()
-	defer res.release()
+	res.populateHeaders()
 	res.c = c
 	res.head = req.Method == http.MethodHead
 	t.h(res, req)
