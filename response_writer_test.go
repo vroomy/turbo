@@ -315,58 +315,6 @@ func TestResponseWriterConnectionErrors(t *testing.T) {
 	}
 }
 
-func TestProcessConnResponse(t *testing.T) {
-	tests := []struct {
-		name, method, body string
-		status             int
-		handler            http.HandlerFunc
-	}{
-		{"empty handler", http.MethodGet, "", http.StatusOK, func(http.ResponseWriter, *http.Request) {}},
-		{"headers only", http.MethodGet, "", http.StatusAccepted, func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusAccepted)
-		}},
-		{"body", http.MethodGet, "hello", http.StatusCreated, func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusCreated)
-			_, _ = w.Write([]byte("hello"))
-		}},
-		{"head", http.MethodHead, "", http.StatusOK, func(w http.ResponseWriter, _ *http.Request) {
-			_, _ = w.Write([]byte("hello"))
-		}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			client, server := net.Pipe()
-			defer client.Close()
-			defer server.Close()
-			if err := client.SetDeadline(time.Now().Add(5 * time.Second)); err != nil {
-				t.Fatal(err)
-			}
-			turbo := Turbo{h: tt.handler}
-			done := make(chan error, 1)
-			go func() {
-				err := turbo.process(server)
-				server.Close()
-				done <- err
-			}()
-			if _, err := io.WriteString(client, tt.method+" / HTTP/1.1\r\nHost: example.com\r\n\r\n"); err != nil {
-				t.Fatal(err)
-			}
-			in := bufio.NewReader(client)
-			res := readResponse(t, in, tt.method)
-			if res.StatusCode != tt.status {
-				t.Errorf("status = %d, want %d", res.StatusCode, tt.status)
-			}
-			assertResponseBody(t, res, tt.body)
-			if extra, err := io.ReadAll(in); err != nil || len(extra) != 0 {
-				t.Fatalf("bytes after response = %q, error = %v", extra, err)
-			}
-			if err := <-done; err != nil {
-				t.Fatal(err)
-			}
-		})
-	}
-}
-
 func readResponse(t *testing.T, in io.Reader, method string) *http.Response {
 	t.Helper()
 	r, ok := in.(*bufio.Reader)

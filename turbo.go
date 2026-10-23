@@ -2,6 +2,7 @@ package turbo
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -31,7 +32,7 @@ func newTurbo(l net.Listener, workerCount, queueLength int) (out *Turbo) {
 	}
 
 	go t.listen()
-	return
+	return &t
 }
 
 type Turbo struct {
@@ -49,9 +50,16 @@ func (t *Turbo) Close() (err error) {
 		return nil
 	}
 
-	// Wait for workers to finish and close
+	if t.l != nil {
+		err = t.l.Close()
+		if errors.Is(err, net.ErrClosed) {
+			err = nil
+		}
+	}
+
+	// Closing the listener releases Accept so listen can close the work queue.
 	t.workers.Wait()
-	return nil
+	return err
 }
 
 func (t *Turbo) listen() {
@@ -64,6 +72,9 @@ func (t *Turbo) listen() {
 
 		var c net.Conn
 		if c, err = t.l.Accept(); err != nil {
+			if t.closed.Load() || errors.Is(err, net.ErrClosed) {
+				return
+			}
 			log.Printf("error accepting connection: %v\n", err)
 			continue
 		}
@@ -84,10 +95,14 @@ func (t *Turbo) work() {
 
 func (t *Turbo) process(c net.Conn) (err error) {
 	var req *http.Request
-	defer closeConn(c)
+	defer func() {
+		if closeErr := closeConn(c); err == nil {
+			err = closeErr
+		}
+	}()
 	r := bufio.NewReader(c)
 	if req, err = http.ReadRequest(r); err != nil {
-		err = fmt.Errorf("error reading request: %v", err)
+		err = fmt.Errorf("error reading request: %w", err)
 		return err
 	}
 
@@ -100,5 +115,5 @@ func (t *Turbo) process(c net.Conn) (err error) {
 		return err
 	}
 
-	return c.Close()
+	return nil
 }
