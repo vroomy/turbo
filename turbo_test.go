@@ -196,6 +196,62 @@ func TestTurboProcessErrors(t *testing.T) {
 	}
 }
 
+func TestTurboRequestBodyLifecycle(t *testing.T) {
+	tests := []struct {
+		name    string
+		body    string
+		consume bool
+		replace bool
+	}{
+		{name: "unread body", body: "body"},
+		{name: "consumed body", body: "body", consume: true},
+		{name: "handler replaces body", body: "body", replace: true},
+		{name: "client never sends declared body"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, conn := net.Pipe()
+			t.Cleanup(func() {
+				client.Close()
+				conn.Close()
+			})
+			deadline := time.Now().Add(5 * time.Second)
+			if err := client.SetDeadline(deadline); err != nil {
+				t.Fatal(err)
+			}
+			if err := conn.SetDeadline(deadline); err != nil {
+				t.Fatal(err)
+			}
+			var body io.ReadCloser
+			server := Turbo{h: func(_ http.ResponseWriter, req *http.Request) {
+				body = req.Body
+				if tt.consume {
+					if _, err := io.Copy(io.Discard, req.Body); err != nil {
+						t.Error(err)
+					}
+				}
+				if tt.replace {
+					req.Body = http.NoBody
+				}
+			}}
+			done := make(chan error, 1)
+			go func() { done <- server.process(conn) }()
+			request := "POST / HTTP/1.1\r\nHost: example.com\r\nContent-Length: 4\r\n\r\n" + tt.body
+			if _, err := io.WriteString(client, request); err != nil {
+				t.Fatal(err)
+			}
+			res := readResponse(t, client, http.MethodPost)
+			assertResponseBody(t, res, "")
+			if err := waitForTurboClose(t, done); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := body.Read(make([]byte, 1)); !errors.Is(err, http.ErrBodyReadAfterClose) {
+				t.Fatalf("read after handler returned = %v, want ErrBodyReadAfterClose", err)
+			}
+		})
+	}
+}
+
 func TestTurboWorkers(t *testing.T) {
 	tests := []struct {
 		name           string

@@ -4,12 +4,17 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"sync"
 	"sync/atomic"
 )
+
+var requestReaders = sync.Pool{
+	New: func() any { return bufio.NewReader(nil) },
+}
 
 func New(port uint16, workerCount, queueLength int) (out *Turbo, err error) {
 	var l net.Listener
@@ -95,16 +100,19 @@ func (t *Turbo) work() {
 
 func (t *Turbo) process(c net.Conn) (err error) {
 	var req *http.Request
+	var body io.ReadCloser
+	r := requestReaders.Get().(*bufio.Reader)
+	r.Reset(c)
 	defer func() {
-		if closeErr := closeConn(c); err == nil {
+		if closeErr := finishRequest(c, r, body); err == nil {
 			err = closeErr
 		}
 	}()
-	r := bufio.NewReader(c)
 	if req, err = http.ReadRequest(r); err != nil {
 		err = fmt.Errorf("error reading request: %w", err)
 		return err
 	}
+	body = req.Body
 
 	res := makeResponseWriter()
 	res.c = c
@@ -116,4 +124,15 @@ func (t *Turbo) process(c net.Conn) (err error) {
 	}
 
 	return nil
+}
+
+func finishRequest(c net.Conn, reader *bufio.Reader, body io.ReadCloser) error {
+	err := closeConn(c)
+	// Closing the connection first prevents an unread body from blocking cleanup.
+	if body != nil {
+		_ = body.Close()
+	}
+	reader.Reset(nil)
+	requestReaders.Put(reader)
+	return err
 }
