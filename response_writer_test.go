@@ -344,7 +344,7 @@ func TestProcessConnResponse(t *testing.T) {
 			turbo := Turbo{h: tt.handler}
 			done := make(chan error, 1)
 			go func() {
-				err := turbo.processConn(server)
+				err := turbo.process(server)
 				server.Close()
 				done <- err
 			}()
