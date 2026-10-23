@@ -1,0 +1,294 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	    3667	     60207 ns/op	   2.13 MB/s	     16609 req/s	    8949 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	    3936	     61823 ns/op	   2.07 MB/s	     16175 req/s	    8905 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	    3886	     64340 ns/op	   1.99 MB/s	     15542 req/s	    8940 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	    3992	     63602 ns/op	   2.01 MB/s	     15723 req/s	    8957 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	    3896	     62578 ns/op	   2.05 MB/s	     15980 req/s	    8918 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	    3885	     63555 ns/op	   2.01 MB/s	     15734 req/s	    8914 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8        	    3650	     66473 ns/op	   1.93 MB/s	     15044 req/s	    5793 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8        	    3660	     67500 ns/op	   1.90 MB/s	     14815 req/s	    5792 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8        	    3673	     67114 ns/op	   1.91 MB/s	     14900 req/s	    5751 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8        	    3634	     68283 ns/op	   1.87 MB/s	     14645 req/s	    5817 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8        	    3541	     77554 ns/op	   1.65 MB/s	     12894 req/s	    5788 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8        	    3706	     66911 ns/op	   1.91 MB/s	     14945 req/s	    5826 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	    9320	     26622 ns/op	   4.81 MB/s	     37563 req/s	    8909 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	    9062	     28221 ns/op	   4.54 MB/s	     35435 req/s	    8904 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	    7760	     32366 ns/op	   3.95 MB/s	     30896 req/s	    8912 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	    9714	     26231 ns/op	   4.88 MB/s	     38123 req/s	    8905 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	    9571	     28036 ns/op	   4.57 MB/s	     35668 req/s	    8902 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	    8971	     28123 ns/op	   4.55 MB/s	     35558 req/s	    8905 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8      	    8469	     28129 ns/op	   4.55 MB/s	     35550 req/s	    5754 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8      	    8266	     28892 ns/op	   4.43 MB/s	     34612 req/s	    5753 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8      	    8788	     28875 ns/op	   4.43 MB/s	     34632 req/s	    5776 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8      	    8294	     85087 ns/op	   1.50 MB/s	     11753 req/s	    5769 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8      	    9008	     27651 ns/op	   4.63 MB/s	     36165 req/s	    5756 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8      	    8596	     28043 ns/op	   4.56 MB/s	     35660 req/s	    5754 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	    3224	     72499 ns/op	   1.77 MB/s	     13793 req/s	    8711 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	    3118	     91742 ns/op	   1.40 MB/s	     10900 req/s	    8723 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	    3363	     74874 ns/op	   1.71 MB/s	     13356 req/s	    8705 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	    3336	     71928 ns/op	   1.78 MB/s	     13903 req/s	    8714 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	    3372	     74638 ns/op	   1.71 MB/s	     13398 req/s	    8701 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	    3270	     85704 ns/op	   1.49 MB/s	     11668 req/s	    8682 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8     	    3316	     73551 ns/op	   1.74 MB/s	     13596 req/s	    4926 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8     	    3330	    217578 ns/op	   0.59 MB/s	      4596 req/s	    4956 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8     	    3163	    314942 ns/op	   0.41 MB/s	      3175 req/s	    4958 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8     	    3198	   6502855 ns/op	   0.02 MB/s	       153.8 req/s	    4953 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8     	    3092	     72977 ns/op	   1.75 MB/s	     13703 req/s	    4954 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8     	    3284	    231014 ns/op	   0.55 MB/s	      4329 req/s	    4981 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	    7860	     28898 ns/op	   4.43 MB/s	     34605 req/s	    8704 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	    8152	    118148 ns/op	   1.08 MB/s	      8464 req/s	    8705 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	    8383	     29066 ns/op	   4.40 MB/s	     34404 req/s	    8697 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	    8464	    118594 ns/op	   1.08 MB/s	      8432 req/s	    8703 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	    8565	     28444 ns/op	   4.50 MB/s	     35157 req/s	    8695 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	    8854	     29533 ns/op	   4.33 MB/s	     33861 req/s	    8698 B/op	      61 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8   	    8026	     74481 ns/op	   1.72 MB/s	     13426 req/s	    4925 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8   	    8362	     27096 ns/op	   4.72 MB/s	     36906 req/s	    4934 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8   	    9213	     28109 ns/op	   4.55 MB/s	     35575 req/s	    4941 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8   	    8521	     28660 ns/op	   4.47 MB/s	     34891 req/s	    4932 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8   	    8383	     55954 ns/op	   2.29 MB/s	     17872 req/s	    4937 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8   	    8713	     27962 ns/op	   4.58 MB/s	     35763 req/s	    4936 B/op	      69 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	    2832	     79817 ns/op	 821.08 MB/s	     12529 req/s	    8914 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	    3019	     81008 ns/op	 809.01 MB/s	     12345 req/s	    8956 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	    2906	    106582 ns/op	 614.89 MB/s	      9382 req/s	    8927 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	    3114	     78230 ns/op	 837.74 MB/s	     12783 req/s	    8968 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	    3094	     79597 ns/op	 823.34 MB/s	     12563 req/s	    8968 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	    3040	     79053 ns/op	 829.01 MB/s	     12650 req/s	    8929 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8        	    2875	    102198 ns/op	 641.26 MB/s	      9785 req/s	    5805 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8        	    3002	     83453 ns/op	 785.31 MB/s	     11983 req/s	    5804 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8        	    2962	     81547 ns/op	 803.66 MB/s	     12263 req/s	    5787 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8        	    2979	     81926 ns/op	 799.94 MB/s	     12206 req/s	    5786 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8        	    2922	     95937 ns/op	 683.11 MB/s	     10424 req/s	    5836 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8        	    2952	     81655 ns/op	 802.60 MB/s	     12247 req/s	    5792 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	    6871	     35502 ns/op	1845.96 MB/s	     28167 req/s	    8950 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	    7381	     68219 ns/op	 960.67 MB/s	     14659 req/s	    8936 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	    6676	    143710 ns/op	 456.03 MB/s	      6958 req/s	    8939 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	    6073	    740161 ns/op	  88.54 MB/s	      1351 req/s	    8944 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     100	   7115092 ns/op	   9.21 MB/s	       140.5 req/s	   10198 B/op	      68 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	    1712	   8460450 ns/op	   7.75 MB/s	       118.2 req/s	    8981 B/op	      67 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8      	    6600	    186524 ns/op	 351.35 MB/s	      5361 req/s	    5802 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8      	    6591	    158862 ns/op	 412.54 MB/s	      6295 req/s	    5801 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8      	    7359	    141590 ns/op	 462.86 MB/s	      7063 req/s	    5825 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8      	    7004	     33776 ns/op	1940.31 MB/s	     29607 req/s	    5796 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8      	    6550	     34437 ns/op	1903.08 MB/s	     29039 req/s	    5817 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8      	    6229	    118235 ns/op	 554.29 MB/s	      8458 req/s	    5824 B/op	      75 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	    3210	     70830 ns/op	  16.26 MB/s	     14118 req/s	    9043 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	    3042	     70770 ns/op	  16.28 MB/s	     14130 req/s	    9026 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	    3307	     73732 ns/op	  15.62 MB/s	     13563 req/s	    9051 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	    3403	     93065 ns/op	  12.38 MB/s	     10745 req/s	    9061 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	    4336	     70421 ns/op	  16.36 MB/s	     14200 req/s	    9041 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	    3374	     71072 ns/op	  16.21 MB/s	     14070 req/s	    9061 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8            	    2998	     72817 ns/op	  15.82 MB/s	     13733 req/s	    5891 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8            	    3286	     91547 ns/op	  12.58 MB/s	     10923 req/s	    5918 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8            	    3382	     71812 ns/op	  16.04 MB/s	     13925 req/s	    5913 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8            	    3336	     74437 ns/op	  15.48 MB/s	     13434 req/s	    5921 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8            	    3199	     73252 ns/op	  15.73 MB/s	     13651 req/s	    5918 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8            	    3277	     90753 ns/op	  12.69 MB/s	     11019 req/s	    5938 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	    9188	     27647 ns/op	  41.67 MB/s	     36171 req/s	    9019 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	    8398	     28784 ns/op	  40.02 MB/s	     34742 req/s	    9013 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	    8154	     63097 ns/op	  18.26 MB/s	     15849 req/s	    9017 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	    8538	     29346 ns/op	  39.26 MB/s	     34076 req/s	    9011 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	    7947	     88909 ns/op	  12.96 MB/s	     11247 req/s	    9026 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	    8665	     30408 ns/op	  37.88 MB/s	     32886 req/s	    9016 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8          	    7440	     96438 ns/op	  11.95 MB/s	     10369 req/s	    5901 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8          	    8416	    116364 ns/op	   9.90 MB/s	      8594 req/s	    5899 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8          	    8193	    145061 ns/op	   7.94 MB/s	      6894 req/s	    5895 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8          	    7839	   2249998 ns/op	   0.51 MB/s	       444.4 req/s	    5905 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8          	    7168	    305084 ns/op	   3.78 MB/s	      3278 req/s	    5882 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8          	    8098	    145345 ns/op	   7.93 MB/s	      6880 req/s	    5885 B/op	      79 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	    3223	     71427 ns/op	     14000 req/s	    8767 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	    3404	     72263 ns/op	     13838 req/s	    8767 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	    3394	     90644 ns/op	     11032 req/s	    8767 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	    3392	     68045 ns/op	     14696 req/s	    8768 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	    3441	     72055 ns/op	     13878 req/s	    8766 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	    3451	     71030 ns/op	     14079 req/s	    8768 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8            	    3316	     93685 ns/op	     10674 req/s	    5625 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8            	    3300	     73414 ns/op	     13621 req/s	    5640 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8            	    3266	     73118 ns/op	     13677 req/s	    5623 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8            	    3261	     73916 ns/op	     13529 req/s	    5635 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8            	    3546	     92236 ns/op	     10842 req/s	    5628 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8            	    3340	     73270 ns/op	     13648 req/s	    5641 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	    8788	     28357 ns/op	     35265 req/s	    8772 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	    6374	    104166 ns/op	      9600 req/s	    8774 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	    9134	     28302 ns/op	     35333 req/s	    8772 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	    8804	     86930 ns/op	     11503 req/s	    8773 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	    9088	     27356 ns/op	     36555 req/s	    8772 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	    7950	     28235 ns/op	     35417 req/s	    8773 B/op	      65 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8          	    7921	     87936 ns/op	     11372 req/s	    5634 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8          	    8746	     28909 ns/op	     34591 req/s	    5651 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8          	    9151	     28957 ns/op	     34534 req/s	    5634 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8          	    8475	     87580 ns/op	     11418 req/s	    5651 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8          	    8311	     28827 ns/op	     34690 req/s	    5646 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8          	    8617	    111998 ns/op	      8929 req/s	    5650 B/op	      73 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	    3360	     70231 ns/op	     14239 req/s	    8511 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	    2961	    233689 ns/op	      4279 req/s	    8511 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	    3385	     70642 ns/op	     14156 req/s	    8512 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	    3379	    223363 ns/op	      4477 req/s	    8512 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	    3196	     73070 ns/op	     13686 req/s	    8510 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	    3376	    281508 ns/op	      3552 req/s	    8511 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8           	    2991	    646877 ns/op	      1546 req/s	    5552 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8           	    2720	   4676939 ns/op	       213.8 req/s	    5553 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8           	    3042	    644881 ns/op	      1551 req/s	    5556 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8           	    3196	    370344 ns/op	      2700 req/s	    5546 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8           	    3354	     75729 ns/op	     13205 req/s	    5548 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8           	    3279	    290386 ns/op	      3444 req/s	    5549 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	    7024	     29073 ns/op	     34396 req/s	    8520 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	    8764	    109900 ns/op	      9099 req/s	    8519 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	    8468	    112038 ns/op	      8926 req/s	    8520 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	    7983	     28773 ns/op	     34755 req/s	    8520 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	    9255	    106325 ns/op	      9405 req/s	    8519 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	    7461	    131176 ns/op	      7623 req/s	    8520 B/op	      60 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8         	    8145	     26558 ns/op	     37653 req/s	    5573 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8         	   10000	     89291 ns/op	     11199 req/s	    5566 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8         	    7881	     29693 ns/op	     33678 req/s	    5565 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8         	    8715	     28771 ns/op	     34758 req/s	    5576 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8         	    8024	     93563 ns/op	     10688 req/s	    5563 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8         	    8443	     28031 ns/op	     35675 req/s	    5570 B/op	      70 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8        	   35082	      6836 ns/op	  18.72 MB/s	    146288 req/s	    8856 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8        	   34746	      6973 ns/op	  18.36 MB/s	    143420 req/s	    8883 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8        	   32896	      6957 ns/op	  18.40 MB/s	    143747 req/s	    8872 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8        	   35403	      6873 ns/op	  18.62 MB/s	    145491 req/s	    8904 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8        	   35252	      7215 ns/op	  17.74 MB/s	    138603 req/s	    8898 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8        	   34936	      7215 ns/op	  17.74 MB/s	    138609 req/s	    8908 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8       	   21484	     11097 ns/op	  11.53 MB/s	     90114 req/s	    5884 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8       	   20125	     11216 ns/op	  11.41 MB/s	     89160 req/s	    5755 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8       	   21004	     11222 ns/op	  11.41 MB/s	     89114 req/s	    5608 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8       	   20858	     11241 ns/op	  11.39 MB/s	     88964 req/s	    5786 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8       	   20860	     11266 ns/op	  11.36 MB/s	     88765 req/s	    5608 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8       	   20776	     11531 ns/op	  11.10 MB/s	     86722 req/s	    5751 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8      	   96678	      2968 ns/op	  43.12 MB/s	    336885 req/s	    8841 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8      	   94384	      2758 ns/op	  46.41 MB/s	    362557 req/s	    8902 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8      	   99212	      2783 ns/op	  45.99 MB/s	    359277 req/s	    8904 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8      	   98793	      2764 ns/op	  46.31 MB/s	    361761 req/s	    8795 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8      	   98098	      2374 ns/op	  53.91 MB/s	    421187 req/s	    8912 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8      	   96752	      2430 ns/op	  52.67 MB/s	    411511 req/s	    8908 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8     	   74900	      2945 ns/op	  43.47 MB/s	    339609 req/s	    5757 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8     	   77577	      3061 ns/op	  41.82 MB/s	    326708 req/s	    5668 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8     	   76362	      2967 ns/op	  43.14 MB/s	    337067 req/s	    6123 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8     	   71798	      3018 ns/op	  42.42 MB/s	    331388 req/s	    5608 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8     	   80187	      3112 ns/op	  41.14 MB/s	    321367 req/s	    5608 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8     	   80946	      3018 ns/op	  42.41 MB/s	    331309 req/s	    5895 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8     	   34098	      6744 ns/op	  18.98 MB/s	    148277 req/s	    8474 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8     	   34363	      6805 ns/op	  18.81 MB/s	    146941 req/s	    8474 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8     	   36628	      6881 ns/op	  18.60 MB/s	    145320 req/s	    8474 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8     	   33724	      6745 ns/op	  18.98 MB/s	    148255 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8     	   36453	      6700 ns/op	  19.10 MB/s	    149249 req/s	    8474 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8     	   35338	      6503 ns/op	  19.68 MB/s	    153770 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8    	   22641	     10407 ns/op	  12.30 MB/s	     96087 req/s	    4803 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8    	   23523	     10688 ns/op	  11.98 MB/s	     93559 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8    	   22652	     10842 ns/op	  11.81 MB/s	     92238 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8    	   22687	     10812 ns/op	  11.84 MB/s	     92489 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8    	   21925	     10927 ns/op	  11.71 MB/s	     91516 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8    	   22258	     11140 ns/op	  11.49 MB/s	     89768 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8   	   87771	      2448 ns/op	  52.29 MB/s	    408522 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8   	   94516	      2548 ns/op	  50.24 MB/s	    392465 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8   	  102828	      2244 ns/op	  57.04 MB/s	    445612 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8   	   85964	      2395 ns/op	  53.44 MB/s	    417532 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8   	  100663	      2604 ns/op	  49.16 MB/s	    384083 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8   	  107067	      2473 ns/op	  51.76 MB/s	    404363 req/s	    8475 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8  	   78644	      2928 ns/op	  43.71 MB/s	    341509 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8  	   75420	      2947 ns/op	  43.43 MB/s	    339319 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8  	   81970	      2994 ns/op	  42.75 MB/s	    333974 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8  	   80472	      3087 ns/op	  41.47 MB/s	    323988 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8  	   81048	      2978 ns/op	  42.99 MB/s	    335841 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8  	   79282	      3074 ns/op	  41.64 MB/s	    325347 req/s	    4800 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8        	   19132	     12386 ns/op	5290.92 MB/s	     80733 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8        	   18535	     12307 ns/op	5324.94 MB/s	     81252 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8        	   18830	     12280 ns/op	5336.82 MB/s	     81433 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8        	   19608	     11892 ns/op	5511.01 MB/s	     84091 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8        	   19062	     12317 ns/op	5320.98 MB/s	     81192 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8        	   19387	     11871 ns/op	5520.70 MB/s	     84239 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8       	   13126	     17103 ns/op	3831.89 MB/s	     58470 req/s	    5611 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8       	   13472	     17827 ns/op	3676.13 MB/s	     56093 req/s	    5610 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8       	   13578	     18276 ns/op	3585.96 MB/s	     54717 req/s	    5611 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8       	   13734	     18257 ns/op	3589.54 MB/s	     54772 req/s	    5608 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8       	   13046	     18466 ns/op	3549.00 MB/s	     54153 req/s	    5611 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8       	   10000	     21153 ns/op	3098.23 MB/s	     47275 req/s	    5619 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8      	   76472	      3585 ns/op	18280.81 MB/s	    278943 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8      	   73244	      3571 ns/op	18353.62 MB/s	    280054 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8      	   74989	      3582 ns/op	18294.36 MB/s	    279150 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8      	   75091	      3071 ns/op	21337.32 MB/s	    325582 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8      	   72168	      3101 ns/op	21136.02 MB/s	    322510 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8      	   76600	      3090 ns/op	21206.92 MB/s	    323592 req/s	    8710 B/op	      52 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8     	   59236	      3985 ns/op	16444.28 MB/s	    250920 req/s	    5609 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8     	   58922	      3887 ns/op	16859.70 MB/s	    257259 req/s	    5609 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8     	   60901	      3852 ns/op	17014.05 MB/s	    259614 req/s	    5610 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8     	   60492	      3838 ns/op	17077.41 MB/s	    260581 req/s	    5609 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8     	   53553	      3976 ns/op	16481.03 MB/s	    251480 req/s	    5609 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8     	   60896	      3901 ns/op	16799.85 MB/s	    256345 req/s	    5609 B/op	      58 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8            	   34688	      7203 ns/op	 159.92 MB/s	    138822 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8            	   32386	      7303 ns/op	 157.75 MB/s	    136932 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8            	   32132	      7232 ns/op	 159.28 MB/s	    138265 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8            	   32860	      7286 ns/op	 158.11 MB/s	    137251 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8            	   31833	      7328 ns/op	 157.20 MB/s	    136456 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8            	   33589	      7073 ns/op	 162.88 MB/s	    141393 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8           	   21072	     11404 ns/op	 101.01 MB/s	     87687 req/s	    5733 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8           	   20984	     10849 ns/op	 106.19 MB/s	     92178 req/s	    5736 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8           	   21013	     11230 ns/op	 102.58 MB/s	     89046 req/s	    5733 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8           	   21736	     11431 ns/op	 100.78 MB/s	     87482 req/s	    5733 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8           	   21055	     11432 ns/op	 100.77 MB/s	     87471 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8           	   20070	     11444 ns/op	 100.67 MB/s	     87383 req/s	    5736 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8          	   99406	      2888 ns/op	 398.84 MB/s	    346219 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8          	   97888	      3060 ns/op	 376.43 MB/s	    326762 req/s	    8817 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8          	  104816	      2921 ns/op	 394.43 MB/s	    342388 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8          	   91528	      2344 ns/op	 491.52 MB/s	    426670 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8          	   90866	      2470 ns/op	 466.32 MB/s	    404792 req/s	    8816 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8          	   97942	      2531 ns/op	 455.17 MB/s	    395111 req/s	    8817 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8         	   74926	      3104 ns/op	 371.09 MB/s	    322123 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8         	   78518	      3027 ns/op	 380.61 MB/s	    330390 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8         	   75304	      3121 ns/op	 369.11 MB/s	    320404 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8         	   76905	      3102 ns/op	 371.43 MB/s	    322418 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8         	   78657	      3062 ns/op	 376.18 MB/s	    326548 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8         	   70285	      3063 ns/op	 376.06 MB/s	    326441 req/s	    5734 B/op	      62 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8            	   35445	      6354 ns/op	    157389 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8            	   34783	      6751 ns/op	    148128 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8            	   39327	      6660 ns/op	    150160 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8            	   41704	      6321 ns/op	    158207 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8            	   37238	      5979 ns/op	    167259 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8            	   36536	      6058 ns/op	    165062 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8           	   21811	     11364 ns/op	     87996 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8           	   21613	     11083 ns/op	     90229 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8           	   20684	     11114 ns/op	     89978 req/s	    5505 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8           	   21664	     11511 ns/op	     86875 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8           	   21399	     11114 ns/op	     89980 req/s	    5505 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8           	   21439	     11115 ns/op	     89971 req/s	    5505 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8          	  100574	      2893 ns/op	    345655 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8          	   97160	      2659 ns/op	    376128 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8          	   94642	      2675 ns/op	    373787 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8          	   93626	      2311 ns/op	    432727 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8          	   92733	      2347 ns/op	    426090 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8          	   94971	      2170 ns/op	    460903 req/s	    8600 B/op	      50 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8         	   76101	      3059 ns/op	    326940 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8         	   82054	      2991 ns/op	    334353 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8         	   81321	      2968 ns/op	    336970 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8         	   80012	      3018 ns/op	    331352 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8         	   80551	      3031 ns/op	    329880 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8         	   79911	      3010 ns/op	    332276 req/s	    5504 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8           	   38392	      6173 ns/op	    162004 req/s	    8346 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8           	   36138	      6221 ns/op	    160748 req/s	    8346 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8           	   38706	      6997 ns/op	    142928 req/s	    8346 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8           	   36860	      5867 ns/op	    170447 req/s	    8346 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8           	   38724	      5767 ns/op	    173402 req/s	    8346 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8           	   41418	      5768 ns/op	    173385 req/s	    8346 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8          	   21526	     10943 ns/op	     91386 req/s	    5429 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8          	   21591	     10675 ns/op	     93677 req/s	    5428 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8          	   22004	     10865 ns/op	     92037 req/s	    5428 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8          	   22027	     11127 ns/op	     89874 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8          	   21874	     11027 ns/op	     90689 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8          	   22246	     10861 ns/op	     92076 req/s	    5428 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8         	  105360	      2868 ns/op	    348638 req/s	    8347 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8         	  103074	      2669 ns/op	    374664 req/s	    8347 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8         	   93164	      2243 ns/op	    445733 req/s	    8347 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8         	   95334	      2320 ns/op	    431003 req/s	    8347 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8         	  107683	      2197 ns/op	    455075 req/s	    8347 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8         	  100864	      2290 ns/op	    436690 req/s	    8347 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8        	   79293	      3024 ns/op	    330659 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8        	   79492	      2967 ns/op	    337036 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8        	   81820	      2929 ns/op	    341412 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8        	   78841	      2950 ns/op	    339006 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8        	   79591	      2943 ns/op	    339742 req/s	    5427 B/op	      53 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8        	   79124	      2971 ns/op	    336569 req/s	    5427 B/op	      53 allocs/op
+PASS
+ok  	github.com/vroomy/turbo	230.322s

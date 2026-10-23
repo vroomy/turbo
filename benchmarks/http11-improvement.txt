@@ -1,0 +1,249 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+                                                     │ benchmarks/http11-before.txt │      benchmarks/http11-after.txt       │
+                                                     │            sec/op            │     sec/op       vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                        63.07µ ±    5%    61.98µ ±    2%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8                       67.31µ ±   15%    68.65µ ±   16%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                      28.08µ ±   15%    25.81µ ±   33%        ~ (p=0.132 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8                     28.50µ ±  199%    27.98µ ±  111%        ~ (p=0.240 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8                     74.76µ ±   23%    72.78µ ±  199%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8                    224.3µ ± 2799%    188.6µ ± 3355%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8                   29.30µ ±  305%    43.35µ ±  298%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8                  28.38µ ±  162%    28.16µ ±  520%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8                        79.71µ ±   34%    77.63µ ±   19%   -2.61% (p=0.041 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8                       82.69µ ±   24%    81.53µ ±    3%        ~ (p=0.132 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8                      441.9µ ± 1814%    143.3µ ± 1814%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8                    129.91µ ±   74%    34.43µ ±  306%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8                            70.95µ ±   31%    72.38µ ±   33%        ~ (p=0.394 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8                           73.84µ ±   24%    73.09µ ±   28%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8                          29.88µ ±  198%    49.11µ ±  143%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8                         145.2µ ± 1450%    155.0µ ± 1320%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                            71.74µ ±   26%    71.05µ ±  101%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8                           73.66µ ±   27%    73.33µ ±   31%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                          28.33µ ±  268%    28.04µ ±  240%        ~ (p=0.485 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8                         58.27µ ±   92%   105.61µ ±   73%        ~ (p=0.485 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8                           148.2µ ±   90%    147.5µ ± 4721%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8                          507.6µ ±  821%    322.9µ ± 1220%        ~ (p=0.394 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8                         108.1µ ±   73%    110.8µ ±   75%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8                        29.23µ ±  220%    65.23µ ±   65%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8                       6.965µ ±    4%    6.392µ ±    2%   -8.23% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8                      11.23µ ±    3%    11.32µ ±    0%        ~ (p=0.071 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8                     2.761µ ±   14%    2.207µ ±    4%  -20.08% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8                    3.018µ ±    3%    3.008µ ±    2%        ~ (p=0.788 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8                    6.745µ ±    4%    6.412µ ±    3%   -4.93% (p=0.004 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8                   10.83µ ±    4%    10.73µ ±    4%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8                  2.461µ ±    9%    2.352µ ±    5%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8                 2.986µ ±    3%    2.997µ ±    3%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8                       12.29µ ±    3%    11.85µ ±    4%   -3.57% (p=0.041 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8                      18.27µ ±   16%    17.73µ ±    3%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8                     3.336µ ±    8%    3.021µ ±    2%   -9.46% (p=0.004 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8                    3.894µ ±    2%    3.880µ ±    3%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8                           7.259µ ±    3%    6.806µ ±    2%   -6.24% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8                          11.42µ ±    5%    11.11µ ±    3%        ~ (p=0.093 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8                         2.710µ ±   13%    2.353µ ±    2%  -13.16% (p=0.026 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8                        3.083µ ±    2%    3.066µ ±    2%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8                           6.338µ ±    7%    5.776µ ±    9%   -8.87% (p=0.015 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8                          11.11µ ±    4%    11.16µ ±    3%        ~ (p=0.563 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8                         2.503µ ±   16%    2.180µ ±    5%  -12.90% (p=0.015 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8                        3.014µ ±    2%    3.015µ ±    1%        ~ (p=0.974 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8                          6.020µ ±   16%    5.566µ ±    5%   -7.55% (p=0.009 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8                         10.90µ ±    2%    10.72µ ±    6%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8                        2.305µ ±   24%    2.317µ ±   16%        ~ (p=0.485 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8                       2.959µ ±    2%    2.992µ ±    4%        ~ (p=0.065 n=6)
+geomean                                                              19.72µ            18.90µ           -4.12%
+
+                                                     │ benchmarks/http11-before.txt │      benchmarks/http11-after.txt       │
+                                                     │             B/s              │       B/s        vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                        1.936Mi ±   5%    1.969Mi ±   2%        ~ (p=0.286 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8                       1.817Mi ±  13%    1.779Mi ±  14%        ~ (p=0.515 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                      4.349Mi ±  13%    4.730Mi ±  25%        ~ (p=0.104 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8                     4.282Mi ±  67%    4.363Mi ±  53%        ~ (p=0.223 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8                     1.631Mi ±  18%    1.674Mi ±  66%        ~ (p=0.900 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8                    556.6Ki ± 207%   1010.7Ki ±  98%        ~ (p=0.859 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8                   4.163Mi ±  75%    3.195Mi ±  78%        ~ (p=0.610 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8                  4.301Mi ±  62%    4.339Mi ±  84%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8                        784.1Mi ±  25%    805.1Mi ±  16%   +2.68% (p=0.041 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8                       755.9Mi ±  19%    766.6Mi ±   3%        ~ (p=0.132 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8                      259.7Mi ± 578%    436.2Mi ± 299%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8                     485.0Mi ± 282%   1815.4Mi ±  75%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8                            15.48Mi ±  24%    15.18Mi ±  25%        ~ (p=0.394 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8                           14.88Mi ±  19%    15.03Mi ±  22%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8                          36.78Mi ±  66%    26.75Mi ±  66%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8                         7.567Mi ±  94%    7.143Mi ±  93%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8                       17.53Mi ±   3%    19.10Mi ±   2%   +8.95% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8                      10.87Mi ±   3%    10.78Mi ±   0%        ~ (p=0.069 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8                     44.21Mi ±  16%    55.33Mi ±   3%  +25.14% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8                    40.45Mi ±   3%    40.58Mi ±   2%        ~ (p=0.818 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8                    18.10Mi ±   4%    19.04Mi ±   3%   +5.19% (p=0.004 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8                   11.28Mi ±   4%    11.38Mi ±   4%        ~ (p=0.738 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8                  49.61Mi ±  10%    51.94Mi ±   6%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8                 40.88Mi ±   3%    40.74Mi ±   3%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8                       4.965Gi ±   4%    5.149Gi ±   4%   +3.70% (p=0.041 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8                      3.341Gi ±  14%    3.442Gi ±   3%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8                     18.39Gi ±   8%    20.21Gi ±   2%   +9.91% (p=0.004 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8                    15.67Gi ±   2%    15.73Gi ±   3%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8                           151.3Mi ±   3%    161.4Mi ±   2%   +6.66% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8                          96.22Mi ±   5%    98.89Mi ±   3%        ~ (p=0.093 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8                         407.2Mi ±  15%    466.9Mi ±   2%  +14.66% (p=0.026 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8                        356.4Mi ±   2%    358.3Mi ±   2%        ~ (p=0.699 n=6)
+geomean                                                              51.93Mi           56.61Mi          +9.02%
+
+                                                     │ benchmarks/http11-before.txt │      benchmarks/http11-after.txt      │
+                                                     │            req/s             │     req/s       vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                         15.86k ±   5%    16.14k ±   2%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8                        14.86k ±  13%    14.57k ±  14%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                       35.61k ±  13%    38.74k ±  25%        ~ (p=0.132 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8                      35.09k ±  67%    35.73k ±  53%        ~ (p=0.240 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8                      13.38k ±  19%    13.74k ±  67%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8                     4.463k ± 207%    8.085k ±  98%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8                    34.13k ±  75%    26.15k ±  78%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8                   35.23k ±  62%    35.55k ±  84%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8                         12.55k ±  25%    12.88k ±  16%   +2.68% (p=0.041 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8                        12.09k ±  19%    12.27k ±   3%        ~ (p=0.132 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8                       4.154k ± 578%    6.979k ± 299%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8                      7.761k ± 282%   29.047k ±  75%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8                             14.09k ±  24%    13.82k ±  25%        ~ (p=0.394 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8                            13.54k ±  19%    13.68k ±  22%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8                           33.48k ±  66%    24.35k ±  66%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8                          6.887k ±  94%    6.500k ±  93%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                             13.94k ±  21%    14.07k ±  50%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8                            13.57k ±  21%    13.64k ±  23%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                           35.30k ±  73%    35.66k ±  71%        ~ (p=0.485 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8                         22.976k ±  61%    9.523k ± 268%        ~ (p=0.485 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8                            9.082k ±  61%    9.200k ±  98%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8                           2.126k ± 521%    3.101k ± 342%        ~ (p=0.394 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8                          9.252k ± 276%    9.034k ± 302%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8                         34.22k ±  69%    22.28k ±  58%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8                        143.6k ±   3%    156.4k ±   2%   +8.95% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8                       89.04k ±   3%    88.33k ±   0%        ~ (p=0.065 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8                      362.2k ±  16%    453.2k ±   3%  +25.15% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8                     331.3k ±   3%    332.4k ±   2%        ~ (p=0.818 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8                     148.3k ±   4%    156.0k ±   3%   +5.19% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8                    92.36k ±   4%    93.22k ±   4%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8                   406.4k ±  10%    425.5k ±   6%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8                  334.9k ±   3%    333.7k ±   3%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8                        81.34k ±   4%    84.36k ±   4%   +3.70% (p=0.041 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8                       54.74k ±  14%    56.40k ±   3%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8                      301.3k ±   8%    331.1k ±   2%   +9.91% (p=0.004 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8                     256.8k ±   2%    257.7k ±   3%        ~ (p=0.937 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8                            137.8k ±   3%    146.9k ±   2%   +6.66% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8                           87.58k ±   5%    90.01k ±   3%        ~ (p=0.093 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8                          370.7k ±  15%    425.0k ±   2%  +14.66% (p=0.026 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8                         324.4k ±   2%    326.2k ±   2%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8                            157.8k ±   6%    173.2k ±   8%   +9.73% (p=0.015 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8                           89.97k ±   3%    89.58k ±   3%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8                          401.1k ±  15%    458.7k ±   6%  +14.36% (p=0.015 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8                         331.8k ±   2%    331.8k ±   1%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8                           166.2k ±  14%    179.8k ±   5%   +8.16% (p=0.009 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8                          91.71k ±   2%    93.26k ±   6%        ~ (p=0.310 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8                         433.8k ±  20%    433.0k ±  14%        ~ (p=0.485 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8                        338.0k ±   2%    334.3k ±   4%        ~ (p=0.065 n=6)
+geomean                                                               52.11k           54.49k          +4.58%
+
+                                                     │ benchmarks/http11-before.txt │      benchmarks/http11-after.txt      │
+                                                     │             B/op             │     B/op      vs base                 │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                         8.720Ki ±  0%   4.602Ki ± 0%  -47.22% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8                        5.657Ki ±  1%   5.646Ki ± 1%        ~ (p=0.065 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                       8.696Ki ±  0%   4.606Ki ± 0%  -47.04% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8                      5.620Ki ±  0%   5.631Ki ± 0%        ~ (p=0.457 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8                      8.504Ki ±  0%   4.382Ki ± 0%  -48.47% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8                     4.839Ki ±  1%   4.836Ki ± 1%        ~ (p=0.584 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8                    8.497Ki ±  0%   4.395Ki ± 0%  -48.27% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8                   4.819Ki ±  0%   4.822Ki ± 0%        ~ (p=0.457 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8                         8.733Ki ±  0%   4.615Ki ± 1%  -47.15% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8                        5.662Ki ±  1%   5.657Ki ± 1%        ~ (p=0.288 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8                       8.737Ki ± 14%   4.632Ki ± 0%  -46.98% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8                      5.673Ki ±  0%   5.668Ki ± 0%        ~ (p=0.699 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8                             8.835Ki ±  0%   4.718Ki ± 1%  -46.60% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8                            5.779Ki ±  0%   5.776Ki ± 1%        ~ (p=0.784 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8                           8.805Ki ±  0%   4.722Ki ± 0%  -46.38% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8                          5.759Ki ±  0%   5.758Ki ± 0%        ~ (p=0.729 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                             8.562Ki ±  0%   4.470Ki ± 0%  -47.79% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8                            5.500Ki ±  0%   5.493Ki ± 0%        ~ (p=0.180 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                           8.567Ki ±  0%   4.489Ki ± 0%  -47.60% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8                          5.516Ki ±  0%   5.523Ki ± 0%   +0.14% (p=0.032 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8                            8.312Ki ±  0%   4.224Ki ± 3%  -49.18% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8                           5.420Ki ±  0%   5.425Ki ± 0%        ~ (p=0.589 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8                          8.320Ki ±  0%   4.240Ki ± 0%  -49.04% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8                         5.438Ki ±  0%   5.447Ki ± 0%        ~ (p=0.100 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8                        8.682Ki ±  0%   4.569Ki ± 0%  -47.37% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8                       5.618Ki ±  3%   5.541Ki ± 6%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8                      8.694Ki ±  1%   4.572Ki ± 1%  -47.42% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8                     5.579Ki ±  7%   5.651Ki ± 2%        ~ (p=0.455 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8                     8.275Ki ±  0%   4.183Ki ± 0%  -49.46% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8                    4.688Ki ±  0%   4.689Ki ± 0%        ~ (p=0.067 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8                   8.276Ki ±  0%   4.183Ki ± 0%  -49.46% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8                  4.688Ki ±  0%   4.688Ki ± 0%        ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8                        8.506Ki ±  0%   4.412Ki ± 0%  -48.13% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8                       5.479Ki ±  0%   5.480Ki ± 0%        ~ (p=0.284 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8                      8.506Ki ±  0%   4.412Ki ± 0%  -48.13% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8                     5.478Ki ±  0%   5.478Ki ± 0%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8                            8.609Ki ±  0%   4.516Ki ± 0%  -47.55% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8                           5.599Ki ±  0%   5.600Ki ± 0%        ~ (p=0.348 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8                          8.609Ki ±  0%   4.516Ki ± 0%  -47.55% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8                         5.600Ki ±  0%   5.600Ki ± 0%        ~ (p=1.000 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8                            8.398Ki ±  0%   4.305Ki ± 0%  -48.74% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8                           5.375Ki ±  0%   5.376Ki ± 0%        ~ (p=0.364 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8                          8.398Ki ±  0%   4.305Ki ± 0%  -48.74% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8                         5.375Ki ±  0%   5.375Ki ± 0%        ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8                           8.150Ki ±  0%   4.057Ki ± 4%  -50.22% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8                          5.301Ki ±  0%   5.300Ki ± 0%        ~ (p=0.145 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8                         8.151Ki ±  0%   4.058Ki ± 0%  -50.22% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8                        5.300Ki ±  0%   5.300Ki ± 0%        ~ (p=1.000 n=6) ¹
+geomean                                                               6.781Ki         4.884Ki       -27.97%
+¹ all samples are equal
+
+                                                     │ benchmarks/http11-before.txt │    benchmarks/http11-after.txt     │
+                                                     │          allocs/op           │ allocs/op   vs base                │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                            67.00 ± 0%   65.00 ± 0%  -2.99% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8                           75.00 ± 0%   75.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                          67.00 ± 0%   65.00 ± 0%  -2.99% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Stdlib-8                         75.00 ± 0%   75.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8                         61.00 ± 0%   59.00 ± 0%  -3.28% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Stdlib-8                        69.00 ± 0%   69.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8                       61.00 ± 0%   59.00 ± 0%  -3.28% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Stdlib-8                      69.00 ± 0%   69.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8                            67.00 ± 0%   65.00 ± 0%  -2.99% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Serial/Stdlib-8                           75.00 ± 0%   75.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8                          67.00 ± 1%   65.00 ± 0%  -2.99% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/LargeGET/Parallel/Stdlib-8                         75.00 ± 0%   75.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8                                70.00 ± 0%   68.00 ± 0%  -2.86% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/POST/Serial/Stdlib-8                               79.00 ± 0%   79.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8                              70.00 ± 0%   68.00 ± 0%  -2.86% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/POST/Parallel/Stdlib-8                             79.00 ± 0%   79.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                65.00 ± 0%   63.00 ± 0%  -3.08% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Stdlib-8                               73.00 ± 0%   73.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                              65.00 ± 0%   63.00 ± 0%  -3.08% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Stdlib-8                             73.00 ± 0%   73.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8                               60.00 ± 0%   58.00 ± 0%  -3.33% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Serial/Stdlib-8                              70.00 ± 0%   70.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8                             60.00 ± 0%   58.00 ± 0%  -3.33% (p=0.002 n=6)
+HTTP11NoKeepAlive/TCP/Empty/Parallel/Stdlib-8                            70.00 ± 0%   70.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8                           52.00 ± 0%   50.00 ± 0%  -3.85% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Serial/Stdlib-8                          58.00 ± 0%   58.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8                         52.00 ± 0%   50.00 ± 0%  -3.85% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Stdlib-8                        58.00 ± 0%   58.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Turbo-8                        46.00 ± 0%   44.00 ± 0%  -4.35% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Serial/Stdlib-8                       52.00 ± 0%   52.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Turbo-8                      46.00 ± 0%   44.00 ± 0%  -4.35% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/ImplicitGET/Parallel/Stdlib-8                     52.00 ± 0%   52.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Turbo-8                           52.00 ± 0%   50.00 ± 0%  -3.85% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Serial/Stdlib-8                          58.00 ± 0%   58.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Turbo-8                         52.00 ± 0%   50.00 ± 0%  -3.85% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/LargeGET/Parallel/Stdlib-8                        58.00 ± 0%   58.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/POST/Serial/Turbo-8                               55.00 ± 0%   53.00 ± 0%  -3.64% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Serial/Stdlib-8                              62.00 ± 0%   62.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Turbo-8                             55.00 ± 0%   53.00 ± 0%  -3.64% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/POST/Parallel/Stdlib-8                            62.00 ± 0%   62.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8                               50.00 ± 0%   48.00 ± 0%  -4.00% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Serial/Stdlib-8                              56.00 ± 0%   56.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8                             50.00 ± 0%   48.00 ± 0%  -4.00% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/HEAD/Parallel/Stdlib-8                            56.00 ± 0%   56.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Turbo-8                              45.00 ± 0%   43.00 ± 0%  -4.44% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Serial/Stdlib-8                             53.00 ± 0%   53.00 ± 0%       ~ (p=1.000 n=6) ¹
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Turbo-8                            45.00 ± 0%   43.00 ± 0%  -4.44% (p=0.002 n=6)
+HTTP11NoKeepAlive/Pipe/Empty/Parallel/Stdlib-8                           53.00 ± 0%   53.00 ± 0%       ~ (p=1.000 n=6) ¹
+geomean                                                                  60.51        59.42       -1.79%
+¹ all samples are equal
