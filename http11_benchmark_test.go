@@ -87,6 +87,39 @@ func BenchmarkHTTP11NoKeepAlive(b *testing.B) {
 	}
 }
 
+// Isolate request parsing and response writing from clients and connections.
+func BenchmarkTurboProcess(b *testing.B) {
+	for _, workload := range http11Workloads() {
+		b.Run(workload.name, func(b *testing.B) {
+			request := workload.request()
+			conn := &http11ProcessConn{}
+			server := Turbo{h: workload.handler()}
+			b.ReportAllocs()
+			b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				conn.request.Reset(request)
+				if err := server.process(conn); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+type http11ProcessConn struct {
+	request bytes.Reader
+}
+
+func (c *http11ProcessConn) Read(p []byte) (int, error)     { return c.request.Read(p) }
+func (*http11ProcessConn) Write(p []byte) (int, error)      { return len(p), nil }
+func (*http11ProcessConn) Close() error                     { return nil }
+func (*http11ProcessConn) LocalAddr() net.Addr              { return nil }
+func (*http11ProcessConn) RemoteAddr() net.Addr             { return nil }
+func (*http11ProcessConn) SetDeadline(time.Time) error      { return nil }
+func (*http11ProcessConn) SetReadDeadline(time.Time) error  { return nil }
+func (*http11ProcessConn) SetWriteDeadline(time.Time) error { return nil }
+
 func benchmarkHTTP11(b *testing.B, transport, implementation string, workload http11Workload, parallel bool) {
 	b.StopTimer()
 	dial := startHTTP11BenchmarkServer(b, transport, implementation, workload.handler())
@@ -137,6 +170,44 @@ func TestHTTP11BenchmarkContract(t *testing.T) {
 				})
 			}
 		}
+	}
+}
+
+func TestTurboConcurrentResponses(t *testing.T) {
+	dial := startHTTP11BenchmarkServer(t, "Pipe", "Turbo", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("X-Request", req.URL.Path)
+		w.Header().Set("Content-Length", strconv.Itoa(len(req.URL.Path)))
+		_, _ = io.WriteString(w, req.URL.Path)
+	})
+	for client := range 16 {
+		t.Run(strconv.Itoa(client), func(t *testing.T) {
+			t.Parallel()
+			for request := range 16 {
+				func() {
+					path := fmt.Sprintf("/%d/%d", client, request)
+					conn, err := dial()
+					if err != nil {
+						t.Fatal(err)
+					}
+					defer conn.Close()
+					if err := conn.SetDeadline(time.Now().Add(5 * time.Second)); err != nil {
+						t.Fatal(err)
+					}
+					if _, err := io.WriteString(conn, "GET "+path+" HTTP/1.1\r\nHost: test.local\r\nConnection: close\r\n\r\n"); err != nil {
+						t.Fatal(err)
+					}
+					in := bufio.NewReader(conn)
+					res := readResponse(t, in, http.MethodGet)
+					if res.StatusCode != http.StatusOK || res.Header.Get("X-Request") != path {
+						t.Fatalf("response for %s = %s, X-Request %q", path, res.Status, res.Header.Get("X-Request"))
+					}
+					assertResponseBody(t, res, path)
+					if _, err := in.ReadByte(); err != io.EOF {
+						t.Fatalf("expected connection EOF, got %v", err)
+					}
+				}()
+			}
+		})
 	}
 }
 

@@ -8,16 +8,117 @@ import (
 	"net"
 	"net/http"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
 
 func TestResponseWriterHeader(t *testing.T) {
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	h := r.Header()
 	h.Set("X-Test", "value")
 	if got := r.Header().Get("X-Test"); got != "value" {
 		t.Fatalf("Header did not preserve changes: %q", got)
+	}
+}
+
+func TestResponseWriterDefaultHeaderValues(t *testing.T) {
+	for _, key := range []string{"Connection", "Date"} {
+		t.Run(key, func(t *testing.T) {
+			r := makeResponseWriter()
+			t.Cleanup(r.release)
+			before := r.Header().Clone()
+			r.Header().Add(key, "extra")
+			for other, values := range before {
+				if other != key && !reflect.DeepEqual(r.Header()[other], values) {
+					t.Errorf("appending %s changed %s: %q", key, other, r.Header()[other])
+				}
+			}
+		})
+	}
+}
+
+func TestResponseWriterHeaderOwnership(t *testing.T) {
+	var retained http.Header
+	func() {
+		r := makeResponseWriter()
+		defer r.release()
+		r.c = new(responseConn)
+		retained = r.Header()
+		retained.Set("X-Request", "first")
+		if _, err := r.Write([]byte("first")); err != nil {
+			t.Fatal(err)
+		}
+	}()
+	r := makeResponseWriter()
+	t.Cleanup(r.release)
+	retained.Set("X-Request", "changed")
+	retained["Connection"][0] = "keep-alive"
+	retained["Date"][0] = "changed"
+	if r.Header().Get("X-Request") != "" || r.Header().Get("Connection") != "close" {
+		t.Fatalf("headers shared across responses: %v", r.Header())
+	}
+	if _, err := http.ParseTime(r.Header().Get("Date")); err != nil {
+		t.Fatalf("Date shared across responses: %v", err)
+	}
+}
+
+func TestResponseWriterStatusLine(t *testing.T) {
+	tests := []struct {
+		code int
+		want string
+	}{
+		{http.StatusOK, "200 OK"},
+		{http.StatusInternalServerError, "500 Internal Server Error"},
+		{299, "299 status code 299"},
+		{999, "999 status code 999"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			c := new(responseConn)
+			r := makeResponseWriter()
+			t.Cleanup(r.release)
+			r.c = c
+			r.WriteHeader(tt.code)
+			if _, err := r.writeHeader(); err != nil {
+				t.Fatal(err)
+			}
+			res := readResponse(t, &c.data, http.MethodHead)
+			res.Body.Close()
+			if res.Status != tt.want || res.Proto != "HTTP/1.1" {
+				t.Fatalf("status line = %s %s, want HTTP/1.1 %s", res.Proto, res.Status, tt.want)
+			}
+		})
+	}
+}
+
+func TestResponseWriterHeaderSerialization(t *testing.T) {
+	for _, size := range []int{128, 32 << 10} {
+		t.Run(strconv.Itoa(size), func(t *testing.T) {
+			c := new(responseConn)
+			r := makeResponseWriter()
+			t.Cleanup(r.release)
+			r.c = c
+			value := strings.Repeat("x", size)
+			r.Header().Set("X-Large", value)
+			r.Header().Set("X-Newline", "before\r\nafter")
+			r.Header()["Invalid Header"] = []string{"ignored"}
+			r.WriteHeader(http.StatusOK)
+			r.Header().Set("X-Large", "changed after commit")
+			if _, err := r.Write([]byte("body")); err != nil {
+				t.Fatal(err)
+			}
+			res := readResponse(t, &c.data, http.MethodGet)
+			if got := res.Header.Get("X-Large"); got != value {
+				t.Errorf("X-Large = %d bytes, want %d committed bytes", len(got), size)
+			}
+			if got := res.Header.Get("X-Newline"); got != "before  after" {
+				t.Errorf("X-Newline = %q", got)
+			}
+			assertResponseBody(t, res, "body")
+		})
 	}
 }
 
@@ -44,6 +145,7 @@ func BenchmarkResponseWriter(b *testing.B) {
 				if _, err := r.Write(body); err != nil {
 					b.Fatal(err)
 				}
+				r.release()
 			}
 		})
 	}
@@ -52,6 +154,7 @@ func BenchmarkResponseWriter(b *testing.B) {
 func TestResponseWriterWrite(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.Header().Add("Set-Cookie", "a=1")
 	r.Header().Add("Set-Cookie", "b=2")
@@ -82,6 +185,7 @@ func TestResponseWriterWrite(t *testing.T) {
 func TestResponseWriterWriteHeader(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.Header().Set("X-Test", "before")
 	r.Header().Set("Content-Type", "application/custom")
@@ -104,6 +208,7 @@ func TestResponseWriterWriteHeader(t *testing.T) {
 func TestResponseWriterDetectContentTypeAfterWriteHeader(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.WriteHeader(http.StatusCreated)
 	r.Header().Set("Content-Type", "ignored/after-commit")
@@ -119,6 +224,7 @@ func TestResponseWriterDetectContentTypeAfterWriteHeader(t *testing.T) {
 func TestResponseWriterInformationalHeaders(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.Header().Set("Link", "</style.css>; rel=preload")
 	r.Header().Set("Content-Length", "4")
@@ -160,6 +266,7 @@ func TestResponseWriterBodyNotAllowed(t *testing.T) {
 		t.Run(http.StatusText(code), func(t *testing.T) {
 			c := new(responseConn)
 			r := makeResponseWriter()
+			t.Cleanup(r.release)
 			r.c = c
 			r.WriteHeader(code)
 			if n, err := r.Write([]byte("body")); n != 0 || !errors.Is(err, http.ErrBodyNotAllowed) {
@@ -177,6 +284,7 @@ func TestResponseWriterBodyNotAllowed(t *testing.T) {
 func TestResponseWriterContentLength(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.Header().Set("Content-Length", "4")
 	if n, err := r.Write([]byte("bo")); n != 2 || err != nil {
@@ -200,6 +308,7 @@ func TestResponseWriterInvalidContentLength(t *testing.T) {
 	for _, values := range [][]string{{"invalid"}, {"-1"}, {"1", "2"}} {
 		c := new(responseConn)
 		r := makeResponseWriter()
+		t.Cleanup(r.release)
 		r.c = c
 		r.Header()["Content-Length"] = values
 		if n, err := r.Write([]byte("body")); n != 0 || err == nil {
@@ -214,6 +323,7 @@ func TestResponseWriterInvalidContentLength(t *testing.T) {
 func TestResponseWriterCanonicalContentLength(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.Header().Set("Content-Length", "+4")
 	if _, err := r.Write([]byte("body")); err != nil {
@@ -230,6 +340,7 @@ func TestResponseWriterInvalidStatus(t *testing.T) {
 	for _, code := range []int{0, 99, 1000} {
 		c := new(responseConn)
 		r := makeResponseWriter()
+		t.Cleanup(r.release)
 		r.c = c
 		r.WriteHeader(code)
 		if n, err := r.Write([]byte("body")); n != 4 || err != nil {
@@ -246,6 +357,7 @@ func TestResponseWriterInvalidStatus(t *testing.T) {
 func TestResponseWriterEmptyWrite(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	if n, err := r.Write(nil); n != 0 || err != nil {
 		t.Fatalf("Write(nil) = (%d, %v)", n, err)
@@ -263,6 +375,7 @@ func TestResponseWriterEmptyWrite(t *testing.T) {
 func TestResponseWriterSuppressAutomaticHeaders(t *testing.T) {
 	c := new(responseConn)
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.Header()["Content-Type"] = nil
 	r.Header()["Date"] = nil
@@ -293,6 +406,7 @@ func TestResponseWriterConnectionErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &responseConn{failAt: tt.failAt, n: tt.n, err: tt.err}
 			r := makeResponseWriter()
+			t.Cleanup(r.release)
 			r.c = c
 			if n, err := r.Write([]byte("body")); n != tt.wantN || !errors.Is(err, tt.wantErr) {
 				t.Fatalf("Write = (%d, %v), want (%d, %v)", n, err, tt.wantN, tt.wantErr)
@@ -308,6 +422,7 @@ func TestResponseWriterConnectionErrors(t *testing.T) {
 	}
 	c := &responseConn{failAt: 1, err: sentinel}
 	r := makeResponseWriter()
+	t.Cleanup(r.release)
 	r.c = c
 	r.WriteHeader(http.StatusCreated)
 	if n, err := r.Write([]byte("body")); n != 0 || !errors.Is(err, sentinel) {

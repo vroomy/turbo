@@ -1,17 +1,24 @@
 package turbo
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
-	"strings"
+	"sync"
 	"time"
 )
 
 var _ http.ResponseWriter = &responseWriter{}
+
+const maxPooledHeaderCapacity = 16 << 10
+
+var responseWriters = sync.Pool{
+	New: func() any { return &responseWriter{headerBuffer: new(bytes.Buffer)} },
+}
 
 var responseHeaderExclusions = map[string]bool{
 	"Connection":        true,
@@ -36,10 +43,13 @@ var bodylessHeaderExclusions = map[string]bool{
 	"Trailer":           true,
 }
 
-func makeResponseWriter() (w responseWriter) {
+func makeResponseWriter() (w *responseWriter) {
+	w = responseWriters.Get().(*responseWriter)
+	values := []string{"close", time.Now().UTC().Format(http.TimeFormat)}
+	// Cap each slice so appending cannot overwrite the other header's value.
 	w.headers = http.Header{
-		"Connection": {"close"},
-		"Date":       {time.Now().UTC().Format(http.TimeFormat)},
+		"Connection": values[:1:1],
+		"Date":       values[1:2:2],
 	}
 	w.contentLength = -1
 	return w
@@ -49,7 +59,7 @@ type responseWriter struct {
 	headers http.Header
 	c       net.Conn
 
-	headerBuffer strings.Builder
+	headerBuffer *bytes.Buffer
 
 	sentHeader       bool
 	sniffContentType bool
@@ -61,6 +71,18 @@ type responseWriter struct {
 
 	head bool
 	err  error
+}
+
+func (r *responseWriter) release() {
+	buffer := r.headerBuffer
+	if buffer.Cap() > maxPooledHeaderCapacity {
+		return
+	}
+	buffer.Reset()
+	// Handler-visible maps remain owned by the response. Clear all references and
+	// request state before reusing the writer after the handler returns.
+	*r = responseWriter{headerBuffer: buffer}
+	responseWriters.Put(r)
 }
 
 func (r *responseWriter) Header() http.Header {
@@ -125,7 +147,7 @@ func (r *responseWriter) prepareHeader() (err error) {
 	}
 
 	r.appendStatusLine()
-	if err = r.headers.WriteSubset(&r.headerBuffer, r.headerExclusions()); err != nil {
+	if err = r.headers.WriteSubset(r.headerBuffer, r.headerExclusions()); err != nil {
 		return err
 	}
 	if !r.isInformational() {
@@ -179,11 +201,22 @@ func (r *responseWriter) shouldSniffContentType() bool {
 }
 
 func (r *responseWriter) appendStatusLine() {
+	r.headerBuffer.WriteString("HTTP/1.1 ")
+	r.appendInt(int64(r.statusCode))
+	r.headerBuffer.WriteByte(' ')
 	text := http.StatusText(r.statusCode)
 	if text == "" {
-		text = "status code " + strconv.Itoa(r.statusCode)
+		r.headerBuffer.WriteString("status code ")
+		r.appendInt(int64(r.statusCode))
+	} else {
+		r.headerBuffer.WriteString(text)
 	}
-	fmt.Fprintf(&r.headerBuffer, "HTTP/1.1 %d %s\r\n", r.statusCode, text)
+	r.headerBuffer.WriteString("\r\n")
+}
+
+func (r *responseWriter) appendInt(value int64) {
+	var digits [20]byte
+	r.headerBuffer.Write(strconv.AppendInt(digits[:0], value, 10))
 }
 
 func (r *responseWriter) appendFramingHeaders() {
@@ -193,7 +226,7 @@ func (r *responseWriter) appendFramingHeaders() {
 		return
 	}
 	r.headerBuffer.WriteString("Content-Length: ")
-	r.headerBuffer.WriteString(strconv.FormatInt(r.contentLength, 10))
+	r.appendInt(r.contentLength)
 	r.headerBuffer.WriteString("\r\n")
 }
 
@@ -239,7 +272,7 @@ func (r *responseWriter) writeHeader() (n int, err error) {
 		return 0, r.err
 	}
 
-	n, err = io.WriteString(r.c, r.headerBuffer.String())
+	n, err = r.c.Write(r.headerBuffer.Bytes())
 	return r.recordWriteResult(n, r.headerBuffer.Len(), err)
 }
 

@@ -115,9 +115,10 @@ func (t *Turbo) process(c net.Conn) (err error) {
 	body = req.Body
 
 	res := makeResponseWriter()
+	defer res.release()
 	res.c = c
 	res.head = req.Method == http.MethodHead
-	t.h(&res, req)
+	t.h(res, req)
 
 	if _, err = res.writeHeader(); err != nil {
 		return err
