@@ -12,6 +12,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/vroomy/turbo/request"
 )
 
 func TestNew(t *testing.T) {
@@ -99,6 +101,7 @@ func TestTurboProcess(t *testing.T) {
 		}},
 	}
 	writer := makeResponseWriter()
+	var parser request.Parser
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, server := net.Pipe()
@@ -127,7 +130,7 @@ func TestTurboProcess(t *testing.T) {
 				tt.handler(w, req)
 			}}
 			done := make(chan error, 1)
-			go func() { done <- turbo.process(server, &writer) }()
+			go func() { done <- turbo.process(server, &writer, &parser) }()
 			protocol := tt.protocol
 			if protocol == "" {
 				protocol = "HTTP/1.1"
@@ -156,7 +159,7 @@ func TestTurboProcess(t *testing.T) {
 }
 
 func TestTurboProcessErrors(t *testing.T) {
-	const request = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n"
+	const wire = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n"
 	readFailure := errors.New("read failed")
 	writeFailure := errors.New("write failed")
 	closeFailure := errors.New("close failed")
@@ -170,15 +173,16 @@ func TestTurboProcessErrors(t *testing.T) {
 		{name: "empty request", wantErr: io.EOF},
 		{name: "truncated headers", request: "GET / HTTP/1.1\r\nHost: example.com\r\n", wantErr: io.ErrUnexpectedEOF},
 		{name: "malformed request", request: "not an HTTP request\r\n\r\n", wantMessage: "error reading request"},
-		{name: "read failure", request: request, readErr: readFailure, wantErr: readFailure},
-		{name: "header write failure", request: request, failWrite: 1, writeErr: writeFailure, wantErr: writeFailure, wantHandler: true},
-		{name: "body write failure", request: request, failWrite: 2, writeErr: writeFailure, wantErr: writeFailure, wantHandler: true},
-		{name: "short header write", request: request, failWrite: 1, wantErr: io.ErrShortWrite, wantHandler: true},
-		{name: "close failure", request: request, closeErr: closeFailure, wantErr: closeFailure, wantHandler: true},
-		{name: "read error survives close failure", request: request, readErr: readFailure, closeErr: closeFailure, wantErr: readFailure},
-		{name: "write error survives close failure", request: request, failWrite: 2, writeErr: writeFailure, closeErr: closeFailure, wantErr: writeFailure, wantHandler: true},
+		{name: "read failure", request: wire, readErr: readFailure, wantErr: readFailure},
+		{name: "header write failure", request: wire, failWrite: 1, writeErr: writeFailure, wantErr: writeFailure, wantHandler: true},
+		{name: "body write failure", request: wire, failWrite: 2, writeErr: writeFailure, wantErr: writeFailure, wantHandler: true},
+		{name: "short header write", request: wire, failWrite: 1, wantErr: io.ErrShortWrite, wantHandler: true},
+		{name: "close failure", request: wire, closeErr: closeFailure, wantErr: closeFailure, wantHandler: true},
+		{name: "read error survives close failure", request: wire, readErr: readFailure, closeErr: closeFailure, wantErr: readFailure},
+		{name: "write error survives close failure", request: wire, failWrite: 2, writeErr: writeFailure, closeErr: closeFailure, wantErr: writeFailure, wantHandler: true},
 	}
 	writer := makeResponseWriter()
+	var parser request.Parser
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			conn := newTurboTestConn(tt.request)
@@ -191,7 +195,7 @@ func TestTurboProcessErrors(t *testing.T) {
 				called = true
 				_, _ = w.Write([]byte("response"))
 			}}
-			err := server.process(conn, &writer)
+			err := server.process(conn, &writer, &parser)
 			if tt.wantErr != nil && !errors.Is(err, tt.wantErr) {
 				t.Errorf("process error = %v, want %v", err, tt.wantErr)
 			}
@@ -221,6 +225,7 @@ func TestTurboRequestBodyLifecycle(t *testing.T) {
 		{name: "client never sends declared body"},
 	}
 	writer := makeResponseWriter()
+	var parser request.Parser
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, conn := net.Pipe()
@@ -248,7 +253,7 @@ func TestTurboRequestBodyLifecycle(t *testing.T) {
 				}
 			}}
 			done := make(chan error, 1)
-			go func() { done <- server.process(conn, &writer) }()
+			go func() { done <- server.process(conn, &writer, &parser) }()
 			request := "POST / HTTP/1.1\r\nHost: example.com\r\nContent-Length: 4\r\n\r\n" + tt.body
 			if _, err := io.WriteString(client, request); err != nil {
 				t.Fatal(err)
@@ -299,6 +304,7 @@ func TestTurboWorkers(t *testing.T) {
 			})
 			started := make(chan struct{}, count)
 			var writer http.ResponseWriter
+			var previousRequest *http.Request
 			server.h = func(w http.ResponseWriter, req *http.Request) {
 				if tt.workers == 1 {
 					if writer == nil {
@@ -306,6 +312,10 @@ func TestTurboWorkers(t *testing.T) {
 					} else if w != writer {
 						t.Error("worker replaced its response writer between requests")
 					}
+					if previousRequest != nil && req != previousRequest {
+						t.Error("worker replaced its request between requests")
+					}
+					previousRequest = req
 				}
 				started <- struct{}{}
 				<-release

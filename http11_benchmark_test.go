@@ -12,6 +12,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/vroomy/turbo/request"
 )
 
 type http11Workload struct {
@@ -90,16 +92,17 @@ func BenchmarkHTTP11NoKeepAlive(b *testing.B) {
 func BenchmarkTurboProcess(b *testing.B) {
 	for _, workload := range http11Workloads() {
 		b.Run(workload.name, func(b *testing.B) {
-			request := workload.request()
+			wire := workload.request()
 			conn := &http11ProcessConn{}
 			server := Turbo{h: workload.handler()}
 			writer := makeResponseWriter()
+			var parser request.Parser
 			b.ReportAllocs()
 			b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				conn.request.Reset(request)
-				if err := server.process(conn, &writer); err != nil {
+				conn.request.Reset(wire)
+				if err := server.process(conn, &writer, &parser); err != nil {
 					b.Fatal(err)
 				}
 			}

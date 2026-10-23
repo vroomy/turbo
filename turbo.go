@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"sync"
 	"sync/atomic"
+
+	"github.com/vroomy/turbo/request"
 )
 
 var requestReaders = sync.Pool{
@@ -92,15 +94,17 @@ func (t *Turbo) work() {
 	var err error
 	defer t.workers.Done()
 	res := makeResponseWriter()
+	var parser request.Parser
 	for c := range t.conns {
-		if err = t.process(c, &res); err != nil {
+		if err = t.process(c, &res, &parser); err != nil {
 			log.Printf("error processing connection: %v\n", err)
 		}
 	}
 }
 
-func (t *Turbo) process(c net.Conn, res *responseWriter) (err error) {
+func (t *Turbo) process(c net.Conn, res *responseWriter, parser *request.Parser) (err error) {
 	defer res.reset()
+	defer parser.Reset()
 	var req *http.Request
 	var body io.ReadCloser
 	r := requestReaders.Get().(*bufio.Reader)
@@ -110,7 +114,7 @@ func (t *Turbo) process(c net.Conn, res *responseWriter) (err error) {
 			err = closeErr
 		}
 	}()
-	if req, err = http.ReadRequest(r); err != nil {
+	if req, err = parser.Parse(r); err != nil {
 		err = fmt.Errorf("error reading request: %w", err)
 		return err
 	}
