@@ -21,15 +21,23 @@ func Parse(r io.Reader) (*http.Request, error) {
 }
 
 // Parser reuses request, URL, and header storage. Its zero value is ready to use.
-// A Parser belongs to one worker and must not be used concurrently.
+// Small header strings share immutable 1 KiB blocks, which retained clones can
+// keep alive.
+// A Parser belongs to one worker and must not be copied or used concurrently
+// after its first use.
 type Parser struct {
-	req     http.Request
-	url     url.URL
-	headers http.Header
-	values  []string
+	req        http.Request
+	url        url.URL
+	headers    http.Header
+	values     []string
+	headerText strings.Builder
 }
 
-const maxRetainedHeaders = 128
+const (
+	maxRetainedHeaders  = 128
+	headerTextBlockSize = 1024
+	maxSharedHeaderSize = headerTextBlockSize / 4
+)
 
 // Parse reads a request using reusable storage where supported. The request and
 // its metadata are valid until Reset or the next Parse. Use Request.Clone to
@@ -40,8 +48,8 @@ func (p *Parser) Parse(r io.Reader) (*http.Request, error) {
 	return parse(r, p)
 }
 
-// Reset releases request data while retaining small header maps and value
-// slices. It does not close the body, which remains the caller's responsibility.
+// Reset clears request fields while retaining bounded parsing storage. It does
+// not close the body, which remains the caller's responsibility.
 func (p *Parser) Reset() {
 	p.req = http.Request{}
 	p.url = url.URL{}
@@ -112,7 +120,7 @@ func parseBuffered(header []byte, storage *Parser) (*http.Request, bool) {
 	}
 	// One owned string holds the target and fields. Method and protocol use
 	// constants; no returned strings refer to the reader's mutable buffer.
-	owned := ownHeader(targetBytes, fields)
+	owned := ownHeader(targetBytes, fields, storage)
 	target := owned[:len(targetBytes)]
 	headers, host, ok := parseHeaders(owned[len(targetBytes):], storage)
 	if !ok {
@@ -157,9 +165,25 @@ func makeRequest(target string, storage *Parser) (*http.Request, error) {
 	return &http.Request{URL: u}, nil
 }
 
-func ownHeader(target, fields []byte) string {
+func ownHeader(target, fields []byte, storage *Parser) string {
+	size := len(target) + len(fields)
+	if storage != nil && size <= maxSharedHeaderSize {
+		text := &storage.headerText
+		if text.Cap()-text.Len() < size {
+			// Reset drops the old block. Retained strings keep it alive, and
+			// previously written bytes are never overwritten.
+			text.Reset()
+			text.Grow(headerTextBlockSize)
+		}
+		start := text.Len()
+		text.Write(target)
+		text.Write(fields)
+		return text.String()[start:]
+	}
+
+	// Large headers own their allocation without displacing the shared block.
 	var text strings.Builder
-	text.Grow(len(target) + len(fields))
+	text.Grow(size)
 	text.Write(target)
 	text.Write(fields)
 	return text.String()

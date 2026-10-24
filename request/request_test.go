@@ -202,6 +202,108 @@ func TestParserRetainedCapacity(t *testing.T) {
 	}
 }
 
+func TestOwnHeaderStorage(t *testing.T) {
+	var parser Parser
+	var retained, expected []string
+	var rollovers int
+	for i := range 100 {
+		target := []byte(fmt.Sprintf("/request/%03d", i))
+		fields := []byte(fmt.Sprintf("Host: host-%03d.local\r\nX-Request: %03d\r\n", i, i))
+		want := string(target) + string(fields)
+		previousLen := parser.headerText.Len()
+		got := ownHeader(target, fields, &parser)
+		if got != want {
+			t.Fatalf("header = %q, want %q", got, want)
+		}
+		if parser.headerText.Len() < previousLen {
+			rollovers++
+		}
+		if parser.headerText.Cap() > headerTextBlockSize {
+			t.Fatalf("retained header text capacity = %d", parser.headerText.Cap())
+		}
+		// Readers reuse their buffers, and Reset must preserve retained strings.
+		for i := range target {
+			target[i] = 'x'
+		}
+		for i := range fields {
+			fields[i] = 'x'
+		}
+		retained, expected = append(retained, got), append(expected, want)
+		parser.Reset()
+	}
+	if rollovers == 0 {
+		t.Fatal("test did not exhaust a shared block")
+	}
+	for i := range retained {
+		if retained[i] != expected[i] {
+			t.Fatalf("retained header %d = %q, want %q", i, retained[i], expected[i])
+		}
+	}
+	before := parser.headerText.Len()
+	large := []byte(strings.Repeat("L", maxSharedHeaderSize+1))
+	got := ownHeader(nil, large, &parser)
+	large[0] = 'x'
+	if got[0] != 'L' || parser.headerText.Len() != before {
+		t.Fatal("large header aliased its input or displaced the shared block")
+	}
+}
+
+func TestParserCloneAcrossHeaderBlocks(t *testing.T) {
+	var parser Parser
+	var clones []*http.Request
+	for i := range 100 {
+		wire := fmt.Sprintf("GET /request/%03d?q=%03d HTTP/1.1\r\nHost: host-%03d.local\r\nX-Request: %03d\r\n\r\n", i, i, i, i)
+		req, err := parser.Parse(requestReader(wire, "buffered"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		clones = append(clones, req.Clone(req.Context()))
+		parser.Reset()
+	}
+	for i, req := range clones {
+		if req.URL.Path != fmt.Sprintf("/request/%03d", i) || req.URL.RawQuery != fmt.Sprintf("q=%03d", i) || req.Host != fmt.Sprintf("host-%03d.local", i) || req.Header.Get("X-Request") != fmt.Sprintf("%03d", i) {
+			t.Fatalf("cloned request %d changed: %+v", i, req)
+		}
+	}
+}
+
+func TestParserConcurrentClone(t *testing.T) {
+	var parser Parser
+	req, err := parser.Parse(requestReader("GET /retained?q=one HTTP/1.1\r\nHost: first.local\r\nX-Request: first\r\n\r\n", "buffered"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	clone := req.Clone(req.Context())
+	started, stop, done := make(chan struct{}), make(chan struct{}), make(chan struct{})
+	go func() {
+		defer close(done)
+		close(started)
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+				if clone.URL.Path != "/retained" || clone.URL.RawQuery != "q=one" || clone.Host != "first.local" || clone.Header.Get("X-Request") != "first" {
+					t.Error("concurrent parsing changed cloned metadata")
+					return
+				}
+			}
+		}
+	}()
+	defer func() {
+		close(stop)
+		<-done
+	}()
+	<-started
+	for i := range 100 {
+		wire := fmt.Sprintf("GET /next/%d HTTP/1.1\r\nHost: next.local\r\nX-Request: %d\r\n\r\n", i, i)
+		if _, err := parser.Parse(requestReader(wire, "buffered")); err != nil {
+			t.Fatal(err)
+		}
+		parser.Reset()
+	}
+}
+
 func errorText(err error) string {
 	if err == nil {
 		return ""
@@ -367,6 +469,36 @@ func BenchmarkParse(b *testing.B) {
 						if err := req.Body.Close(); err != nil {
 							b.Fatal(err)
 						}
+					}
+				})
+			}
+		})
+	}
+}
+
+var ownedHeaderResult string
+
+func BenchmarkOwnHeader(b *testing.B) {
+	for _, workload := range []struct {
+		name, target, fields string
+	}{
+		{"SmallGET", "/bench", "Host: benchmark.local\r\nConnection: close\r\nContent-Length: 0\r\n"},
+		{"Headers", "/a?b=c", "Host: benchmark.local\r\nUser-Agent: benchmark/1.0\r\nAccept: */*\r\nAccept-Encoding: gzip\r\nConnection: close\r\nX-Request-Id: 12345\r\n"},
+		{"Large", "/bench", "X-Large: " + strings.Repeat("x", 2048) + "\r\n"},
+	} {
+		b.Run(workload.name, func(b *testing.B) {
+			for _, mode := range []string{"Fresh", "Reused"} {
+				b.Run(mode, func(b *testing.B) {
+					target, fields := []byte(workload.target), []byte(workload.fields)
+					var parser Parser
+					var storage *Parser
+					if mode == "Reused" {
+						storage = &parser
+					}
+					b.ReportAllocs()
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						ownedHeaderResult = ownHeader(target, fields, storage)
 					}
 				})
 			}
