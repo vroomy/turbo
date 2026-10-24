@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"runtime"
 	"strconv"
 	"sync"
@@ -16,6 +17,8 @@ import (
 
 	"github.com/vroomy/turbo/request"
 )
+
+const http11BenchmarkTimeout = 10 * time.Second
 
 type http11Workload struct {
 	name         string
@@ -219,9 +222,7 @@ func TestTurboConcurrentResponses(t *testing.T) {
 						t.Fatal(err)
 					}
 					defer conn.Close()
-					if err := conn.SetDeadline(time.Now().Add(5 * time.Second)); err != nil {
-						t.Fatal(err)
-					}
+					// Pipe dial installs a watchdog which is canceled by Close.
 					if _, err := io.WriteString(conn, "GET "+path+" HTTP/1.1\r\nHost: test.local\r\nConnection: close\r\n\r\n"); err != nil {
 						t.Fatal(err)
 					}
@@ -255,14 +256,31 @@ func newHTTP11BenchmarkClient(dial func() (net.Conn, error), request []byte, wor
 	}
 }
 
-func (c *http11BenchmarkClient) roundTrip(verifyBody bool) error {
+func (c *http11BenchmarkClient) roundTrip(verifyBody bool) (err error) {
 	conn, err := c.dial()
 	if err != nil {
 		return fmt.Errorf("dial: %w", err)
 	}
-	defer conn.Close()
-	if err := conn.SetDeadline(time.Now().Add(10 * time.Second)); err != nil {
-		return err
+	var body io.ReadCloser
+	defer func() {
+		// Close before Body.Close: an invalid response can leave an unread body
+		// whose Close would otherwise drain from a stalled peer.
+		_ = conn.Close()
+		if body != nil {
+			_ = body.Close()
+		}
+		c.response.Reset(nil)
+		if pipe, ok := conn.(*http11PipeConn); ok && pipe.timedOut() {
+			// A watchdog close must never count as the required server EOF,
+			// even if peer closure races with expiry at the end of the response.
+			err = fmt.Errorf("pipe round trip watchdog: %w", os.ErrDeadlineExceeded)
+		}
+	}()
+	if _, pipe := conn.(*http11PipeConn); !pipe {
+		// TCP keeps native socket deadlines; Pipe uses the dial-installed timer.
+		if err := conn.SetDeadline(time.Now().Add(http11BenchmarkTimeout)); err != nil {
+			return err
+		}
 	}
 	if n, err := conn.Write(c.request); err != nil {
 		return fmt.Errorf("write request: %w", err)
@@ -274,7 +292,7 @@ func (c *http11BenchmarkClient) roundTrip(verifyBody bool) error {
 	if err != nil {
 		return fmt.Errorf("read response: %w", err)
 	}
-	defer res.Body.Close()
+	body = res.Body
 	if res.ProtoMajor != 1 || res.ProtoMinor != 1 || res.StatusCode != http.StatusOK || !res.Close {
 		return fmt.Errorf("unexpected response: %s %s, Close=%v", res.Proto, res.Status, res.Close)
 	}
@@ -345,7 +363,7 @@ func startHTTP11BenchmarkServer(tb testing.TB, transport, implementation string,
 func newHTTP11BenchmarkListener(tb testing.TB, transport string) (net.Listener, func() (net.Conn, error)) {
 	tb.Helper()
 	if transport == "Pipe" {
-		listener := &http11PipeListener{pending: make(chan net.Conn), closed: make(chan struct{})}
+		listener := newHTTP11PipeListener(http11BenchmarkTimeout)
 		return listener, listener.dial
 	}
 	config := net.ListenConfig{KeepAlive: -1}
@@ -371,7 +389,14 @@ func (l *http11StartListener) Accept() (net.Conn, error) {
 type http11PipeListener struct {
 	pending chan net.Conn
 	closed  chan struct{}
+	timeout time.Duration
 	once    sync.Once
+}
+
+func newHTTP11PipeListener(timeout time.Duration) *http11PipeListener {
+	return &http11PipeListener{
+		pending: make(chan net.Conn), closed: make(chan struct{}), timeout: timeout,
+	}
 }
 
 func (l *http11PipeListener) Accept() (net.Conn, error) {
@@ -384,10 +409,15 @@ func (l *http11PipeListener) Accept() (net.Conn, error) {
 }
 
 func (l *http11PipeListener) dial() (net.Conn, error) {
-	client, server := net.Pipe()
+	rawClient, server := net.Pipe()
+	client := newHTTP11PipeConn(rawClient, l.timeout)
 	select {
 	case l.pending <- server:
 		return client, nil
+	case <-client.expired:
+		client.Close()
+		server.Close()
+		return nil, fmt.Errorf("pipe dial watchdog: %w", os.ErrDeadlineExceeded)
 	case <-l.closed:
 		client.Close()
 		server.Close()
@@ -401,3 +431,43 @@ func (l *http11PipeListener) Close() error {
 }
 
 func (*http11PipeListener) Addr() net.Addr { return &net.TCPAddr{} }
+
+// Own the Pipe timeout rather than calling net.Pipe.SetDeadline: its internal
+// AfterFunc timers survive Close and retain the pipe until their deadlines.
+// This watchdog uses one timer and one completion channel per fresh connection,
+// with no goroutine on successful requests. Only expiry starts a callback.
+type http11PipeConn struct {
+	net.Conn
+	timer   *time.Timer
+	expired chan struct{}
+	once    sync.Once
+}
+
+func newHTTP11PipeConn(conn net.Conn, timeout time.Duration) *http11PipeConn {
+	c := &http11PipeConn{Conn: conn, expired: make(chan struct{})}
+	c.timer = time.AfterFunc(timeout, func() {
+		// Closing one end releases reads and writes on both ends of net.Pipe.
+		_ = c.Conn.Close()
+		close(c.expired)
+	})
+	return c
+}
+
+func (c *http11PipeConn) Close() error {
+	c.once.Do(func() {
+		if !c.timer.Stop() {
+			// Stop does not join an AfterFunc callback which has already started.
+			<-c.expired
+		}
+	})
+	return c.Conn.Close()
+}
+
+func (c *http11PipeConn) timedOut() bool {
+	select {
+	case <-c.expired:
+		return true
+	default:
+		return false
+	}
+}

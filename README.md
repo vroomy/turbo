@@ -9,3 +9,5 @@ which must be consumed during the handler.
 
 See [benchmarks](benchmarks/README.md) for repeatable Turbo versus `net/http`
 comparisons, workload definitions, and recorded results.
+See the [TODO](TODO.md) for the current Pipe timeout design, its costs, and
+the revised measurement baseline.
