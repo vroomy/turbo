@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"runtime"
 	"strconv"
 	"sync"
 	"testing"
@@ -85,6 +86,31 @@ func BenchmarkHTTP11NoKeepAlive(b *testing.B) {
 				})
 			}
 		})
+	}
+}
+
+func BenchmarkHTTP11Accept(b *testing.B) {
+	workload := http11Workload{method: http.MethodGet, responseBody: bytes.Repeat([]byte("x"), 128)}
+	for _, transport := range []string{"TCP", "Pipe"} {
+		for _, mode := range []struct {
+			name        string
+			parallelism int
+		}{
+			{name: "Serial"},
+			{name: "Parallel", parallelism: 1},
+			{name: "Parallel4", parallelism: 4},
+			{name: "Parallel16", parallelism: 16},
+		} {
+			b.Run(transport+"/"+mode.name, func(b *testing.B) {
+				b.SetParallelism(mode.parallelism)
+				benchmarkHTTP11(b, transport, "Turbo", workload, mode.parallelism > 0)
+				clients := 1
+				if mode.parallelism > 0 {
+					clients = runtime.GOMAXPROCS(0) * mode.parallelism
+				}
+				b.ReportMetric(float64(clients), "clients")
+			})
+		}
 	}
 }
 
