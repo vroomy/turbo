@@ -1,0 +1,38 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 -sample_index=alloc_space /private/tmp/turbo-date-cache/before.test /tmp/turbo-date-cache/before-process-memory.pprof
+File: before.test
+Type: alloc_space
+Time: 2026-10-25 07:45:28 PDT
+Showing nodes accounting for 2749.25kB, 98.10% of 2802.39kB total
+Dropped 152 nodes (cum <= 14.01kB)
+Showing top 30 nodes out of 49
+      flat  flat%   sum%        cum   cum%
+ 1400.62kB 49.98% 49.98%  1400.62kB 49.98%  internal/bytealg.MakeNoZero
+  625.78kB 22.33% 72.31%   625.78kB 22.33%  net/textproto.MIMEHeader.Set (inline)
+  625.09kB 22.31% 94.62%   625.09kB 22.31%  time.Time.Format
+   31.78kB  1.13% 95.75%    31.78kB  1.13%  regexp/syntax.(*compiler).inst (inline)
+   26.84kB  0.96% 96.71%    26.88kB  0.96%  runtime.mallocgc
+   22.05kB  0.79% 97.49%    22.05kB  0.79%  regexp.onePassCopy
+    7.34kB  0.26% 97.76%    16.31kB  0.58%  regexp.makeOnePass
+    2.89kB   0.1% 97.86%    87.99kB  3.14%  regexp.compile
+    2.53kB  0.09% 97.95%    76.52kB  2.73%  testing.(*B).Run
+    1.28kB 0.046% 98.00%  2602.63kB 92.87%  github.com/vroomy/turbo.BenchmarkTurboProcess.func1
+    0.83kB  0.03% 98.03%    24.44kB  0.87%  testing.runBenchmarks
+    0.77kB 0.027% 98.05%   140.94kB  5.03%  github.com/vroomy/turbo.BenchmarkTurboProcess
+    0.69kB 0.025% 98.08%    66.31kB  2.37%  github.com/vroomy/turbo.http11Workloads
+    0.40kB 0.014% 98.09%    14.12kB   0.5%  testing.newMatcher
+    0.23kB 0.0084% 98.10%  2749.73kB 98.12%  testing.(*B).runN
+    0.07kB 0.0025% 98.10%    29.73kB  1.06%  testing.(*M).Run
+    0.05kB 0.0017% 98.10%  2596.99kB 92.67%  github.com/vroomy/turbo.(*Turbo).process
+         0     0% 98.10%    65.62kB  2.34%  bytes.Repeat
+         0     0% 98.10%   625.84kB 22.33%  github.com/vroomy/turbo.(*responseWriter).populateHeaders
+         0     0% 98.10%   629.70kB 22.47%  github.com/vroomy/turbo.http11Workload.handler.func1
+         0     0% 98.10%  1335.84kB 47.67%  github.com/vroomy/turbo/request.(*Parser).Parse
+         0     0% 98.10%     1335kB 47.64%  github.com/vroomy/turbo/request.ownHeader
+         0     0% 98.10%  1335.84kB 47.67%  github.com/vroomy/turbo/request.parse
+         0     0% 98.10%  1335.84kB 47.67%  github.com/vroomy/turbo/request.parseBuffered
+         0     0% 98.10%    29.73kB  1.06%  main.main
+         0     0% 98.10%   625.78kB 22.33%  net/http.Header.Set (inline)
+         0     0% 98.10%    87.99kB  3.14%  regexp.Compile (inline)
+         0     0% 98.10%    38.36kB  1.37%  regexp.compileOnePass
+         0     0% 98.10%    30.98kB  1.11%  regexp/syntax.(*compiler).compile
+         0     0% 98.10%    29.50kB  1.05%  regexp/syntax.(*compiler).rune

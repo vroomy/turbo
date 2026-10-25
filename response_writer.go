@@ -55,6 +55,11 @@ type responseWriter struct {
 
 	headerBuffer *bytes.Buffer
 
+	// Worker-local, immutable Date value retained across responses. An empty
+	// string marks an uninitialized cache, including at Unix second zero.
+	dateSecond int64
+	dateValue  string
+
 	sentHeader       bool
 	sniffContentType bool
 
@@ -74,8 +79,17 @@ func (r *responseWriter) populateHeaders() {
 		}
 	}
 	r.populateHeader("Connection", "close")
-	r.populateHeader("Date", time.Now().UTC().Format(http.TimeFormat))
+	r.populateHeader("Date", r.dateHeader(time.Now()))
 	r.contentLength = -1
+}
+
+func (r *responseWriter) dateHeader(now time.Time) string {
+	second := now.Unix()
+	if r.dateValue == "" || r.dateSecond != second {
+		r.dateSecond = second
+		r.dateValue = now.UTC().Format(http.TimeFormat)
+	}
+	return r.dateValue
 }
 
 func (r *responseWriter) populateHeader(key, value string) {
@@ -93,8 +107,11 @@ func (r *responseWriter) reset() {
 	} else {
 		buffer.Reset()
 	}
-	// Retain the worker's header map and buffer while clearing request state.
-	*r = responseWriter{headers: r.headers, headerBuffer: buffer}
+	// Retain worker storage and the Date cache while clearing request state.
+	*r = responseWriter{
+		headers: r.headers, headerBuffer: buffer,
+		dateSecond: r.dateSecond, dateValue: r.dateValue,
+	}
 }
 
 func (r *responseWriter) Header() http.Header {

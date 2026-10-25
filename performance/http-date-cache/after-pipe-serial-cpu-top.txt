@@ -1,0 +1,39 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /private/tmp/turbo-date-cache/after.test /tmp/turbo-date-cache/after-pipe-serial-cpu.pprof
+File: after.test
+Type: cpu
+Time: 2026-10-25 07:45:33 PDT
+Duration: 3.80s, Total samples = 4.37s (114.87%)
+Showing nodes accounting for 4.31s, 98.63% of 4.37s total
+Dropped 49 nodes (cum <= 0.02s)
+Showing top 30 nodes out of 39
+      flat  flat%   sum%        cum   cum%
+     2.86s 65.45% 65.45%      2.86s 65.45%  runtime.pthread_cond_signal
+     1.13s 25.86% 91.30%      1.13s 25.86%  runtime.pthread_cond_wait
+     0.16s  3.66% 94.97%      0.16s  3.66%  runtime.usleep
+     0.10s  2.29% 97.25%      0.10s  2.29%  runtime.pthread_kill
+     0.05s  1.14% 98.40%      0.05s  1.14%  runtime.madvise
+     0.01s  0.23% 98.63%      0.03s  0.69%  runtime.gcDrain
+         0     0% 98.63%      2.84s 64.99%  _.goready.func1
+         0     0% 98.63%      0.05s  1.14%  runtime.(*mheap).alloc.func1
+         0     0% 98.63%      0.05s  1.14%  runtime.(*mheap).allocSpan
+         0     0% 98.63%      1.30s 29.75%  runtime.findRunnable
+         0     0% 98.63%      0.12s  2.75%  runtime.forEachP.func1
+         0     0% 98.63%      0.12s  2.75%  runtime.forEachPInternal
+         0     0% 98.63%      0.03s  0.69%  runtime.gcBgMarkWorker.func2
+         0     0% 98.63%      0.09s  2.06%  runtime.gopreempt_m (inline)
+         0     0% 98.63%      0.09s  2.06%  runtime.goschedImpl
+         0     0% 98.63%      1.13s 25.86%  runtime.mPark (inline)
+         0     0% 98.63%      1.22s 27.92%  runtime.mcall
+         0     0% 98.63%      0.09s  2.06%  runtime.morestack
+         0     0% 98.63%      0.09s  2.06%  runtime.newstack
+         0     0% 98.63%      1.13s 25.86%  runtime.notesleep
+         0     0% 98.63%      2.85s 65.22%  runtime.notewakeup
+         0     0% 98.63%      1.22s 27.92%  runtime.park_m
+         0     0% 98.63%      0.10s  2.29%  runtime.preemptM
+         0     0% 98.63%      0.09s  2.06%  runtime.preemptall
+         0     0% 98.63%      0.10s  2.29%  runtime.preemptone
+         0     0% 98.63%      2.84s 64.99%  runtime.ready
+         0     0% 98.63%      0.15s  3.43%  runtime.runqgrab
+         0     0% 98.63%      0.15s  3.43%  runtime.runqsteal
+         0     0% 98.63%      1.30s 29.75%  runtime.schedule
+         0     0% 98.63%      1.15s 26.32%  runtime.semasleep

@@ -1,0 +1,39 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /private/tmp/turbo-date-cache/before.test /tmp/turbo-date-cache/before-pipe-serial-cpu.pprof
+File: before.test
+Type: cpu
+Time: 2026-10-25 07:45:17 PDT
+Duration: 3.80s, Total samples = 4.39s (115.39%)
+Showing nodes accounting for 4.32s, 98.41% of 4.39s total
+Dropped 51 nodes (cum <= 0.02s)
+Showing top 30 nodes out of 47
+      flat  flat%   sum%        cum   cum%
+     3.02s 68.79% 68.79%      3.02s 68.79%  runtime.pthread_cond_signal
+     0.83s 18.91% 87.70%      0.83s 18.91%  runtime.pthread_cond_wait
+     0.23s  5.24% 92.94%      0.23s  5.24%  runtime.usleep
+     0.11s  2.51% 95.44%      0.11s  2.51%  runtime.madvise
+     0.08s  1.82% 97.27%      0.08s  1.82%  runtime.pthread_kill
+     0.04s  0.91% 98.18%      0.04s  0.91%  runtime.pthread_cond_timedwait_relative_np
+     0.01s  0.23% 98.41%      0.20s  4.56%  runtime.stealWork
+         0     0% 98.41%      3.01s 68.56%  _.goready.func1
+         0     0% 98.41%      0.11s  2.51%  runtime.(*mheap).alloc.func1
+         0     0% 98.41%      0.11s  2.51%  runtime.(*mheap).allocSpan
+         0     0% 98.41%      1.05s 23.92%  runtime.findRunnable
+         0     0% 98.41%      0.09s  2.05%  runtime.forEachP.func1
+         0     0% 98.41%      0.09s  2.05%  runtime.forEachPInternal
+         0     0% 98.41%      0.05s  1.14%  runtime.gcBgMarkWorker.func2
+         0     0% 98.41%      0.05s  1.14%  runtime.gcDrain
+         0     0% 98.41%      0.05s  1.14%  runtime.gcDrainMarkWorkerDedicated (inline)
+         0     0% 98.41%      0.13s  2.96%  runtime.gopreempt_m (inline)
+         0     0% 98.41%      0.13s  2.96%  runtime.goschedImpl
+         0     0% 98.41%      0.04s  0.91%  runtime.lock (inline)
+         0     0% 98.41%      0.04s  0.91%  runtime.lock2
+         0     0% 98.41%      0.04s  0.91%  runtime.lockWithRank (inline)
+         0     0% 98.41%      0.83s 18.91%  runtime.mPark (inline)
+         0     0% 98.41%      0.95s 21.64%  runtime.mcall
+         0     0% 98.41%      0.12s  2.73%  runtime.morestack
+         0     0% 98.41%      0.12s  2.73%  runtime.newstack
+         0     0% 98.41%      0.83s 18.91%  runtime.notesleep
+         0     0% 98.41%      0.04s  0.91%  runtime.notetsleep
+         0     0% 98.41%      0.04s  0.91%  runtime.notetsleep_internal
+         0     0% 98.41%      3.02s 68.79%  runtime.notewakeup
+         0     0% 98.41%      0.04s  0.91%  runtime.osyield (inline)

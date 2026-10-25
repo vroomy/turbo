@@ -1,0 +1,38 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 -sample_index=inuse_space /private/tmp/turbo-date-cache/after.test /tmp/turbo-date-cache/after-process-memory.pprof
+File: after.test
+Type: inuse_space
+Time: 2026-10-25 07:45:44 PDT
+Showing nodes accounting for 37.70kB, 97.51% of 38.66kB total
+Dropped 66 nodes (cum <= 0.19kB)
+Showing top 30 nodes out of 73
+      flat  flat%   sum%        cum   cum%
+   26.72kB 69.10% 69.10%    26.74kB 69.17%  runtime.mallocgc
+    4.53kB 11.72% 80.82%     4.53kB 11.72%  sync.(*Pool).pinSlow
+    4.09kB 10.59% 91.41%     4.09kB 10.59%  bufio.NewReaderSize (inline)
+    0.92kB  2.38% 93.80%     0.92kB  2.38%  regexp.onePassCopy
+    0.69kB  1.78% 95.57%     0.69kB  1.78%  regexp/syntax.(*compiler).inst (inline)
+    0.25kB  0.65% 96.22%     0.25kB  0.65%  strings.(*Replacer).build
+    0.16kB   0.4% 96.63%     1.34kB  3.46%  net/http.Header.sortedKeyValues
+    0.16kB   0.4% 97.03%     1.89kB  4.89%  regexp.compile
+    0.09kB  0.24% 97.27%     1.22kB  3.15%  regexp.newOnePassMachine (inline)
+    0.05kB  0.12% 97.39%     6.91kB 17.88%  github.com/vroomy/turbo.(*Turbo).process
+    0.05kB  0.12% 97.51%     1.63kB  4.22%  net/http.Header.writeSubset
+         0     0% 97.51%     4.09kB 10.59%  bufio.NewReader (inline)
+         0     0% 97.51%     1.45kB  3.76%  fmt.Sprintf
+         0     0% 97.51%     1.30kB  3.35%  fmt.newPrinter
+         0     0% 97.51%     1.63kB  4.22%  github.com/vroomy/turbo.(*responseWriter).Write
+         0     0% 97.51%     1.63kB  4.22%  github.com/vroomy/turbo.(*responseWriter).WriteHeader
+         0     0% 97.51%     1.63kB  4.22%  github.com/vroomy/turbo.(*responseWriter).ensureHeader (inline)
+         0     0% 97.51%     1.63kB  4.22%  github.com/vroomy/turbo.(*responseWriter).prepareHeader
+         0     0% 97.51%     3.12kB  8.08%  github.com/vroomy/turbo.BenchmarkTurboProcess
+         0     0% 97.51%     8.41kB 21.76%  github.com/vroomy/turbo.BenchmarkTurboProcess.func1
+         0     0% 97.51%     1.65kB  4.26%  github.com/vroomy/turbo.http11Workload.handler.func1
+         0     0% 97.51%     1.45kB  3.76%  github.com/vroomy/turbo.http11Workload.request (inline)
+         0     0% 97.51%     4.09kB 10.59%  github.com/vroomy/turbo.init.func1
+         0     0% 97.51%     0.38kB  0.99%  main.main
+         0     0% 97.51%     1.63kB  4.22%  net/http.Header.WriteSubset (inline)
+         0     0% 97.51%     1.22kB  3.15%  regexp.(*Regexp).MatchString (inline)
+         0     0% 97.51%     1.22kB  3.15%  regexp.(*Regexp).doMatch (inline)
+         0     0% 97.51%     1.22kB  3.15%  regexp.(*Regexp).doOnePass
+         0     0% 97.51%     1.22kB  3.15%  regexp.(*Regexp).find
+         0     0% 97.51%     1.89kB  4.89%  regexp.Compile (inline)

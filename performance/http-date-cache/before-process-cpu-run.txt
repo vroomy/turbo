@@ -1,0 +1,7 @@
+# GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^BenchmarkTurboProcess$/^SmallGET$' -test.benchtime=3s -test.count=1 -test.timeout=1m -test.cpuprofile=/tmp/turbo-date-cache/before-process-cpu.pprof
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	 3797353	       997.8 ns/op	 128.28 MB/s	     132 B/op	       3 allocs/op
+PASS

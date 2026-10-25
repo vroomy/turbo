@@ -1,6 +1,7 @@
 /benchmarks
 /testdata
 /examples
-/performance
+/performance/*
+!/performance/http-date-cache/
 *.pprof
 *.test

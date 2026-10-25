@@ -1,0 +1,39 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /private/tmp/turbo-date-cache/before.test /tmp/turbo-date-cache/before-process-cpu.pprof
+File: before.test
+Type: cpu
+Time: 2026-10-25 07:45:12 PDT
+Duration: 4.88s, Total samples = 4.06s (83.15%)
+Showing nodes accounting for 3.20s, 78.82% of 4.06s total
+Dropped 68 nodes (cum <= 0.02s)
+Showing top 30 nodes out of 125
+      flat  flat%   sum%        cum   cum%
+     0.47s 11.58% 11.58%      0.47s 11.58%  runtime.madvise
+     0.44s 10.84% 22.41%      0.44s 10.84%  runtime.kevent
+     0.22s  5.42% 27.83%      0.22s  5.42%  net/textproto.validHeaderFieldByte (inline)
+     0.19s  4.68% 32.51%      0.19s  4.68%  internal/bytealg.IndexByteString
+     0.14s  3.45% 35.96%      0.32s  7.88%  time.Time.appendFormat
+     0.13s  3.20% 39.16%      0.16s  3.94%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.11s  2.71% 41.87%      0.33s  8.13%  net/textproto.CanonicalMIMEHeaderKey
+     0.11s  2.71% 44.58%      0.11s  2.71%  runtime.memmove
+     0.10s  2.46% 47.04%      0.14s  3.45%  internal/runtime/maps.(*Iter).Next
+     0.09s  2.22% 49.26%      0.09s  2.22%  github.com/vroomy/turbo/request.validValue (inline)
+     0.08s  1.97% 51.23%      0.19s  4.68%  bytes.Index
+     0.08s  1.97% 53.20%      0.08s  1.97%  github.com/vroomy/turbo/request.validToken (inline)
+     0.08s  1.97% 55.17%      0.08s  1.97%  time.appendInt
+     0.07s  1.72% 56.90%      0.15s  3.69%  bytes.(*Buffer).WriteString
+     0.07s  1.72% 58.62%      0.07s  1.72%  internal/bytealg.CountString
+     0.07s  1.72% 60.34%      0.19s  4.68%  internal/stringslite.Index
+     0.07s  1.72% 62.07%      0.24s  5.91%  runtime.mapaccess2_faststr
+     0.07s  1.72% 63.79%      0.07s  1.72%  runtime.memclrNoHeapPointers
+     0.07s  1.72% 65.52%      0.07s  1.72%  runtime.pthread_cond_signal
+     0.07s  1.72% 67.24%      0.07s  1.72%  time.nextStdChunk
+     0.06s  1.48% 68.72%      0.77s 18.97%  github.com/vroomy/turbo/request.parseHeaders
+     0.06s  1.48% 70.20%      0.06s  1.48%  strings.(*byteReplacer).Replace
+     0.05s  1.23% 71.43%      0.05s  1.23%  bytes.(*Buffer).tryGrowByReslice (inline)
+     0.05s  1.23% 72.66%      0.05s  1.23%  internal/runtime/maps.(*Map).putSlotSmallFastStr
+     0.05s  1.23% 73.89%      0.44s 10.84%  net/http.Header.writeSubset
+     0.05s  1.23% 75.12%      0.08s  1.97%  strings.Trim
+     0.04s  0.99% 76.11%      0.09s  2.22%  runtime.mapIterNext
+     0.04s  0.99% 77.09%      0.04s  0.99%  runtime.memequal
+     0.04s  0.99% 78.08%      0.04s  0.99%  runtime.walltime
+     0.03s  0.74% 78.82%      0.13s  3.20%  bytes.Cut

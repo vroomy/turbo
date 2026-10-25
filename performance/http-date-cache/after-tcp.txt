@@ -1,0 +1,200 @@
+# round 1, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     63212 ns/op	   2.02 MB/s	     15820 req/s	    3261 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     22406 ns/op	   5.71 MB/s	     44630 req/s	    3751 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     64522 ns/op	   1.98 MB/s	     15499 req/s	    3050 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     23822 ns/op	   5.37 MB/s	     41978 req/s	    3566 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     68541 ns/op	 956.16 MB/s	     14590 req/s	    3143 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     28679 ns/op	2285.16 MB/s	     34869 req/s	    3654 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     61686 ns/op	  18.68 MB/s	     16211 req/s	    4103 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     22391 ns/op	  51.45 MB/s	     44661 req/s	    4484 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     59841 ns/op	     16711 req/s	    2878 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     22678 ns/op	     44095 req/s	    3166 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     61296 ns/op	     16314 req/s	    2768 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     22924 ns/op	     43622 req/s	    3044 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     63073 ns/op	   8.12 MB/s	     15855 req/s	    3212 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     27662 ns/op	  18.51 MB/s	     36151 req/s	    3757 B/op	      46 allocs/op
+PASS
+# round 2, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     65518 ns/op	   1.95 MB/s	     15263 req/s	    3294 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     24138 ns/op	   5.30 MB/s	     41429 req/s	    3709 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     62847 ns/op	   2.04 MB/s	     15912 req/s	    3074 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     23425 ns/op	   5.46 MB/s	     42689 req/s	    3585 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     72844 ns/op	 899.67 MB/s	     13728 req/s	    3147 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     29349 ns/op	2232.96 MB/s	     34072 req/s	    3638 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     66614 ns/op	  17.29 MB/s	     15012 req/s	    4000 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     22298 ns/op	  51.66 MB/s	     44846 req/s	    4485 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     65746 ns/op	     15210 req/s	    2892 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     23555 ns/op	     42454 req/s	    3189 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     63622 ns/op	     15718 req/s	    2806 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     23949 ns/op	     41755 req/s	    3072 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     66048 ns/op	   7.75 MB/s	     15140 req/s	    3202 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     26937 ns/op	  19.01 MB/s	     37124 req/s	    3750 B/op	      45 allocs/op
+PASS
+# round 3, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     68704 ns/op	   1.86 MB/s	     14555 req/s	    3192 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     25031 ns/op	   5.11 MB/s	     39951 req/s	    3788 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     68131 ns/op	   1.88 MB/s	     14678 req/s	    3020 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     28990 ns/op	   4.42 MB/s	     34495 req/s	    3602 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     79332 ns/op	 826.10 MB/s	     12605 req/s	    3189 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     31814 ns/op	2059.95 MB/s	     31432 req/s	    3680 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     66321 ns/op	  17.37 MB/s	     15078 req/s	    4038 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     28022 ns/op	  41.11 MB/s	     35686 req/s	    4527 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     71654 ns/op	     13956 req/s	    2872 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     31712 ns/op	     31534 req/s	    3207 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	    145845 ns/op	      6857 req/s	    2781 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     22987 ns/op	     43503 req/s	    3089 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     64456 ns/op	   7.94 MB/s	     15514 req/s	    3285 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     29244 ns/op	  17.51 MB/s	     34195 req/s	    3769 B/op	      45 allocs/op
+PASS
+# round 4, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     68121 ns/op	   1.88 MB/s	     14680 req/s	    3189 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     26161 ns/op	   4.89 MB/s	     38224 req/s	    3808 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     61285 ns/op	   2.09 MB/s	     16317 req/s	    3089 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     24174 ns/op	   5.29 MB/s	     41367 req/s	    3590 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     74188 ns/op	 883.38 MB/s	     13479 req/s	    3125 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     31721 ns/op	2065.98 MB/s	     31524 req/s	    3701 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     70251 ns/op	  16.40 MB/s	     14235 req/s	    4023 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     23169 ns/op	  49.72 MB/s	     43160 req/s	    4508 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     64236 ns/op	     15567 req/s	    2898 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     25870 ns/op	     38655 req/s	    3187 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     64435 ns/op	     15520 req/s	    2777 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     26310 ns/op	     38009 req/s	    3086 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     64383 ns/op	   7.95 MB/s	     15532 req/s	    3193 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     27262 ns/op	  18.78 MB/s	     36681 req/s	    3729 B/op	      45 allocs/op
+PASS
+# round 5, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     76939 ns/op	   1.66 MB/s	     12997 req/s	    3232 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     26670 ns/op	   4.80 MB/s	     37496 req/s	    3765 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     65453 ns/op	   1.96 MB/s	     15278 req/s	    3145 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     28063 ns/op	   4.56 MB/s	     35634 req/s	    3593 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     78050 ns/op	 839.67 MB/s	     12812 req/s	    3108 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     49489 ns/op	1324.27 MB/s	     20207 req/s	    3732 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     78566 ns/op	  14.66 MB/s	     12728 req/s	    4002 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     26667 ns/op	  43.20 MB/s	     37500 req/s	    4483 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     71336 ns/op	     14018 req/s	    2898 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     30290 ns/op	     33014 req/s	    3165 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     71758 ns/op	     13936 req/s	    2779 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     35943 ns/op	     27822 req/s	    3087 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     74622 ns/op	   6.86 MB/s	     13401 req/s	    3227 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     32750 ns/op	  15.63 MB/s	     30534 req/s	    3729 B/op	      45 allocs/op
+PASS
+# round 6, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     74042 ns/op	   1.73 MB/s	     13506 req/s	    3275 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     35365 ns/op	   3.62 MB/s	     28277 req/s	    3842 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     76812 ns/op	   1.67 MB/s	     13019 req/s	    3146 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     24899 ns/op	   5.14 MB/s	     40163 req/s	    3604 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     78324 ns/op	 836.73 MB/s	     12767 req/s	    3165 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     37469 ns/op	1749.09 MB/s	     26689 req/s	    3613 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     75434 ns/op	  15.27 MB/s	     13257 req/s	    4024 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     40016 ns/op	  28.79 MB/s	     24990 req/s	    4485 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     62304 ns/op	     16050 req/s	    2881 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     29860 ns/op	     33490 req/s	    3176 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     69238 ns/op	     14443 req/s	    2773 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     36603 ns/op	     27320 req/s	    3085 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     81116 ns/op	   6.31 MB/s	     12328 req/s	    3182 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     44555 ns/op	  11.49 MB/s	     22444 req/s	    3771 B/op	      45 allocs/op
+PASS
+# round 7, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     83143 ns/op	   1.54 MB/s	     12027 req/s	    3230 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     36290 ns/op	   3.53 MB/s	     27556 req/s	    3758 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     79287 ns/op	   1.61 MB/s	     12612 req/s	    3080 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     52817 ns/op	   2.42 MB/s	     18933 req/s	    3647 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	    113064 ns/op	 579.64 MB/s	      8845 req/s	    3172 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     35769 ns/op	1832.18 MB/s	     27957 req/s	    3708 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     79398 ns/op	  14.51 MB/s	     12595 req/s	    4070 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     41534 ns/op	  27.74 MB/s	     24077 req/s	    4486 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     87482 ns/op	     11431 req/s	    2848 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     45127 ns/op	     22160 req/s	    3183 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     67510 ns/op	     14813 req/s	    2778 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     34846 ns/op	     28697 req/s	    3087 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     82021 ns/op	   6.24 MB/s	     12192 req/s	    3223 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     51687 ns/op	   9.91 MB/s	     19347 req/s	    3834 B/op	      45 allocs/op
+PASS
+# round 8, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     90317 ns/op	   1.42 MB/s	     11072 req/s	    3167 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     30119 ns/op	   4.25 MB/s	     33202 req/s	    3724 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     78662 ns/op	   1.63 MB/s	     12713 req/s	    3080 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     35497 ns/op	   3.61 MB/s	     28171 req/s	    3606 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     89900 ns/op	 728.98 MB/s	     11123 req/s	    3107 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     50831 ns/op	1289.29 MB/s	     19673 req/s	    3800 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     89081 ns/op	  12.93 MB/s	     11226 req/s	    4045 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     34077 ns/op	  33.81 MB/s	     29345 req/s	    4515 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     72769 ns/op	     13742 req/s	    2882 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     40923 ns/op	     24436 req/s	    3208 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     83143 ns/op	     12028 req/s	    2793 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     45809 ns/op	     21830 req/s	    3105 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     75724 ns/op	   6.76 MB/s	     13206 req/s	    3232 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     33868 ns/op	  15.12 MB/s	     29527 req/s	    3689 B/op	      45 allocs/op
+PASS
+# round 9, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     75140 ns/op	   1.70 MB/s	     13309 req/s	    3189 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     37089 ns/op	   3.45 MB/s	     26962 req/s	    3688 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     79618 ns/op	   1.61 MB/s	     12560 req/s	    3143 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     41316 ns/op	   3.10 MB/s	     24204 req/s	    3627 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     79122 ns/op	 828.29 MB/s	     12639 req/s	    3108 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     36125 ns/op	1814.13 MB/s	     27681 req/s	    3807 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     75679 ns/op	  15.22 MB/s	     13214 req/s	    4002 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     38160 ns/op	  30.19 MB/s	     26206 req/s	    4483 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     80870 ns/op	     12365 req/s	    2851 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     28041 ns/op	     35662 req/s	    3189 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     66986 ns/op	     14928 req/s	    2782 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     33575 ns/op	     29784 req/s	    3066 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     80681 ns/op	   6.35 MB/s	     12395 req/s	    3270 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     51122 ns/op	  10.02 MB/s	     19561 req/s	    3790 B/op	      45 allocs/op
+PASS
+# round 10, GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/.*/.*/^Turbo$' -test.benchmem -test.benchtime=200x -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8         	     200	     85042 ns/op	   1.51 MB/s	     11759 req/s	    3225 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8       	     200	     24933 ns/op	   5.13 MB/s	     40107 req/s	    3787 B/op	      46 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Serial/Turbo-8      	     200	     73979 ns/op	   1.73 MB/s	     13517 req/s	    3080 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/ImplicitGET/Parallel/Turbo-8    	     200	     34636 ns/op	   3.70 MB/s	     28871 req/s	    3563 B/op	      41 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Serial/Turbo-8         	     200	     90507 ns/op	 724.10 MB/s	     11049 req/s	    3129 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/LargeGET/Parallel/Turbo-8       	     200	     47890 ns/op	1368.48 MB/s	     20881 req/s	    3761 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Serial/Turbo-8             	     200	     87488 ns/op	  13.17 MB/s	     11430 req/s	    4000 B/op	      55 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/POST/Parallel/Turbo-8           	     200	     34218 ns/op	  33.67 MB/s	     29225 req/s	    4505 B/op	      56 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8             	     200	     71259 ns/op	     14033 req/s	    2883 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8           	     200	     37330 ns/op	     26788 req/s	    3187 B/op	      43 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Serial/Turbo-8            	     200	     78655 ns/op	     12714 req/s	    2774 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/Empty/Parallel/Turbo-8          	     200	     43911 ns/op	     22773 req/s	    3069 B/op	      40 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Serial/Turbo-8        	     200	     72684 ns/op	   7.04 MB/s	     13758 req/s	    3182 B/op	      45 allocs/op
+BenchmarkHTTP11NoKeepAlive/TCP/StreamGET/Parallel/Turbo-8      	     200	     32765 ns/op	  15.63 MB/s	     30521 req/s	    3752 B/op	      45 allocs/op
+PASS

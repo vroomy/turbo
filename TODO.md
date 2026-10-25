@@ -283,7 +283,48 @@ large-body regression.
 **Dependencies:** none for implementation; use task 1's revised Pipe baseline
 when available. Coordinate `response_writer.go` edits with tasks 3 and 6.
 
-### 3. [ ] P1 — Cache formatted HTTP Date at one-second resolution
+### 3. [x] P1 — Cache formatted HTTP Date at one-second resolution
+
+**Completed 2026-10-25.** Each response writer retains a Unix second and an
+immutable formatted Date string across `reset`. `populateHeaders` still reads
+the clock on every response, but formats only on first use or when the second
+differs, including backward changes. The empty-string sentinel handles Unix
+second zero. The cache adds 24 bytes per worker on arm64, with no shared state,
+locks, ticker, or background goroutine. Handler Date overrides and nil/empty
+suppression still apply to the current response and are restored to the cached
+default on reuse. Header value slices remain independently owned.
+
+Measurements compare base commit `45364e7d1c6c0b1cf71211d5f2b8ae4bfb0d8a8d`
+against this change with the identical harness, Go 1.27.2, Darwin arm64,
+Apple M3, `GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients. Ten
+alternating-order samples per case use 200 ms for isolated/Pipe and 200
+requests for bounded TCP. SmallGET isolated improves **918.25 to 791 ns/op**
+(-13.86%, `p<0.001`), **132 to 100 B/op**, and **3 to 2 allocs/op**. All seven
+isolated workloads save 32 B and one reported object; their time improves
+8.00–13.86%. ResponseWriter final/informational improves 17.26/15.44% and
+48 to 16 B/op. Rounded object counts do not imply allocation-free requests.
+
+Pipe SmallGET serial/parallel improves **2.54/1.74%** (`p=0.017/<0.001`),
+with one fewer reported object in every Pipe case. Other significant Pipe
+gains range from 1.76–3.66%; ImplicitGET, LargeGET parallel, POST parallel,
+and StreamGET serial are uncertain. There are no significant timing
+regressions in the matrix. All TCP timing differences are uncertain,
+including HEAD/Empty parallel increases of 4.88/9.54%; no TCP speedup is
+established. Short TCP samples include per-worker cache initialization and
+other warmup costs. All timing/profile TCP requests completed without errors.
+
+Separate 20,000-request allocation profiles reduce `time.Time.Format` from
+20,003 allocations (625.09 KiB) to two (64 bytes, setup), confirming that
+formatting no longer allocates per request. CPU profiles cover isolated GET
+and full SmallGET round trips over Pipe/TCP, serial/parallel. The isolated
+Date expression's sampled share drops from 11.33% to 5.29%, while clock and
+map work remain; full round-trip profiles are dominated by synchronization
+and system calls. `go test -race -count=1 ./... -timeout=2m` passed with
+loopback enabled. Deterministic helper tests cover same-second hits, rollover,
+backward time, epoch initialization, UTC output, immutable prior values, and
+reset reuse; parallel override tests cover suppression and committed headers.
+Raw samples, benchstat, metadata, profile summaries, and reproduction scripts
+are tracked in [`performance/http-date-cache/`](performance/http-date-cache/README.md).
 
 **Entry points:** `responseWriter.populateHeaders`, `populateHeader`, `reset`
 in `response_writer.go`; `BenchmarkResponseWriter` and `BenchmarkTurboProcess`.

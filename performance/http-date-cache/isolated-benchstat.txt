@@ -1,0 +1,54 @@
+# GOMAXPROCS=8 benchstat /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/before-isolated.txt /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/after-isolated.txt
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+                               │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/before-isolated.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/after-isolated.txt │
+                               │                                              sec/op                                              │                                 sec/op                                   vs base                │
+TurboProcess/SmallGET-8                                                                                               918.2n ± 1%                                                               791.0n ± 2%  -13.86% (p=0.000 n=10)
+TurboProcess/ImplicitGET-8                                                                                           1014.0n ± 2%                                                               903.1n ± 6%  -10.94% (p=0.001 n=10)
+TurboProcess/LargeGET-8                                                                                               929.1n ± 1%                                                               807.6n ± 3%  -13.07% (p=0.000 n=10)
+TurboProcess/POST-8                                                                                                   1.244µ ± 2%                                                               1.144µ ± 1%   -8.00% (p=0.000 n=10)
+TurboProcess/HEAD-8                                                                                                   921.2n ± 1%                                                               794.9n ± 2%  -13.71% (p=0.000 n=10)
+TurboProcess/Empty-8                                                                                                  826.6n ± 1%                                                               714.9n ± 3%  -13.51% (p=0.000 n=10)
+TurboProcess/StreamGET-8                                                                                              944.9n ± 2%                                                               818.2n ± 2%  -13.40% (p=0.000 n=10)
+ResponseWriter/final-8                                                                                                594.6n ± 1%                                                               491.9n ± 3%  -17.26% (p=0.000 n=10)
+ResponseWriter/informational-8                                                                                        729.2n ± 2%                                                               616.6n ± 2%  -15.44% (p=0.000 n=10)
+geomean                                                                                                               885.7n                                                                    768.1n       -13.28%
+
+                           │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/before-isolated.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/after-isolated.txt │
+                           │                                               B/s                                                │                                   B/s                                    vs base                │
+TurboProcess/SmallGET-8                                                                                          132.9Mi ± 2%                                                              154.3Mi ± 2%  +16.08% (p=0.000 n=10)
+TurboProcess/ImplicitGET-8                                                                                       120.4Mi ± 2%                                                              135.2Mi ± 6%  +12.25% (p=0.002 n=10)
+TurboProcess/LargeGET-8                                                                                          65.69Gi ± 1%                                                              75.57Gi ± 3%  +15.04% (p=0.000 n=10)
+TurboProcess/POST-8                                                                                              883.5Mi ± 2%                                                              960.6Mi ± 1%   +8.73% (p=0.000 n=10)
+TurboProcess/StreamGET-8                                                                                         516.8Mi ± 2%                                                              596.7Mi ± 2%  +15.47% (p=0.000 n=10)
+geomean                                                                                                          867.6Mi                                                                   984.6Mi       +13.48%
+
+                               │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/before-isolated.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/after-isolated.txt │
+                               │                                               B/op                                               │                                  B/op                                    vs base                │
+TurboProcess/SmallGET-8                                                                                                132.0 ± 0%                                                                100.0 ± 0%  -24.24% (p=0.000 n=10)
+TurboProcess/ImplicitGET-8                                                                                            100.00 ± 0%                                                                68.00 ± 0%  -32.00% (p=0.000 n=10)
+TurboProcess/LargeGET-8                                                                                                132.0 ± 0%                                                                100.0 ± 0%  -24.24% (p=0.000 n=10)
+TurboProcess/POST-8                                                                                                  1.112Ki ± 0%                                                              1.081Ki ± 0%   -2.81% (p=0.000 n=10)
+TurboProcess/HEAD-8                                                                                                    132.0 ± 0%                                                                100.0 ± 0%  -24.24% (p=0.000 n=10)
+TurboProcess/Empty-8                                                                                                  116.00 ± 0%                                                                84.00 ± 0%  -27.59% (p=0.000 n=10)
+TurboProcess/StreamGET-8                                                                                               132.0 ± 0%                                                                100.0 ± 0%  -24.24% (p=0.000 n=10)
+ResponseWriter/final-8                                                                                                 48.00 ± 0%                                                                16.00 ± 0%  -66.67% (p=0.000 n=10)
+ResponseWriter/informational-8                                                                                         48.00 ± 0%                                                                16.00 ± 0%  -66.67% (p=0.000 n=10)
+geomean                                                                                                                128.0                                                                     81.68       -36.20%
+
+                               │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/before-isolated.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/performance/http-date-cache/after-isolated.txt │
+                               │                                            allocs/op                                             │                             allocs/op                               vs base                     │
+TurboProcess/SmallGET-8                                                                                                3.000 ± 0%                                                           2.000 ± 0%   -33.33% (p=0.000 n=10)
+TurboProcess/ImplicitGET-8                                                                                             1.000 ± 0%                                                           0.000 ± 0%  -100.00% (p=0.000 n=10)
+TurboProcess/LargeGET-8                                                                                                3.000 ± 0%                                                           2.000 ± 0%   -33.33% (p=0.000 n=10)
+TurboProcess/POST-8                                                                                                    14.00 ± 0%                                                           13.00 ± 0%    -7.14% (p=0.000 n=10)
+TurboProcess/HEAD-8                                                                                                    3.000 ± 0%                                                           2.000 ± 0%   -33.33% (p=0.000 n=10)
+TurboProcess/Empty-8                                                                                                   2.000 ± 0%                                                           1.000 ± 0%   -50.00% (p=0.000 n=10)
+TurboProcess/StreamGET-8                                                                                               3.000 ± 0%                                                           2.000 ± 0%   -33.33% (p=0.000 n=10)
+ResponseWriter/final-8                                                                                                 2.000 ± 0%                                                           1.000 ± 0%   -50.00% (p=0.000 n=10)
+ResponseWriter/informational-8                                                                                         2.000 ± 0%                                                           1.000 ± 0%   -50.00% (p=0.000 n=10)
+geomean                                                                                                                2.753                                                                            ?                       ¹ ²
+¹ summaries must be >0 to compute geomean
+² ratios must be >0 to compute geomean

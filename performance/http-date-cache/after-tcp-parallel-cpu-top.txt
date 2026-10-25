@@ -1,0 +1,38 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /private/tmp/turbo-date-cache/after.test /tmp/turbo-date-cache/after-tcp-parallel-cpu.pprof
+File: after.test
+Type: cpu
+Time: 2026-10-25 07:45:44 PDT
+Duration: 304.30ms, Total samples = 560ms (184.03%)
+Showing nodes accounting for 560ms, 100% of 560ms total
+Showing top 30 nodes out of 111
+      flat  flat%   sum%        cum   cum%
+     400ms 71.43% 71.43%      400ms 71.43%  syscall.rawsyscalln
+      80ms 14.29% 85.71%       80ms 14.29%  runtime.kevent
+      40ms  7.14% 92.86%       40ms  7.14%  runtime.pthread_cond_wait
+      30ms  5.36% 98.21%       30ms  5.36%  runtime.pthread_cond_signal
+      10ms  1.79%   100%       10ms  1.79%  runtime.usleep
+         0     0%   100%       20ms  3.57%  bufio.(*Reader).Peek
+         0     0%   100%       30ms  5.36%  bufio.(*Reader).ReadByte
+         0     0%   100%       20ms  3.57%  bufio.(*Reader).ReadLine
+         0     0%   100%       20ms  3.57%  bufio.(*Reader).ReadSlice
+         0     0%   100%       70ms 12.50%  bufio.(*Reader).fill
+         0     0%   100%       90ms 16.07%  github.com/vroomy/turbo.(*Turbo).listen
+         0     0%   100%       70ms 12.50%  github.com/vroomy/turbo.(*Turbo).process
+         0     0%   100%       20ms  3.57%  github.com/vroomy/turbo.(*Turbo).process.func1
+         0     0%   100%       70ms 12.50%  github.com/vroomy/turbo.(*Turbo).work
+         0     0%   100%      300ms 53.57%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0%   100%       30ms  5.36%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1
+         0     0%   100%       90ms 16.07%  github.com/vroomy/turbo.(*http11StartListener).Accept
+         0     0%   100%       30ms  5.36%  github.com/vroomy/turbo.(*responseWriter).Write
+         0     0%   100%       30ms  5.36%  github.com/vroomy/turbo.(*responseWriter).writeHeaderAndBody
+         0     0%   100%      300ms 53.57%  github.com/vroomy/turbo.benchmarkHTTP11.func1
+         0     0%   100%       20ms  3.57%  github.com/vroomy/turbo.closeConn
+         0     0%   100%       20ms  3.57%  github.com/vroomy/turbo.finishRequest
+         0     0%   100%       30ms  5.36%  github.com/vroomy/turbo.http11Workload.handler.func1
+         0     0%   100%      180ms 32.14%  github.com/vroomy/turbo.newHTTP11BenchmarkListener.func1
+         0     0%   100%       20ms  3.57%  github.com/vroomy/turbo/request.(*Parser).Parse
+         0     0%   100%       20ms  3.57%  github.com/vroomy/turbo/request.parse
+         0     0%   100%       30ms  5.36%  internal/poll.(*FD).Accept
+         0     0%   100%       50ms  8.93%  internal/poll.(*FD).Close
+         0     0%   100%       60ms 10.71%  internal/poll.(*FD).Init
+         0     0%   100%       70ms 12.50%  internal/poll.(*FD).Read

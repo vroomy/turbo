@@ -1,0 +1,150 @@
+# round 1, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  235705	       900.2 ns/op	 142.19 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  242894	       998.0 ns/op	 128.26 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  268532	       934.5 ns/op	70132.94 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  190899	      1243 ns/op	 926.65 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  266649	       922.9 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  296871	       826.2 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  254326	      1267 ns/op	 404.22 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  404445	       585.3 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  339672	       710.7 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 2, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  256891	       912.6 ns/op	 140.26 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  239545	      1013 ns/op	 126.37 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  265725	       909.3 ns/op	72069.69 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  168775	      1263 ns/op	 912.36 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  265884	       907.9 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  295737	       826.0 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  259869	       931.3 ns/op	 549.78 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  406303	       587.5 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  334050	       715.7 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 3, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  263665	       904.6 ns/op	 141.50 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  237079	      1005 ns/op	 127.36 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  238761	       930.9 ns/op	70399.83 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  189093	      1239 ns/op	 930.00 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  270162	       905.0 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  286635	       820.4 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  254342	       929.6 ns/op	 550.76 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  406930	       588.5 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  339098	       715.5 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 4, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  258614	       916.9 ns/op	 139.60 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  234688	      1014 ns/op	 126.28 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  263610	       925.0 ns/op	70846.18 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  188295	      1244 ns/op	 926.14 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  264914	       913.7 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  291949	       823.2 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  257248	       944.5 ns/op	 542.09 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  408727	       593.8 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  337162	       729.3 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 5, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  262125	       916.9 ns/op	 139.60 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  232662	      1014 ns/op	 126.27 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  260365	       932.6 ns/op	70273.08 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  190292	      1246 ns/op	 924.34 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  265484	       914.0 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  293071	       821.5 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  255472	       933.5 ns/op	 548.46 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  416509	       589.2 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  333373	       741.9 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 6, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  263412	       925.8 ns/op	 138.26 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  237418	      1026 ns/op	 124.75 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  265178	       916.3 ns/op	71524.22 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  191944	      1229 ns/op	 937.11 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  259832	       925.0 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  295921	       828.8 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  259065	       960.0 ns/op	 533.31 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  412406	       596.1 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  342334	       746.6 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 7, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  255956	       923.7 ns/op	 138.57 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  240643	      1013 ns/op	 126.34 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  262410	       936.2 ns/op	70001.42 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  192105	      1242 ns/op	 927.76 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  267822	       921.9 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  297049	       837.2 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  257097	       949.1 ns/op	 539.47 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  402282	       608.8 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  323413	       722.3 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 8, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  260090	       929.6 ns/op	 137.69 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  235976	      1031 ns/op	 124.14 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  263947	       931.4 ns/op	70364.30 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  190530	      1269 ns/op	 908.11 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  255822	       931.8 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  293668	       838.1 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  254870	       944.6 ns/op	 542.05 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  411357	       598.6 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  330166	       733.6 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 9, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  260427	       934.7 ns/op	 136.94 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  234418	      1018 ns/op	 125.77 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  264307	       927.1 ns/op	70688.09 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  190065	      1271 ns/op	 906.46 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  262888	       936.3 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  293976	       831.6 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  254247	       957.0 ns/op	 535.03 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  397946	       599.0 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  336841	       735.5 ns/op	      48 B/op	       2 allocs/op
+PASS
+# round 10, GOMAXPROCS=8 /private/tmp/turbo-date-cache/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -test.benchmem -test.benchtime=200ms -test.count=1 -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	  264674	       919.6 ns/op	 139.20 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8      	  237331	      1039 ns/op	 123.23 MB/s	     100 B/op	       1 allocs/op
+BenchmarkTurboProcess/LargeGET-8         	  264627	       927.3 ns/op	70673.34 MB/s	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/POST-8             	  194116	      1234 ns/op	 933.40 MB/s	    1139 B/op	      14 allocs/op
+BenchmarkTurboProcess/HEAD-8             	  266866	       920.5 ns/op	     132 B/op	       3 allocs/op
+BenchmarkTurboProcess/Empty-8            	  294925	       827.0 ns/op	     116 B/op	       2 allocs/op
+BenchmarkTurboProcess/StreamGET-8        	  252458	       945.1 ns/op	 541.73 MB/s	     132 B/op	       3 allocs/op
+BenchmarkResponseWriter/final-8          	  412269	       595.3 ns/op	      48 B/op	       2 allocs/op
+BenchmarkResponseWriter/informational-8  	  341179	       729.1 ns/op	      48 B/op	       2 allocs/op
+PASS

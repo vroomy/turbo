@@ -1,0 +1,21 @@
+# GOMAXPROCS=8 go tool pprof -sample_index=alloc_objects -list=time.Time.Format /private/tmp/turbo-date-cache/after.test /tmp/turbo-date-cache/after-process-memory.pprof
+Total: 42417
+ROUTINE ======================== time.Time.Format in /opt/homebrew/Cellar/go/1.27.2/libexec/src/time/format.go
+         2          2 (flat, cum) 0.0047% of Total
+         .          .    639:func (t Time) Format(layout string) string {
+         .          .    640:	const bufSize = 64
+         .          .    641:	var b []byte
+         .          .    642:	max := len(layout) + 10
+         .          .    643:	if max < bufSize {
+         .          .    644:		var buf [bufSize]byte
+         .          .    645:		b = buf[:0]
+         .          .    646:	} else {
+         .          .    647:		b = make([]byte, 0, max)
+         .          .    648:	}
+         .          .    649:	b = t.AppendFormat(b, layout)
+         2          2    650:	return string(b)
+         .          .    651:}
+         .          .    652:
+         .          .    653:// AppendFormat is like [Time.Format] but appends the textual
+         .          .    654:// representation to b and returns the extended buffer.
+         .          .    655:func (t Time) AppendFormat(b []byte, layout string) []byte {
