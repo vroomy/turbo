@@ -469,6 +469,12 @@ func TestResponseWriterConnectionErrors(t *testing.T) {
 			c := &responseConn{failAt: tt.failAt, n: tt.n, err: tt.err}
 			r := makeResponseWriter()
 			r.c = c
+			if tt.failAt == 2 {
+				// Exercise direct body failures after a successful header write.
+				if _, err := r.writeHeader(); err != nil {
+					t.Fatal(err)
+				}
+			}
 			if n, err := r.Write([]byte("body")); n != tt.wantN || !errors.Is(err, tt.wantErr) {
 				t.Fatalf("Write = (%d, %v), want (%d, %v)", n, err, tt.wantN, tt.wantErr)
 			}

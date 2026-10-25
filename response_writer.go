@@ -15,6 +15,10 @@ var _ http.ResponseWriter = &responseWriter{}
 
 const maxRetainedHeaderCapacity = 16 << 10
 
+// Copy only small first writes into the worker's header buffer. Larger bodies
+// go straight to the connection, and every Write still sends immediately.
+const maxCoalescedResponseSize = 4 << 10
+
 var responseHeaderExclusions = map[string]bool{
 	"Connection":        true,
 	"Content-Length":    true,
@@ -111,6 +115,16 @@ func (r *responseWriter) Write(bs []byte) (n int, err error) {
 	}
 
 	r.appendContentType(bs)
+
+	if !r.sentHeader && !r.head && len(bs) <= maxCoalescedResponseSize-r.headerBuffer.Len()-2 &&
+		r.validateStatusCodeForWriting() == nil && r.validateContentLength(bs) == nil {
+		headerLength := r.headerBuffer.Len() + 2
+		n, err = r.writeHeaderAndBody(bs)
+		// The connection counts header bytes too, including on a partial write.
+		n = max(0, n-headerLength)
+		r.written += int64(n)
+		return n, err
+	}
 
 	if _, err = r.writeHeader(); err != nil {
 		return 0, err
@@ -261,6 +275,11 @@ func (r *responseWriter) writeInformationalHeader() {
 }
 
 func (r *responseWriter) writeHeader() (n int, err error) {
+	return r.writeHeaderAndBody(nil)
+}
+
+// bs is either nil or a validated, bounded first body write.
+func (r *responseWriter) writeHeaderAndBody(bs []byte) (n int, err error) {
 	if r.err != nil {
 		return 0, r.err
 	}
@@ -275,6 +294,9 @@ func (r *responseWriter) writeHeader() (n int, err error) {
 
 	r.sentHeader = true
 	r.headerBuffer.WriteString("\r\n")
+	if len(bs) > 0 {
+		r.headerBuffer.Write(bs)
+	}
 	if r.c == nil {
 		r.err = fmt.Errorf("turbo: response writer has no connection")
 		return 0, r.err

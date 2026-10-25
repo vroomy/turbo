@@ -193,7 +193,8 @@ func TestTurboProcessErrors(t *testing.T) {
 			called := false
 			server := Turbo{h: func(w http.ResponseWriter, _ *http.Request) {
 				called = true
-				_, _ = w.Write([]byte("response"))
+				_, _ = w.Write([]byte("resp"))
+				_, _ = w.Write([]byte("onse"))
 			}}
 			err := server.process(conn, &writer, &parser)
 			if tt.wantErr != nil && !errors.Is(err, tt.wantErr) {
@@ -288,7 +289,7 @@ func TestTurboWorkers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			count := tt.workers + tt.queue
 			listener := newTurboTestListener(count + 2)
-			server := newTurbo(listener, tt.workers, tt.queue)
+			server := newTurbo(listener, tt.workers, tt.queue, nil)
 			if server == nil {
 				t.Fatal("newTurbo returned nil")
 			}
@@ -389,7 +390,7 @@ func TestTurboClose(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			listener := newTurboTestListener(1)
 			listener.closeErr = tt.closeErr
-			server := newTurbo(listener, 2, 0)
+			server := newTurbo(listener, 2, 0, nil)
 			if server == nil {
 				t.Fatal("newTurbo returned nil")
 			}

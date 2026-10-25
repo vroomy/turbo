@@ -11,3 +11,8 @@ See [benchmarks](benchmarks/README.md) for repeatable Turbo versus `net/http`
 comparisons, workload definitions, and recorded results.
 See the [TODO](TODO.md) for the current Pipe timeout design, its costs, and
 the revised measurement baseline.
+
+The [standalone hello-world examples](examples/README.md) compare stdlib and
+Turbo as separate executables using the same handler and the oha load
+generator. Turbo's `NewWithHandler` constructor installs the handler before
+the server starts accepting connections.

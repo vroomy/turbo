@@ -212,7 +212,48 @@ Preserve `TestHTTP11BenchmarkContract` and bounded test completion.
 the end-to-end effect of other tasks. Server-only work can use this baseline
 independently. Coordinate benchmark-file edits with task 4.
 
-### 2. [ ] P1 — Combine response headers and the first body write
+### 2. [x] P1 — Combine response headers and the first body write
+
+**Completed 2026-10-24.** First body writes are appended to the worker's
+serialized header buffer when the total is at most 4 KiB, then sent
+immediately. Later writes, oversized first writes/headers, HEAD, and bodyless
+statuses keep their existing paths. A 64 KiB body is never copied into the
+buffer. The existing 16 KiB retention limit/reset remains; no new fields or
+handler-return buffering were introduced. Counting connections verify one
+write instead of two for SmallGET/ImplicitGET/POST and four instead of five
+for the new four-chunk StreamGET workload. Partial writes count body bytes
+only and preserve sticky errors. Go's local `net.Buffers` implementation uses
+`writev` for TCP but separate writes for Pipe; bounded copying supports both.
+
+Before/after measurements use base commit `f8a9868`, Go 1.27.2, Darwin arm64,
+Apple M3, `GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients, with task 1's
+revised Pipe harness identical in both binaries. Both an initial sequential
+matrix and an alternating-order confirmation used ten samples per case:
+200 ms for isolated/Pipe and 200 requests for bounded TCP. Confirmation Pipe
+SmallGET serial changes from **5.177 to 5.060 µs** (-2.27%, `p=0.001`),
+ImplicitGET serial/parallel improves 1.79/5.02%, POST 9.67/5.83%, and StreamGET
+6.09/4.60%. These gains also appeared in the initial matrix. SmallGET parallel
+confirmation is uncertain (`p=0.052`); LargeGET, HEAD, Empty, and all isolated
+timing changes are not significant. Small initial isolated regressions and
+0.94/1.00% Pipe LargeGET/HEAD serial regressions did not reproduce as
+significant differences in the alternating run.
+
+Initial TCP SmallGET gains of 4.74/5.51% did not repeat significantly in the
+noisy confirmation matrix; **no TCP speedup is established**. Initial TCP
+HEAD/Empty regressions also did not reproduce significantly. Isolated
+SmallGET remains **132 B/op, 3 allocs/op**, with no isolated allocation changes
+for any workload. Pipe object counts are unchanged. Short TCP samples include
+larger worker-buffer warmup costs: SmallGET serial rises 62 B/op (+1.94%) and
+parallel reports 46 to 47 allocs/op; all costs and uncertain results are
+retained. Acceptance rests on repeated Pipe round-trip gains, verified prompt
+streaming, and no demonstrated material large-body regression.
+
+`go test -race -count=1 ./... -timeout=2m` passed, including committed headers,
+informational/bodyless responses, content sniffing, length enforcement,
+partial-write boundaries, reset bounds, and gated streaming over TCP/Pipe.
+Tracked raw samples, all ns/op/B/op/object medians, benchstat, metadata,
+profile summaries, and reproduction scripts are in
+[`performance/response-coalescing/`](performance/response-coalescing/README.md).
 
 **Entry points:** `response_writer.go`: `Write`, `writeHeader`, `writeBody`,
 `recordWriteResult`, `reset`; `Turbo.process` in `turbo.go`.

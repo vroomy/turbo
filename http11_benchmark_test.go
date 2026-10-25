@@ -26,6 +26,7 @@ type http11Workload struct {
 	requestBody  []byte
 	responseBody []byte
 	implicit     bool
+	writeSize    int
 }
 
 func http11Workloads() []http11Workload {
@@ -37,6 +38,7 @@ func http11Workloads() []http11Workload {
 		{name: "POST", method: http.MethodPost, requestBody: bytes.Repeat([]byte("x"), 1<<10), responseBody: small},
 		{name: "HEAD", method: http.MethodHead, responseBody: small},
 		{name: "Empty", method: http.MethodGet},
+		{name: "StreamGET", method: http.MethodGet, responseBody: bytes.Repeat([]byte("x"), 512), writeSize: 128},
 	}
 }
 
@@ -55,6 +57,14 @@ func (w http11Workload) handler() http.HandlerFunc {
 			if len(w.responseBody) > 0 {
 				out.Header().Set("Content-Type", "application/octet-stream")
 			}
+		}
+		if w.writeSize > 0 {
+			for start := 0; start < len(w.responseBody); start += w.writeSize {
+				if _, err := out.Write(w.responseBody[start:min(start+w.writeSize, len(w.responseBody))]); err != nil {
+					return
+				}
+			}
+			return
 		}
 		_, _ = out.Write(w.responseBody)
 	}
@@ -332,8 +342,7 @@ func startHTTP11BenchmarkServer(tb testing.TB, transport, implementation string,
 	gate := &http11StartListener{Listener: listener, ready: make(chan struct{})}
 	switch implementation {
 	case "Turbo":
-		server := newTurbo(gate, 32, 1024)
-		server.h = handler
+		server := newTurbo(gate, 32, 1024, handler)
 		tb.Cleanup(func() {
 			if err := server.Close(); err != nil {
 				tb.Error(err)

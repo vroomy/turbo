@@ -19,18 +19,35 @@ var requestReaders = sync.Pool{
 }
 
 func New(port uint16, workerCount, queueLength int) (out *Turbo, err error) {
+	return newWithHandler(port, workerCount, queueLength, nil)
+}
+
+// NewWithHandler starts a server on 127.0.0.1:port. It installs handler before
+// starting workers or accepting connections. Port zero selects an unused port.
+func NewWithHandler(port uint16, workerCount, queueLength int, handler http.HandlerFunc) (*Turbo, error) {
+	if handler == nil {
+		return nil, errors.New("turbo: handler must not be nil")
+	}
+	if workerCount < 1 || queueLength < 0 {
+		return nil, errors.New("turbo: workers must be positive and queue length nonnegative")
+	}
+	return newWithHandler(port, workerCount, queueLength, handler)
+}
+
+func newWithHandler(port uint16, workerCount, queueLength int, handler http.HandlerFunc) (out *Turbo, err error) {
 	var l net.Listener
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
 	if l, err = net.Listen("tcp", addr); err != nil {
 		return nil, err
 	}
 
-	return newTurbo(l, workerCount, queueLength), nil
+	return newTurbo(l, workerCount, queueLength, handler), nil
 }
 
-func newTurbo(l net.Listener, workerCount, queueLength int) (out *Turbo) {
+func newTurbo(l net.Listener, workerCount, queueLength int, handler http.HandlerFunc) (out *Turbo) {
 	var t Turbo
 	t.l = l
+	t.h = handler
 	t.conns = make(chan net.Conn, queueLength)
 
 	t.workers.Add(workerCount)
