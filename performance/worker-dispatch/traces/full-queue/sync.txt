@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-full-queue-sync.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 66.21s, 100% of 66.21s total
+Dropped 51 nodes (cum <= 0.33s)
+Showing top 30 nodes out of 35
+      flat  flat%   sum%        cum   cum%
+    63.45s 95.83% 95.83%     63.45s 95.83%  runtime.selectgo
+     1.65s  2.48% 98.32%      1.65s  2.48%  runtime.chanrecv1
+     0.56s  0.85% 99.17%      0.56s  0.85%  sync.(*WaitGroup).Wait
+     0.55s  0.83%   100%      0.55s  0.83%  runtime.chansend1
+         0     0%   100%      0.55s  0.84%  bufio.(*Reader).ReadLine
+         0     0%   100%      0.55s  0.84%  bufio.(*Reader).ReadSlice
+         0     0%   100%      0.55s  0.84%  bufio.(*Reader).fill
+         0     0%   100%      0.56s  0.85%  github.com/vroomy/turbo.(*Turbo).listen
+         0     0%   100%     62.88s 94.96%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0%   100%     57.31s 86.56%  github.com/vroomy/turbo.(*http11PipeListener).dial
+         0     0%   100%      0.57s  0.86%  github.com/vroomy/turbo.TestHTTP11DispatchStudy
+         0     0%   100%      0.56s  0.85%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1
+         0     0%   100%     57.31s 86.56%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.2
+         0     0%   100%      0.56s  0.85%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.3
+         0     0%   100%      0.56s  0.85%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4
+         0     0%   100%     62.88s 94.96%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1
+         0     0%   100%      0.56s  0.85%  github.com/vroomy/turbo.runHTTP11Clients
+         0     0%   100%     62.88s 94.97%  github.com/vroomy/turbo.runHTTP11Clients.func1
+         0     0%   100%      0.57s  0.86%  main.main
+         0     0%   100%      0.55s  0.84%  net.(*pipe).Read
+         0     0%   100%      5.01s  7.57%  net.(*pipe).Write
+         0     0%   100%      0.55s  0.84%  net.(*pipe).read
+         0     0%   100%      5.01s  7.57%  net.(*pipe).write
+         0     0%   100%      0.55s  0.84%  net/http.ReadResponse
+         0     0%   100%      0.55s  0.84%  net/textproto.(*Reader).ReadLine
+         0     0%   100%      0.55s  0.84%  net/textproto.(*Reader).readLineSlice
+         0     0%   100%      0.50s  0.76%  runtime.(*wakeableSleep).sleep
+         0     0%   100%      0.50s  0.76%  runtime.traceStartReadCPU.func1
+         0     0%   100%      0.56s  0.85%  runtime/trace.WithRegion
+         0     0%   100%     63.44s 95.82%  sync.(*WaitGroup).Go.func1

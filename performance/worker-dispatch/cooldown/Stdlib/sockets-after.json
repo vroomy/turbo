@@ -1,0 +1,11 @@
+{
+  "states": {
+    "ESTABLISHED": 60,
+    "FIN_WAIT_1": 4,
+    "CLOSE_WAIT": 1,
+    "LISTEN": 6,
+    "TIME_WAIT": 32686
+  },
+  "error": "",
+  "returncode": 0
+}

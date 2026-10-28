@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-full-queue-syscall.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 890.62us, 100% of 890.62us total
+Dropped 5 nodes (cum <= 4.45us)
+Showing top 30 nodes out of 39
+      flat  flat%   sum%        cum   cum%
+  890.62us   100%   100%   890.62us   100%  syscall.syscall
+         0     0%   100%    53.57us  6.01%  fmt.Fprint
+         0     0%   100%    84.35us  9.47%  fmt.Fprintf
+         0     0%   100%    53.57us  6.01%  fmt.Print
+         0     0%   100%   723.65us 81.25%  github.com/vroomy/turbo.TestHTTP11DispatchStudy
+         0     0%   100%   175.87us 19.75%  internal/poll.(*FD).Close
+         0     0%   100%   315.71us 35.45%  internal/poll.(*FD).Write
+         0     0%   100%   175.87us 19.75%  internal/poll.(*FD).decref
+         0     0%   100%   175.87us 19.75%  internal/poll.(*FD).destroy
+         0     0%   100%   175.87us 19.75%  internal/poll.(*SysFile).destroy
+         0     0%   100%   315.71us 35.45%  internal/poll.ignoringEINTRIO
+         0     0%   100%    64.96us  7.29%  main.main
+         0     0%   100%   175.87us 19.75%  os.(*File).Close
+         0     0%   100%   315.71us 35.45%  os.(*File).Write
+         0     0%   100%   315.71us 35.45%  os.(*File).write
+         0     0%   100%   175.87us 19.75%  os.(*file).close
+         0     0%   100%   395.20us 44.37%  os.OpenFile
+         0     0%   100%   712.70us 80.02%  os.WriteFile
+         0     0%   100%   399.04us 44.80%  os.ignoringEINTR
+         0     0%   100%    24.90us  2.80%  os.newFile
+         0     0%   100%    24.90us  2.80%  os.newFile.func1
+         0     0%   100%   370.30us 41.58%  os.open
+         0     0%   100%   395.20us 44.37%  os.openFileNolog
+         0     0%   100%   370.30us 41.58%  os.openFileNolog.func1
+         0     0%   100%    36.16us  4.06%  runtime/trace.(*traceMultiplexer).startLocked.func1
+         0     0%   100%   175.87us 19.75%  syscall.Close
+         0     0%   100%    24.90us  2.80%  syscall.Fstat
+         0     0%   100%   370.30us 41.58%  syscall.Open
+         0     0%   100%   315.71us 35.45%  syscall.Write
+         0     0%   100%   315.71us 35.45%  syscall.write

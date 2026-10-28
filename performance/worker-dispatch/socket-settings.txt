@@ -1,0 +1,4 @@
+kern.osrelease: 25.5.0
+net.inet.tcp.msl: 15000
+net.inet.ip.portrange.first: 49152
+net.inet.ip.portrange.last: 65535

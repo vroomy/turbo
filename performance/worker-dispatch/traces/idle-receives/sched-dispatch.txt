@@ -1,0 +1,43 @@
+# GOMAXPROCS=8 go tool pprof '-list=turbo.*(listen|work)' /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-idle-receives-sched.pprof
+Total: 6.94ms
+ROUTINE ======================== github.com/vroomy/turbo.(*Turbo).listen in /Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go
+   70.29us     3.60ms (flat, cum) 51.84% of Total
+         .          .     93:		if t.closed.Load() {
+         .          .     94:			return
+         .          .     95:		}
+         .          .     96:
+         .          .     97:		var c net.Conn
+         .     1.99ms     98:		if c, err = t.l.Accept(); err != nil {
+         .          .     99:			if t.closed.Load() || errors.Is(err, net.ErrClosed) {
+   70.29us    70.29us    100:				return
+         .          .    101:			}
+         .          .    102:			log.Printf("error accepting connection: %v\n", err)
+         .          .    103:			continue
+         .          .    104:		}
+         .          .    105:
+         .     1.54ms    106:		t.conns <- c
+         .          .    107:	}
+         .          .    108:}
+         .          .    109:
+         .          .    110:func (t *Turbo) work() {
+         .          .    111:	var err error
+ROUTINE ======================== github.com/vroomy/turbo.(*Turbo).work in /Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go
+         0     1.10ms (flat, cum) 15.82% of Total
+         .          .    108:}
+         .          .    109:
+         .          .    110:func (t *Turbo) work() {
+         .          .    111:	var err error
+         .          .    112:	defer t.workers.Done()
+         .    63.74us    113:	res := makeResponseWriter()
+         .          .    114:	var parser request.Parser
+         .          .    115:	for c := range t.conns {
+         .     1.03ms    116:		if err = t.process(c, &res, &parser); err != nil {
+         .          .    117:			log.Printf("error processing connection: %v\n", err)
+         .          .    118:		}
+         .          .    119:	}
+         .      256ns    120:}
+         .          .    121:
+         .          .    122:func (t *Turbo) process(c net.Conn, res *responseWriter, parser *request.Parser) (err error) {
+         .          .    123:	defer res.reset()
+         .          .    124:	defer parser.Reset()
+         .          .    125:	var req *http.Request

@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-slow-client-sched.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 72507.43us, 93.98% of 77155.24us total
+Dropped 82 nodes (cum <= 385.78us)
+Showing top 30 nodes out of 39
+      flat  flat%   sum%        cum   cum%
+64571.53us 83.69% 83.69% 64571.53us 83.69%  github.com/vroomy/turbo.runHTTP11Clients
+ 4708.19us  6.10% 89.79%  4708.19us  6.10%  runtime.systemstack_switch
+ 2741.31us  3.55% 93.35%  2741.31us  3.55%  runtime.traceLocker.stack
+  486.02us  0.63% 93.98%  3491.14us  4.52%  runtime.gcMarkDone
+    0.38us 0.0005% 93.98% 64696.32us 83.85%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1
+         0     0% 93.98%   420.48us  0.54%  context.(*cancelCtx).propagateCancel
+         0     0% 93.98%   420.48us  0.54%  context.AfterFunc
+         0     0% 93.98%   831.87us  1.08%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0% 93.98%   830.53us  1.08%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.2
+         0     0% 93.98% 64571.53us 83.69%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4
+         0     0% 93.98%  1196.10us  1.55%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1
+         0     0% 93.98%   830.53us  1.08%  github.com/vroomy/turbo.newHTTP11BenchmarkListener.func1
+         0     0% 93.98%  1196.10us  1.55%  github.com/vroomy/turbo.runHTTP11Clients.func1
+         0     0% 93.98%   420.48us  0.54%  internal/runtime/maps.NewEmptyMap
+         0     0% 93.98%   830.53us  1.08%  net.(*Dialer).Dial
+         0     0% 93.98%   830.53us  1.08%  net.(*Dialer).DialContext
+         0     0% 93.98%   420.48us  0.54%  net.(*netFD).connect
+         0     0% 93.98%   424.06us  0.55%  net.(*netFD).dial
+         0     0% 93.98%   478.85us  0.62%  net.(*sysDialer).dialParallel
+         0     0% 93.98%   478.85us  0.62%  net.(*sysDialer).dialSerial
+         0     0% 93.98%   478.85us  0.62%  net.(*sysDialer).dialSingle
+         0     0% 93.98%   478.85us  0.62%  net.(*sysDialer).dialTCP
+         0     0% 93.98%   478.85us  0.62%  net.(*sysDialer).doDialTCP
+         0     0% 93.98%   478.85us  0.62%  net.(*sysDialer).doDialTCPProto
+         0     0% 93.98%   478.85us  0.62%  net.internetSocket
+         0     0% 93.98%   478.85us  0.62%  net.socket
+         0     0% 93.98%  7081.11us  9.18%  runtime.gcBgMarkWorker
+         0     0% 93.98%   522.88us  0.68%  runtime.gcMarkTermination
+         0     0% 93.98%   537.99us   0.7%  runtime.gcStart
+         0     0% 93.98%  2482.24us  3.22%  runtime.gcWakeAllAssists

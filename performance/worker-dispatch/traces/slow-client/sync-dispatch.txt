@@ -1,0 +1,28 @@
+# GOMAXPROCS=8 go tool pprof '-list=turbo.*(listen|work)' /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-slow-client-sync.pprof
+Total: 211.72ms
+ROUTINE ======================== github.com/vroomy/turbo.(*Turbo).listen in /Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go
+         0     9.56ms (flat, cum)  4.52% of Total
+         .          .    101:			}
+         .          .    102:			log.Printf("error accepting connection: %v\n", err)
+         .          .    103:			continue
+         .          .    104:		}
+         .          .    105:
+         .     9.56ms    106:		t.conns <- c
+         .          .    107:	}
+         .          .    108:}
+         .          .    109:
+         .          .    110:func (t *Turbo) work() {
+         .          .    111:	var err error
+ROUTINE ======================== github.com/vroomy/turbo.(*Turbo).work in /Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go
+         0    73.84ms (flat, cum) 34.88% of Total
+         .          .    110:func (t *Turbo) work() {
+         .          .    111:	var err error
+         .          .    112:	defer t.workers.Done()
+         .          .    113:	res := makeResponseWriter()
+         .          .    114:	var parser request.Parser
+         .    73.84ms    115:	for c := range t.conns {
+         .          .    116:		if err = t.process(c, &res, &parser); err != nil {
+         .          .    117:			log.Printf("error processing connection: %v\n", err)
+         .          .    118:		}
+         .          .    119:	}
+         .          .    120:}

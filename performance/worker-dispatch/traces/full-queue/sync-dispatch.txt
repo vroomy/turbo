@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof '-list=turbo.*(listen|work)' /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-full-queue-sync.pprof
+Total: 66.21s
+ROUTINE ======================== github.com/vroomy/turbo.(*Turbo).listen in /Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go
+         0   560.77ms (flat, cum)  0.85% of Total
+         .          .     93:		if t.closed.Load() {
+         .          .     94:			return
+         .          .     95:		}
+         .          .     96:
+         .          .     97:		var c net.Conn
+         .       15ms     98:		if c, err = t.l.Accept(); err != nil {
+         .          .     99:			if t.closed.Load() || errors.Is(err, net.ErrClosed) {
+         .          .    100:				return
+         .          .    101:			}
+         .          .    102:			log.Printf("error accepting connection: %v\n", err)
+         .          .    103:			continue
+         .          .    104:		}
+         .          .    105:
+         .   545.78ms    106:		t.conns <- c
+         .          .    107:	}
+         .          .    108:}
+         .          .    109:
+         .          .    110:func (t *Turbo) work() {
+         .          .    111:	var err error
+ROUTINE ======================== github.com/vroomy/turbo.(*Turbo).work in /Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go
+         0     5.89ms (flat, cum) 0.0089% of Total
+         .          .    110:func (t *Turbo) work() {
+         .          .    111:	var err error
+         .          .    112:	defer t.workers.Done()
+         .          .    113:	res := makeResponseWriter()
+         .          .    114:	var parser request.Parser
+         .     3.73ms    115:	for c := range t.conns {
+         .     2.16ms    116:		if err = t.process(c, &res, &parser); err != nil {
+         .          .    117:			log.Printf("error processing connection: %v\n", err)
+         .          .    118:		}
+         .          .    119:	}
+         .          .    120:}
+         .          .    121:

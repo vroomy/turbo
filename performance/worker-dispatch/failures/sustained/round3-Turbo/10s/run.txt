@@ -1,0 +1,8 @@
+# GOMAXPROCS=8 /tmp/turbo-dispatch/turbo.test '-test.run=^TestHTTP11DispatchStudy$' -test.v -test.timeout=1m
+=== RUN   TestHTTP11DispatchStudy
+=== RUN   TestHTTP11DispatchStudy/load
+=== NAME  TestHTTP11DispatchStudy
+    http11_dispatch_test.go:312: 8 requests failed; evidence in /tmp/turbo-dispatch/sustained/round3-Turbo/10s
+--- FAIL: TestHTTP11DispatchStudy (12.37s)
+    --- PASS: TestHTTP11DispatchStudy/load (12.37s)
+FAIL

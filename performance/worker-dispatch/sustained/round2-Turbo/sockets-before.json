@@ -1,0 +1,9 @@
+{
+  "states": {
+    "ESTABLISHED": 50,
+    "LISTEN": 8,
+    "TIME_WAIT": 59036
+  },
+  "error": "",
+  "returncode": 0
+}

@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-full-queue-sched.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 45672.67us, 91.01% of 50184.74us total
+Dropped 48 nodes (cum <= 250.92us)
+Showing top 30 nodes out of 58
+      flat  flat%   sum%        cum   cum%
+23126.02us 46.08% 46.08% 23126.02us 46.08%  github.com/vroomy/turbo.runHTTP11Clients
+ 5888.45us 11.73% 57.82%  5888.45us 11.73%  runtime.chanrecv2
+ 5053.06us 10.07% 67.88%  5053.06us 10.07%  runtime.chansend1
+ 4624.92us  9.22% 77.10%  4624.92us  9.22%  net.(*pipe).Close.func1
+ 2419.21us  4.82% 81.92%  2419.21us  4.82%  runtime.systemstack_switch
+ 1638.33us  3.26% 85.19%  1638.33us  3.26%  runtime.selectgo
+ 1105.28us  2.20% 87.39%  1105.28us  2.20%  runtime.chanrecv1
+  748.29us  1.49% 88.88%   748.29us  1.49%  runtime.traceLocker.stack
+  413.89us  0.82% 89.70%  1748.03us  3.48%  runtime.gcMarkDone
+  355.46us  0.71% 90.41%   355.46us  0.71%  fmt.(*pp).free
+  228.54us  0.46% 90.87%   228.54us  0.46%  runtime.Gosched
+   67.46us  0.13% 91.00%   455.81us  0.91%  runtime.gcStart
+    2.18us 0.0043% 91.01% 23552.96us 46.93%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1
+    1.60us 0.0032% 91.01%   474.37us  0.95%  github.com/vroomy/turbo.(*Turbo).listen
+         0     0% 91.01%   402.05us   0.8%  bufio.(*Reader).Peek
+         0     0% 91.01%  5036.10us 10.04%  bufio.(*Reader).ReadLine
+         0     0% 91.01%  5036.10us 10.04%  bufio.(*Reader).ReadSlice
+         0     0% 91.01%  5438.15us 10.84%  bufio.(*Reader).fill
+         0     0% 91.01%   360.70us  0.72%  fmt.Sprintf
+         0     0% 91.01%  5610.71us 11.18%  github.com/vroomy/turbo.(*Turbo).process
+         0     0% 91.01%  4624.92us  9.22%  github.com/vroomy/turbo.(*Turbo).process.func1
+         0     0% 91.01% 11500.37us 22.92%  github.com/vroomy/turbo.(*Turbo).work
+         0     0% 91.01%  6335.43us 12.62%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0% 91.01%   472.38us  0.94%  github.com/vroomy/turbo.(*http11PipeListener).Accept
+         0     0% 91.01%   472.38us  0.94%  github.com/vroomy/turbo.(*http11StartListener).Accept
+         0     0% 91.01%  4624.92us  9.22%  github.com/vroomy/turbo.(*http11StudyConn).Close
+         0     0% 91.01%   472.38us  0.94%  github.com/vroomy/turbo.(*http11StudyListener).Accept
+         0     0% 91.01%   583.74us  1.16%  github.com/vroomy/turbo.(*responseWriter).Write
+         0     0% 91.01%   583.74us  1.16%  github.com/vroomy/turbo.(*responseWriter).writeHeaderAndBody
+         0     0% 91.01%   583.74us  1.16%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.1

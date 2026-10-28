@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-unbuffered-sync.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 191.67ms, 99.53% of 192.56ms total
+Dropped 33 nodes (cum <= 0.96ms)
+Showing top 30 nodes out of 59
+      flat  flat%   sum%        cum   cum%
+  149.38ms 77.57% 77.57%   149.38ms 77.57%  runtime.selectgo
+   15.56ms  8.08% 85.65%    15.56ms  8.08%  runtime.gcMarkDone
+   13.99ms  7.27% 92.92%    13.99ms  7.27%  runtime.chanrecv2
+   10.77ms  5.59% 98.51%    10.77ms  5.59%  runtime.chanrecv1
+    1.97ms  1.02% 99.53%     1.97ms  1.02%  sync.(*WaitGroup).Wait
+         0     0% 99.53%     1.52ms  0.79%  bufio.(*Reader).Peek
+         0     0% 99.53%     1.29ms  0.67%  bufio.(*Reader).ReadLine
+         0     0% 99.53%     1.29ms  0.67%  bufio.(*Reader).ReadSlice
+         0     0% 99.53%     2.99ms  1.55%  bufio.(*Reader).fill
+         0     0% 99.53%     3.72ms  1.93%  fmt.Sprintf
+         0     0% 99.53%     3.08ms  1.60%  fmt.init.func1
+         0     0% 99.53%     3.08ms  1.60%  fmt.newPrinter
+         0     0% 99.53%     1.57ms  0.82%  github.com/vroomy/turbo.(*Turbo).listen
+         0     0% 99.53%     3.02ms  1.57%  github.com/vroomy/turbo.(*Turbo).process
+         0     0% 99.53%    17.01ms  8.83%  github.com/vroomy/turbo.(*Turbo).work
+         0     0% 99.53%      146ms 75.82%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0% 99.53%     1.19ms  0.62%  github.com/vroomy/turbo.(*http11PipeListener).Accept
+         0     0% 99.53%   142.11ms 73.80%  github.com/vroomy/turbo.(*http11PipeListener).dial
+         0     0% 99.53%     1.19ms  0.62%  github.com/vroomy/turbo.(*http11StartListener).Accept
+         0     0% 99.53%     1.19ms  0.62%  github.com/vroomy/turbo.(*http11StudyListener).Accept
+         0     0% 99.53%     1.50ms  0.78%  github.com/vroomy/turbo.(*responseWriter).Write
+         0     0% 99.53%     1.43ms  0.74%  github.com/vroomy/turbo.(*responseWriter).writeHeaderAndBody
+         0     0% 99.53%     3.21ms  1.67%  github.com/vroomy/turbo.TestHTTP11DispatchStudy
+         0     0% 99.53%        2ms  1.04%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1
+         0     0% 99.53%   142.11ms 73.80%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.2
+         0     0% 99.53%     2.02ms  1.05%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.3
+         0     0% 99.53%     1.97ms  1.02%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4
+         0     0% 99.53%   159.61ms 82.88%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1
+         0     0% 99.53%     1.50ms  0.78%  github.com/vroomy/turbo.http11Workload.handler.func1
+         0     0% 99.53%    13.63ms  7.08%  github.com/vroomy/turbo.http11Workload.request

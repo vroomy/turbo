@@ -1,0 +1,54 @@
+# GOMAXPROCS=8 /tmp/turbo-dispatch/turbo.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11Accept$/^TCP$' -test.benchmem -test.benchtime=256x -test.timeout=2m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11Accept/TCP/Workers1/Queue0/Clients1-8         	     256	     71003 ns/op	   1.80 MB/s	         1.000 clients	         0 queue	     14084 req/s	         1.000 workers	    2843 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue0/Clients8-8         	     256	     26637 ns/op	   4.81 MB/s	         8.000 clients	         0 queue	     37542 req/s	         1.000 workers	    3285 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue0/Clients32-8        	     256	     23960 ns/op	   5.34 MB/s	        32.00 clients	         0 queue	     41736 req/s	         1.000 workers	    3709 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue0/Clients128-8       	     256	     26289 ns/op	   4.87 MB/s	       128.0 clients	         0 queue	     38038 req/s	         1.000 workers	    5642 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue8/Clients1-8         	     256	     66257 ns/op	   1.93 MB/s	         1.000 clients	         8.000 queue	     15093 req/s	         1.000 workers	    2870 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue8/Clients8-8         	     256	     26708 ns/op	   4.79 MB/s	         8.000 clients	         8.000 queue	     37442 req/s	         1.000 workers	    3227 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue8/Clients32-8        	     256	     23482 ns/op	   5.45 MB/s	        32.00 clients	         8.000 queue	     42586 req/s	         1.000 workers	    3629 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue8/Clients128-8       	     256	     27323 ns/op	   4.68 MB/s	       128.0 clients	         8.000 queue	     36600 req/s	         1.000 workers	    5540 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue32/Clients1-8        	     256	     65279 ns/op	   1.96 MB/s	         1.000 clients	        32.00 queue	     15319 req/s	         1.000 workers	    2869 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue32/Clients8-8        	     256	     26272 ns/op	   4.87 MB/s	         8.000 clients	        32.00 queue	     38064 req/s	         1.000 workers	    3205 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue32/Clients32-8       	     256	     22941 ns/op	   5.58 MB/s	        32.00 clients	        32.00 queue	     43591 req/s	         1.000 workers	    3603 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue32/Clients128-8      	     256	     26716 ns/op	   4.79 MB/s	       128.0 clients	        32.00 queue	     37431 req/s	         1.000 workers	    5516 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue1024/Clients1-8      	     256	     63680 ns/op	   2.01 MB/s	         1.000 clients	      1024 queue	     15704 req/s	         1.000 workers	    2884 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue1024/Clients8-8      	     256	     32532 ns/op	   3.93 MB/s	         8.000 clients	      1024 queue	     30739 req/s	         1.000 workers	    3173 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue1024/Clients32-8     	     256	     32033 ns/op	   4.00 MB/s	        32.00 clients	      1024 queue	     31218 req/s	         1.000 workers	    3622 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers1/Queue1024/Clients128-8    	     256	     34200 ns/op	   3.74 MB/s	       128.0 clients	      1024 queue	     29240 req/s	         1.000 workers	    5303 B/op	      46 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue0/Clients1-8         	     256	     75297 ns/op	   1.70 MB/s	         1.000 clients	         0 queue	     13281 req/s	         8.000 workers	    2926 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue0/Clients8-8         	     256	     33900 ns/op	   3.78 MB/s	         8.000 clients	         0 queue	     29498 req/s	         8.000 workers	    3283 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue0/Clients32-8        	     256	     32894 ns/op	   3.89 MB/s	        32.00 clients	         0 queue	     30400 req/s	         8.000 workers	    3714 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue0/Clients128-8       	     256	     35670 ns/op	   3.59 MB/s	       128.0 clients	         0 queue	     28035 req/s	         8.000 workers	    5443 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue8/Clients1-8         	     256	     73799 ns/op	   1.73 MB/s	         1.000 clients	         8.000 queue	     13550 req/s	         8.000 workers	    2933 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue8/Clients8-8         	     256	     31802 ns/op	   4.02 MB/s	         8.000 clients	         8.000 queue	     31444 req/s	         8.000 workers	    3267 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue8/Clients32-8        	     256	     32829 ns/op	   3.90 MB/s	        32.00 clients	         8.000 queue	     30460 req/s	         8.000 workers	    3737 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue8/Clients128-8       	     256	     34796 ns/op	   3.68 MB/s	       128.0 clients	         8.000 queue	     28739 req/s	         8.000 workers	    5505 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue32/Clients1-8        	     256	     73843 ns/op	   1.73 MB/s	         1.000 clients	        32.00 queue	     13542 req/s	         8.000 workers	    2912 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue32/Clients8-8        	     256	     31469 ns/op	   4.07 MB/s	         8.000 clients	        32.00 queue	     31778 req/s	         8.000 workers	    3283 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue32/Clients32-8       	     256	     31942 ns/op	   4.01 MB/s	        32.00 clients	        32.00 queue	     31306 req/s	         8.000 workers	    3709 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue32/Clients128-8      	     256	     34224 ns/op	   3.74 MB/s	       128.0 clients	        32.00 queue	     29219 req/s	         8.000 workers	    5495 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue1024/Clients1-8      	     256	     72520 ns/op	   1.77 MB/s	         1.000 clients	      1024 queue	     13789 req/s	         8.000 workers	    2965 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue1024/Clients8-8      	     256	     29503 ns/op	   4.34 MB/s	         8.000 clients	      1024 queue	     33895 req/s	         8.000 workers	    3284 B/op	      44 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue1024/Clients32-8     	     256	     29495 ns/op	   4.34 MB/s	        32.00 clients	      1024 queue	     33904 req/s	         8.000 workers	    3738 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers8/Queue1024/Clients128-8    	     256	     30312 ns/op	   4.22 MB/s	       128.0 clients	      1024 queue	     32990 req/s	         8.000 workers	    5439 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue0/Clients1-8        	     256	     71677 ns/op	   1.79 MB/s	         1.000 clients	         0 queue	     13951 req/s	        32.00 workers	    3074 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue0/Clients8-8        	     256	     27812 ns/op	   4.60 MB/s	         8.000 clients	         0 queue	     35955 req/s	        32.00 workers	    3465 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue0/Clients32-8       	     256	     31174 ns/op	   4.11 MB/s	        32.00 clients	         0 queue	     32079 req/s	        32.00 workers	    3845 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue0/Clients128-8      	     256	     28249 ns/op	   4.53 MB/s	       128.0 clients	         0 queue	     35400 req/s	        32.00 workers	    5741 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue8/Clients1-8        	     256	     71528 ns/op	   1.79 MB/s	         1.000 clients	         8.000 queue	     13981 req/s	        32.00 workers	    3124 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue8/Clients8-8        	     256	     26133 ns/op	   4.90 MB/s	         8.000 clients	         8.000 queue	     38265 req/s	        32.00 workers	    3449 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue8/Clients32-8       	     256	     28254 ns/op	   4.53 MB/s	        32.00 clients	         8.000 queue	     35394 req/s	        32.00 workers	    3892 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue8/Clients128-8      	     256	     26619 ns/op	   4.81 MB/s	       128.0 clients	         8.000 queue	     37568 req/s	        32.00 workers	    5741 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue32/Clients1-8       	     256	     76579 ns/op	   1.67 MB/s	         1.000 clients	        32.00 queue	     13058 req/s	        32.00 workers	    3125 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue32/Clients8-8       	     256	     40176 ns/op	   3.19 MB/s	         8.000 clients	        32.00 queue	     24891 req/s	        32.00 workers	    3446 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue32/Clients32-8      	     256	     37801 ns/op	   3.39 MB/s	        32.00 clients	        32.00 queue	     26454 req/s	        32.00 workers	    3926 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue32/Clients128-8     	     256	    132273 ns/op	   0.97 MB/s	       128.0 clients	        32.00 queue	      7560 req/s	        32.00 workers	    5611 B/op	      47 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue1024/Clients1-8     	     256	     71877 ns/op	   1.78 MB/s	         1.000 clients	      1024 queue	     13913 req/s	        32.00 workers	    3104 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue1024/Clients8-8     	     256	     33748 ns/op	   3.79 MB/s	         8.000 clients	      1024 queue	     29631 req/s	        32.00 workers	    3495 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue1024/Clients32-8    	     256	     30137 ns/op	   4.25 MB/s	        32.00 clients	      1024 queue	     33182 req/s	        32.00 workers	    3942 B/op	      45 allocs/op
+BenchmarkHTTP11Accept/TCP/Workers32/Queue1024/Clients128-8   	     256	     37823 ns/op	   3.38 MB/s	       128.0 clients	      1024 queue	     26439 req/s	        32.00 workers	    5596 B/op	      47 allocs/op
+PASS

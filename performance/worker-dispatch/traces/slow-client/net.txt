@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-slow-client-net.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 2.80s, 100% of 2.80s total
+Dropped 3 nodes (cum <= 0.01s)
+Showing top 30 nodes out of 40
+      flat  flat%   sum%        cum   cum%
+     1.41s 50.24% 50.24%      1.41s 50.24%  internal/poll.(*FD).WaitWrite
+     1.38s 49.18% 99.42%      1.38s 49.18%  internal/poll.(*FD).Read
+     0.02s  0.58%   100%      0.02s  0.58%  internal/poll.(*FD).Accept
+         0     0%   100%      0.15s  5.43%  bufio.(*Reader).Peek
+         0     0%   100%      1.22s 43.72%  bufio.(*Reader).ReadLine
+         0     0%   100%      1.22s 43.72%  bufio.(*Reader).ReadSlice
+         0     0%   100%      1.38s 49.18%  bufio.(*Reader).fill
+         0     0%   100%      0.02s  0.58%  github.com/vroomy/turbo.(*Turbo).listen
+         0     0%   100%      0.15s  5.43%  github.com/vroomy/turbo.(*Turbo).process
+         0     0%   100%      0.15s  5.43%  github.com/vroomy/turbo.(*Turbo).work
+         0     0%   100%      2.63s 93.99%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0%   100%      0.02s  0.58%  github.com/vroomy/turbo.(*http11StartListener).Accept
+         0     0%   100%      0.02s  0.58%  github.com/vroomy/turbo.(*http11StudyListener).Accept
+         0     0%   100%      1.41s 50.24%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.2
+         0     0%   100%      2.63s 93.98%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1
+         0     0%   100%      1.41s 50.24%  github.com/vroomy/turbo.newHTTP11BenchmarkListener.func1
+         0     0%   100%      2.63s 93.98%  github.com/vroomy/turbo.runHTTP11Clients.func1
+         0     0%   100%      0.15s  5.43%  github.com/vroomy/turbo/request.(*Parser).Parse
+         0     0%   100%      0.15s  5.43%  github.com/vroomy/turbo/request.parse
+         0     0%   100%      1.41s 50.24%  net.(*Dialer).Dial
+         0     0%   100%      1.41s 50.24%  net.(*Dialer).DialContext
+         0     0%   100%      0.02s  0.58%  net.(*TCPListener).Accept
+         0     0%   100%      0.02s  0.58%  net.(*TCPListener).accept
+         0     0%   100%      1.38s 49.18%  net.(*conn).Read
+         0     0%   100%      1.38s 49.18%  net.(*netFD).Read
+         0     0%   100%      0.02s  0.58%  net.(*netFD).accept
+         0     0%   100%      1.41s 50.24%  net.(*netFD).connect
+         0     0%   100%      1.41s 50.24%  net.(*netFD).dial
+         0     0%   100%      1.41s 50.24%  net.(*sysDialer).dialParallel
+         0     0%   100%      1.41s 50.24%  net.(*sysDialer).dialSerial

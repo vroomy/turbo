@@ -1,0 +1,494 @@
+error=expected connection EOF after response, got read tcp 127.0.0.1:65187->127.0.0.1:56555: i/o timeout accepted=270149 closed=270149 goroutines=45
+queue=0/1024
+client=127.0.0.1:65187 server=127.0.0.1:56555
+goroutine 73 [running]:
+runtime/pprof.writeGoroutineStacks({0x103497990, 0x14f1a8d126a0})
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/pprof/pprof.go:816 +0x6c
+runtime/pprof.writeGoroutine({0x103497990?, 0x14f1a8d126a0?}, 0x14f1a8eed5b8?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/pprof/pprof.go:779 +0x2c
+runtime/pprof.(*Profile).WriteTo(0x103121345?, {0x103497990?, 0x14f1a8d126a0?}, 0x14?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/pprof/pprof.go:405 +0x144
+github.com/vroomy/turbo.writeHTTP11StudyFailure(0x14f1a8ed46c8, {0x14f1a8d440b3, 0x2e}, 0x14f1a8e953e0, 0x14f1a8d320c0, {0x10349b540, 0x14f1a8d12698}, {0x1034979b0, 0x14f1a92292a0})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:334 +0x310
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1.1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:257 +0x34
+sync.(*Once).doSlow(0x14f1a8eed9b8?, 0x102ef5524?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:78 +0xdc
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a92292a0?}, {0x10349b540?, 0x14f1a8d12698?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a8eede30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x7, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x14f1a8ed4248, {0x103128227?, 0x14f1a8eeba88?}, 0x10349bc18)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2268 +0x3cc
+testing.runTests.func1(0x14f1a8ed4248)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x38
+testing.tRunner(0x14f1a8ed4248, 0x14f1a8eebbb8)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0xc4
+testing.runTests({0x10312826c, 0x17}, {0x10312826c, 0x17}, 0x14f1a8ea0198, {0x1034f8590, 0x2c, 0x2c}, {0x14f1a8d98c58?, 0x14f1a8ea4380?, ...})
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x400
+testing.(*M).Run(0x14f1a8e8c320)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0x578
+main.main()
+	_testmain.go:140 +0x80
+
+goroutine 20 [chan receive]:
+testing.(*T).Run(0x14f1a8ed4488, {0x10311fdd5?, 0x101?}, 0x14f1a8e80180)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2268 +0x3cc
+github.com/vroomy/turbo.TestHTTP11DispatchStudy(0x14f1a8ed4488)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:192 +0x514
+testing.tRunner(0x14f1a8ed4488, 0x10349bc18)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x3b8
+
+goroutine 29 [sync.WaitGroup.Wait]:
+sync.runtime_SemacquireWaitGroup(0x14f1a8d404c8?, 0x0?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:114 +0x38
+sync.(*WaitGroup).Wait(0x14f1a8d221a0)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:206 +0xa4
+github.com/vroomy/turbo.runHTTP11Clients(0x8, 0x8, 0x14f1a8e48000)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:240 +0x124
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:253 +0x238
+runtime/trace.WithRegion({0x10349a550?, 0x14f1a8e94420?}, {0x103120791, 0x7}, 0x14f1a90a5da8)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/trace/annotation.go:141 +0xc0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1(0x14f1a8ed46c8)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:248 +0x7f8
+testing.tRunner(0x14f1a8ed46c8, 0x14f1a8e80180)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 20
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x3b8
+
+goroutine 30 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 31 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 32 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 33 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 34 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 35 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 36 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 37 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 38 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 39 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 40 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 41 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 42 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 43 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 44 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 45 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 46 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 47 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 48 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 49 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 50 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 51 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 52 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 53 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 54 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 55 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 56 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 57 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 58 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 59 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 60 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 61 [chan receive]:
+github.com/vroomy/turbo.(*Turbo).work(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:115 +0x124
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:55 +0xcc
+
+goroutine 62 [IO wait]:
+internal/poll.runtime_pollWait(0x130bb6a00, 0x72)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14f1a8ed0100?, 0x102ec0150?, 0x0)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Accept(0x14f1a8ed0100)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/poll/fd_unix.go:618 +0x210
+net.(*netFD).accept(0x14f1a8ed0100)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/net/fd_unix.go:149 +0x28
+net.(*TCPListener).accept(0x14f1a8d32080)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/net/tcpsock_posix.go:159 +0x24
+net.(*TCPListener).Accept(0x14f1a8d32080)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/net/tcpsock.go:387 +0x2c
+github.com/vroomy/turbo.(*http11StudyListener).Accept(0x14f1a8e953e0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:133 +0x28
+github.com/vroomy/turbo.(*http11StartListener).Accept(0x14f1a8d20048)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:460 +0x38
+github.com/vroomy/turbo.(*Turbo).listen(0x14f1a8d320c0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:98 +0x70
+created by github.com/vroomy/turbo.newTurbo in goroutine 29
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/turbo.go:58 +0x16c
+
+goroutine 65 [select]:
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.3()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:234 +0xc8
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 66 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a8dbf9e8?, 0xec?, 0x14f1a90e6000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a8dbf998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a90c27f0?}, {0x10349b540?, 0x14f1a8f945c8?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a8dbfe30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x0, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 67 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a8ee99e8?, 0xec?, 0x14f1a921c000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a8ee9998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a8d50c30?}, {0x10349b540?, 0x14f1a8d12690?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a8ee9e30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x1, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 68 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a8dc39e8?, 0xec?, 0x14f1a921c000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a8dc3998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a8d50c50?}, {0x10349b540?, 0x14f1a8e02628?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a8dc3e30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x2, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 69 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a90b79e8?, 0xec?, 0x14f1a921c000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a90b7998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a8d50c00?}, {0x10349b540?, 0x14f1a8d12688?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a90b7e30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x3, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 70 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a8dc19e8?, 0xec?, 0x14f1a921c000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a8dc1998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a8d50c20?}, {0x10349b540?, 0x14f1a8d12670?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a8dc1e30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x4, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 71 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a90b59e8?, 0xec?, 0x14f1a921c000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a90b5998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a8d50c10?}, {0x10349b540?, 0x14f1a8d12678?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a90b5e30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x5, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78
+
+goroutine 72 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x14f1a90b99e8?, 0xec?, 0x14f1a921c000?)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/sema.go:95 +0x28
+internal/sync.(*Mutex).lockSlow(0x14f1a8d22174)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:149 +0x174
+internal/sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/mutex.go:46
+sync.(*Once).doSlow(0x14f1a8d22170, 0x14f1a90b9998)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:74 +0x7c
+sync.(*Once).Do(...)
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/once.go:69
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1.1({0x1034979b0?, 0x14f1a8d50c40?}, {0x10349b540?, 0x14f1a8f00660?})
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:256 +0x64
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:324 +0x5c
+github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip(0x14f1a90b9e30, 0x0)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:363 +0x6a0
+github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1(0x6, 0x1)
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_dispatch_test.go:266 +0x4a8
+github.com/vroomy/turbo.runHTTP11Clients.func1()
+	/Users/itsmontoya/go/src/github.com/vroomy/turbo/http11_benchmark_test.go:236 +0x48
+sync.(*WaitGroup).Go.func1()
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 29
+	/opt/homebrew/Cellar/go/1.27.2/libexec/src/sync/waitgroup.go:238 +0x78

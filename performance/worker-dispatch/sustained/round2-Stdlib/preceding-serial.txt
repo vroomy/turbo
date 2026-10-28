@@ -1,0 +1,7 @@
+# GOMAXPROCS=8 /tmp/turbo-dispatch/turbo.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/^SmallGET$/^Serial$/^Stdlib$' -test.benchtime=3s -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Stdlib-8         	   51865	     74414 ns/op	   1.72 MB/s	         1.000 clients	      1024 queue	     13438 req/s	        32.00 workers	    5777 B/op	      75 allocs/op
+PASS

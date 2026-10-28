@@ -348,7 +348,54 @@ and timings. Expect roughly 32 B/request savings; any TCP speedup may be small.
 
 **Dependencies:** independent of task 2's write strategy; coordinate edits.
 
-### 4. [ ] P1 — Measure and tune worker dispatch, and diagnose sustained TCP timeouts
+### 4. [x] P1 — Measure and tune worker dispatch, and diagnose sustained TCP timeouts
+
+**Completed 2026-10-28, with no production dispatch change.**
+`BenchmarkHTTP11Accept` now independently names workers 1/8/32, queue capacity
+0/8/32/1,024 and clients 1/8/32/128. The full TCP/Pipe sweep has six samples per
+configuration at `GOMAXPROCS=8`, plus selected fixed-client `-cpu=1,4,8` cases.
+The same revised Pipe harness and compiled binary are used throughout,
+at base commit `ca70fcb42db2182812708350c8a3546bce8809e1`, Go 1.27.2,
+Darwin arm64, Apple M3. Documentation now explains the independent parameters,
+legacy client scaling, timeout costs and throughput/latency distinction.
+
+An eight-worker/unbuffered candidate initially improves Pipe at 128 clients
+by 5.73% (`p=0.002`, n=6), but its benefit does not repeat in an alternating
+confirmation: Pipe at 8/128 clients has `p=1.000/0.937`, TCP `p=0.132/0.818`.
+One worker materially regresses concurrent Pipe throughput. Instrumented
+latency/live-heap tables cover all 96 configurations separately from timing;
+36 slow-client/handler runs demonstrate saturation and its costs. Pipe slow
+handlers with 128 clients and queue 1,024 reach p95 142.84/17.56/4.29 ms at
+1/8/32 workers. Fewer workers save idle memory but reduce blocking-handler
+capacity; no broadly justified configuration or dispatch replacement emerged.
+
+Five short traces distinguish empty receives, blocked sends, runnable delay,
+accept and network wait. With 32 workers/eight clients the sampled queue stays
+empty and receives account for 81.21 ms of 100.39 ms synchronization wait.
+With one worker/eight slots/slow handlers, the queue reaches eight and the
+listener blocks on sends for 545.78 ms of a 562.97 ms load interval. These
+cumulative trace delays are not wall-time percentages or latency estimates.
+
+The sustained TCP timeout reproduces in **both implementations**. Three
+rounds reverse run order and test a 15 s pause, retaining failed CPU-profile
+retries and diagnostic state. All six bounded 10,000-request runs pass;
+three of six 3 s and all six 10 s diagnostic runs fail, totaling 72 EOF read
+timeouts after successful response validation. Failure captures show all
+accepted connections already closed, empty Turbo queues, idle workers,
+server sockets in `FIN_WAIT_1` and clients still `ESTABLISHED`. This locates
+the reproduced stall at TCP teardown, not pending dispatch. Port exhaustion
+and the precise kernel/packet mechanism remain unproven. Separate 35 s
+cooldowns without preceding serial churn allow both 3 s and both 10 s runs
+to pass; churn history matters, but sustained reliability is not established.
+No deadlines, EOF checks or socket settings were weakened.
+
+`go test -race -count=1 ./... -timeout=2m` passes, including existing worker,
+close, protocol and lifecycle tests. New deterministic full-queue coverage
+checks blocked-send shutdown, drain, malformed work and exactly-once close;
+the opt-in study also runs under race detection. Reproduction scripts, raw
+samples, benchstat, all configuration/latency/memory tables, trace summaries,
+request/connection counters and preserved failure captures are tracked in
+[`performance/worker-dispatch/`](performance/worker-dispatch/README.md).
 
 **Entry points:** `startHTTP11BenchmarkServer`, `BenchmarkHTTP11Accept`,
 `benchmarkHTTP11` in `http11_benchmark_test.go`; `newTurbo`, `listen`, `work`,

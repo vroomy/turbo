@@ -1,0 +1,97 @@
+{
+  "base_commit": "ca70fcb42db2182812708350c8a3546bce8809e1",
+  "go": "go version go1.27.2 darwin/arm64",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "cpu": "Apple M3",
+  "binary_sha256": "38df1f12767d3e01f3c945d3ae8062af93ab9fdc542c585b3b29803f35d7ba2b",
+  "GOMAXPROCS": 8,
+  "workers": [
+    1,
+    8,
+    32
+  ],
+  "queues": [
+    0,
+    8,
+    32,
+    1024
+  ],
+  "clients": [
+    1,
+    8,
+    32,
+    128
+  ],
+  "timing_samples": 6,
+  "pipe_benchtime": "100ms",
+  "tcp_benchtime": "256x",
+  "latency_requests": 2048,
+  "latency_instrumented": true,
+  "measurement_source_sha256": {
+    "turbo.go": "173d34f542aa9605043b8037910b0de9faf516d01d31ada625d86b893bc56f57",
+    "response_writer.go": "8f0e64d14f8239ef47f14a57701a783b0fc34c2158585e69c3787a9cdcda4c0b",
+    "http11_benchmark_test.go": "41e037d42b8389aa8949ecdbce9c668749cfa134ac209a65a5979fb59baf8b64",
+    "http11_dispatch_test.go": "5d10156cdee7a726c5ec707b5ec31fb3aa3864e303ca5224868197e495ed7680"
+  },
+  "measurement_binary": "/tmp/turbo-dispatch/turbo.test",
+  "note": "All measurements used the recorded binary. Subsequent diagnostic-only hardening covers preflight errors and bounds TIME_WAIT rows; final validation hashes are recorded separately.",
+  "final_validation": {
+    "binary": "/tmp/turbo-dispatch/final.test",
+    "binary_sha256": "9cf5e63e25703c1716a64201086cf49cc8b18e3435584a5b81feb13d23d90b6d",
+    "source_sha256": {
+      "turbo.go": "173d34f542aa9605043b8037910b0de9faf516d01d31ada625d86b893bc56f57",
+      "response_writer.go": "8f0e64d14f8239ef47f14a57701a783b0fc34c2158585e69c3787a9cdcda4c0b",
+      "http11_benchmark_test.go": "41e037d42b8389aa8949ecdbce9c668749cfa134ac209a65a5979fb59baf8b64",
+      "http11_dispatch_test.go": "7c7b8d26b0584e5099f2f109e8cf1711d330bc0eece02b20446ac7a3312475ef"
+    },
+    "checks": [
+      {
+        "command": "GOCACHE=/tmp/turbo-dispatch/go-build go test -race -count=1 ./... -timeout=2m",
+        "status": "passed"
+      },
+      {
+        "command": "go test -race -run ^TestHTTP11DispatchStudy$ -count=1 -timeout=1m .",
+        "scenario": "Pipe, workers=1 queue=8 clients=32 requests=128, slow-handler 1ms",
+        "status": "passed"
+      },
+      {
+        "command": "go test -race -run ^TestHTTP11DispatchStudy$ -count=1 -timeout=1m .",
+        "scenario": "TCP, workers=8 queue=0 clients=32 requests=128, slow-client 1ms",
+        "status": "passed"
+      }
+    ],
+    "profile_sha256": {
+      "round1-Stdlib-cpu.pprof": "57aa68e90d46485d9930c87345fa4c557c88e4a02dd81aa604dd52112848ffa3",
+      "round1-Turbo-cpu.pprof": "cd56cad48226e3101c77ed1fb1153152eb72e383af167a07eb231c2ec8ab5c6a",
+      "round2-Stdlib-cpu.pprof": "18089c1c3c4463c290561f2f24750e7b4924111479155820a74751f2f5885fd9",
+      "round2-Turbo-cpu.pprof": "ae546d86ac9c3d0b46fe66bbeb6e1b51e116c16906b0329a43542eb562158f29",
+      "round3-Stdlib-cpu.pprof": "e97bd720bf0782cd0a2c1b4b0e1e9c4e9680baa3d9641c2b6a6a78c9495ec14c",
+      "round3-Turbo-cpu.pprof": "c94c521ecac492966c936aa6dad859a3e5d2bebf648e79134d3a5f8b830e8118",
+      "trace-full-queue-net.pprof": "c1331c152187bce153053064ba79714b47573239810db4e6b5b4a0639f1dcb67",
+      "trace-full-queue-sched.pprof": "5d6f44b3e937cf15febe9ed1ee3f47a09cdb64f1ee85f3cef6cc5faf0006a4f3",
+      "trace-full-queue-sync.pprof": "be6be74ca9ae2354462bb7b9b44b510f5156aec25d3667dbfeab1c529db9e568",
+      "trace-full-queue-syscall.pprof": "10a43fdb534afbaf264964a86b065e45238a293056f670f5dda43855f9dc1b0a",
+      "trace-idle-receives-net.pprof": "c1331c152187bce153053064ba79714b47573239810db4e6b5b4a0639f1dcb67",
+      "trace-idle-receives-sched.pprof": "6fc653236375b98324a83f5f3e45d3c6ee50681d29dde32dad0e481ddfb08707",
+      "trace-idle-receives-sync.pprof": "34bbd07dec31fe430d5fa24363a6812d48ed580cdaf61f6294bed5f3ff54eba8",
+      "trace-idle-receives-syscall.pprof": "1d560dd13504425a26c89e98b73df99ba31f4484ed6b00910b5ca16eb78ec4e1",
+      "trace-slow-client-net.pprof": "ca3d2f870e76a2e449b5756c12e4ba8cd36c60f9670dc7220e673fa55e4ad48c",
+      "trace-slow-client-sched.pprof": "a3e85f42c83d60f139809f3bc2ff1bb91e549d03905265f98c162b4a2e852cc6",
+      "trace-slow-client-sync.pprof": "2bf2c495a2f04b563b9c987afebe63b5a669502ac5878d840e304c626b0bdf89",
+      "trace-slow-client-syscall.pprof": "123f3e531d44d397cd13094d576e9300ce98c8998ee2531d3fc07c96c27a6bd0",
+      "trace-tcp-net.pprof": "95ca1b14bc764bd2dd41bd0b22d2c06c8b89f67e62c4b17aa57ac578c77e1089",
+      "trace-tcp-sched.pprof": "454ac1fe55d61a4b66bd14bc492e6469541dfb36e968ee4128e80fbff4a64513",
+      "trace-tcp-sync.pprof": "ae74774ac55f4dca3aeea5c26ee6e6c7fabaeae593be62aa70055ed9d88dd763",
+      "trace-tcp-syscall.pprof": "da7d07d55a71d5bfa83835b308bcf5f4ad6efb56db9046b5d68a8e97119d5ffe",
+      "trace-unbuffered-net.pprof": "c1331c152187bce153053064ba79714b47573239810db4e6b5b4a0639f1dcb67",
+      "trace-unbuffered-sched.pprof": "564bc822f1e5ebe22ab79ccd04901fa342151815c85b8b1a4a0e104b509bcbde",
+      "trace-unbuffered-sync.pprof": "4421d72cca88a580c307d017f2ed746e8bf718f79492815bef5b99bd8e665b01",
+      "trace-unbuffered-syscall.pprof": "a4ceb20ae985af977f23307893766528ab0ec4b39ac9b787e3a404ce8bd26c1b",
+      "traces-full-queue.trace": "e2d7e4a6b9ff41c16a1e85878f895a3699f1b0c3a3f33d9d9e2e7add07ae962b",
+      "traces-idle-receives.trace": "987d1d37294383291bddcec6ec871ef4a05d55c974f09348de7a8412e11e397b",
+      "traces-slow-client.trace": "378daeb6d928802f0688525922b5c5970f0ff6918943a33dc3e3220805f316c4",
+      "traces-tcp.trace": "27bd45d45be0199ffad85d94b73d1fd55b7893309828534d3a6ece82d6f427b6",
+      "traces-unbuffered.trace": "28ec763119935cdcbfeeb96d73fce5cda709a861fd926a992d6d4f0ed77ce9f8"
+    }
+  }
+}

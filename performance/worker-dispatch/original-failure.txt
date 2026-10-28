@@ -1,0 +1,19 @@
+# GOMAXPROCS=8 /Users/itsmontoya/go/src/github.com/vroomy/turbo/benchmarks/current-2026-10-24/turbo.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^TCP$/^SmallGET$/^Parallel$/^Turbo$' -test.benchmem -test.timeout=5m -test.benchtime=3s -test.cpuprofile=/Users/itsmontoya/go/src/github.com/vroomy/turbo/benchmarks/current-2026-10-24/tcp-parallel-turbo-cpu.pprof
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8   	--- FAIL: BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60572->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60568->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60567->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60571->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60573->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60569->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60566->127.0.0.1:54702: i/o timeout
+    http11_benchmark_test.go:169: read tcp 127.0.0.1:60570->127.0.0.1:54702: i/o timeout
+--- FAIL: BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel
+--- FAIL: BenchmarkHTTP11NoKeepAlive/TCP/SmallGET
+--- FAIL: BenchmarkHTTP11NoKeepAlive/TCP
+--- FAIL: BenchmarkHTTP11NoKeepAlive
+FAIL

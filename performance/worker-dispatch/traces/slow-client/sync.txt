@@ -1,0 +1,37 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-dispatch/turbo.test /tmp/turbo-dispatch/trace-slow-client-sync.pprof
+File: turbo.test
+Type: delay
+Showing nodes accounting for 211.65ms, 100% of 211.72ms total
+Dropped 38 nodes (cum <= 1.06ms)
+Showing top 30 nodes out of 59
+      flat  flat%   sum%        cum   cum%
+   73.84ms 34.88% 34.88%    73.84ms 34.88%  runtime.chanrecv2
+   64.88ms 30.64% 65.52%    64.88ms 30.64%  runtime.chanrecv1
+   26.24ms 12.39% 77.92%    26.24ms 12.39%  runtime.selectgo
+   26.22ms 12.38% 90.30%    26.22ms 12.38%  sync.(*WaitGroup).Wait
+   10.91ms  5.15% 95.45%    10.91ms  5.15%  runtime.gcMarkDone
+    9.56ms  4.52%   100%     9.56ms  4.52%  runtime.chansend1
+         0     0%   100%     1.25ms  0.59%  context.WithDeadline
+         0     0%   100%     1.25ms  0.59%  context.WithDeadlineCause
+         0     0%   100%     5.93ms  2.80%  fmt.(*buffer).writeString
+         0     0%   100%     2.38ms  1.12%  fmt.(*fmt).fmtS
+         0     0%   100%     2.38ms  1.12%  fmt.(*fmt).padString
+         0     0%   100%     5.93ms  2.80%  fmt.(*pp).doPrintf
+         0     0%   100%     2.38ms  1.12%  fmt.(*pp).fmtString
+         0     0%   100%     2.38ms  1.12%  fmt.(*pp).printArg
+         0     0%   100%     5.99ms  2.83%  fmt.Sprintf
+         0     0%   100%     9.56ms  4.52%  github.com/vroomy/turbo.(*Turbo).listen
+         0     0%   100%    73.84ms 34.88%  github.com/vroomy/turbo.(*Turbo).work
+         0     0%   100%     3.02ms  1.42%  github.com/vroomy/turbo.(*http11BenchmarkClient).roundTrip
+         0     0%   100%    29.21ms 13.80%  github.com/vroomy/turbo.TestHTTP11DispatchStudy
+         0     0%   100%    26.22ms 12.38%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1
+         0     0%   100%     3.02ms  1.42%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.2
+         0     0%   100%    26.24ms 12.39%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.3
+         0     0%   100%    26.22ms 12.38%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4
+         0     0%   100%    10.97ms  5.18%  github.com/vroomy/turbo.TestHTTP11DispatchStudy.func1.4.1
+         0     0%   100%     6.41ms  3.03%  github.com/vroomy/turbo.http11Workload.request
+         0     0%   100%     1.28ms  0.61%  github.com/vroomy/turbo.newHTTP11BenchmarkClient
+         0     0%   100%     3.02ms  1.42%  github.com/vroomy/turbo.newHTTP11BenchmarkListener.func1
+         0     0%   100%    26.22ms 12.38%  github.com/vroomy/turbo.runHTTP11Clients
+         0     0%   100%    16.12ms  7.61%  github.com/vroomy/turbo.runHTTP11Clients.func1
+         0     0%   100%    30.52ms 14.41%  main.main
