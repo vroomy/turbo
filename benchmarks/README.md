@@ -244,3 +244,58 @@ for transport in tcp pipe; do
     benchstat "/tmp/http11-$transport-stdlib.txt" "/tmp/http11-$transport-turbo.txt"
 done
 ```
+
+## Fragmentation and immutable request storage (TODO 10–11)
+
+The storage study retains production behavior after comparing allocation,
+retention, and timing tradeoffs. Results and the no-change decision are recorded
+in [`TODO.md`](../TODO.md). The measurement harness is checked in:
+
+- `BenchmarkParseFragments`: complete, early/middle/final split GET/HEAD reads,
+  plus valid duplicate Content-Length forcing fallback after partial parsing.
+- `BenchmarkParseStorage`: exact owned byte sizes around packing bounds and
+  alternating small/large byte and field sets.
+- `BenchmarkProcessStorage`: corresponding process cases, preserving the
+  original SmallGET handler's two header allocations. Large field sets also
+  produce 129 response fields and a 20 KiB value.
+- `BenchmarkRoundTripStorage`: the original Pipe/TCP client and handler with
+  68/257/704-byte requests, 1/8/32 workers, queue 1,024, and 1/8 clients.
+- `TestStorageWorkerHeap`: opt-in actual-worker snapshots with deterministic
+  barriers, changing sizes, and clones surviving shutdown.
+- `TestStoragePackingHeap`: opt-in parser ownership and dense/sparse clone
+  profiles. Thirty-two clones per parser survive parser release; sparse clones
+  are separated by 64 discarded requests.
+
+The split reader controls server read boundaries without sleeps or additional
+goroutines. These are isolated fragmentation measurements; socket writes alone
+cannot reliably force the same TCP read boundaries. Public fallback, body, URL,
+clone ownership, response map identity, and storage bounds remain unchanged.
+
+Reproduce with Go 1.27 and `benchstat` on PATH. The script copies current source
+and identical harnesses to isolated directories before changing only two packing
+constants. All timings run sequentially and separately from profiles/race tests:
+
+```sh
+python3 scripts/storage_study.py prepare
+python3 scripts/storage_study.py baseline
+python3 scripts/storage_study.py timing
+python3 scripts/storage_study.py profiles
+TURBO_STORAGE_SAMPLES=10 python3 scripts/storage_study.py timing tcp-confirmation
+python3 scripts/storage_study.py validate
+python3 scripts/storage_study.py summarize
+```
+
+Defaults are `GOMAXPROCS=8`, six alternating-order 100 ms timing samples, and
+bounded 200-request TCP samples at 32 workers. TCP and the full race suite need
+loopback access. Full allocation profiles use 20,000 iterations plus one
+calibration iteration with `MemProfileRate=1`; fractional events include that
+calibration. Do not compare their instrumented timings with ordinary samples.
+
+Sources/binary profiles default to `/tmp/turbo-storage-study`; use a fresh
+`TURBO_STORAGE_SCRATCH` to repeat preparation without replacing prior evidence.
+Raw text results, benchstat, metadata/hashes, heap JSON, and generated summaries
+go to `studies/request-storage/`, which is ignored. Snapshots report cumulative
+goroutine creation, live goroutines, stack bytes, and heap bytes separately;
+process totals include test/runtime/profiler storage. The packing table measures
+512/128, 1,024/256 (current), 1,024/512, and 2,048/1,024-byte block/sharing bounds.
+Larger blocks are an exploration of increased retention, not an adopted change.

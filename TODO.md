@@ -2,7 +2,8 @@
 
 ## Round two: allocation and goroutine profiling (2026-10-28)
 
-Tasks 1–9 below are complete. A new profiling pass at `37519a3`
+Tasks 1–11 below are complete; tasks 10–11 retain the existing production code.
+A new profiling pass at `37519a3`
 adds cumulative goroutine-creation metrics to the HTTP and isolated process
 benchmarks. Production code is unchanged. Full results, raw timings, profile
 summaries, trace attribution and reproduction scripts are in
@@ -91,7 +92,64 @@ claiming an end-to-end gain. Benchmark before/after with the same harness and
 run both parser fuzzers and the race suite. Keep the no-change outcome if
 cache bookkeeping or retention outweighs the allocation benefit.
 
-### 10. [ ] P2 — Measure reuse under fragmented requests and changing sizes
+### 10. [x] P2 — Measure reuse under fragmented requests and changing sizes
+
+**Completed 2026-10-28 — measurement map; fallback unchanged.** Added fixed
+first-read boundaries for GET/HEAD (early, middle, final byte), valid duplicate
+Content-Length for fallback after partial fast-path parsing, and alternating
+68/2,048-byte and 2/129-field request sets. The process harness keeps the existing
+SmallGET handler; large field sets additionally produce 129 response headers
+and a 20 KiB value. No sleeps or per-request goroutines control the reads.
+Differential fixture tests cover all cases and clones across parser resets.
+
+Six uninstrumented 100 ms samples at `7ab87f1c7e12d99ee80198b27b07a300e038e9db`,
+Go 1.27.2, Darwin arm64, Apple M3, `GOMAXPROCS=8` give these GET medians:
+
+| Read pattern | Parser ns/op | Parser B/op | Process ns/op | Process B/op |
+| --- | ---: | ---: | ---: | ---: |
+| Complete | 291.15 | 68 | 719.5 | 100 |
+| Early split | 627.9 | 957 | 1,082 | 990 |
+| Middle split | 667.65 | 957 | 1,117 | 990 |
+| Final-byte split | 672.55 | 957 | 1,135 | 990 |
+| Late fallback | 1,066 | 1,114 | 1,530.5 | 1,147 |
+
+HEAD follows the same allocation pattern. Reported parser objects are
+0/8/9/8/10 respectively; process objects are 2/10/11/10/12. Full allocation
+profiles show 1,335 immutable blocks for 20,001 complete parses (0.066747
+objects/parse), zero such blocks for split reads, and 1,820 for late fallback.
+Thus late fallback pays both ownership and stdlib parsing costs. Alternating
+bytes process at 1.6225 µs, 1,091 B/op, two reported objects; alternating large
+request/response fields at 19.728 µs, 49,800.5 B/op, 78 reported objects.
+These are isolated measurements, not predictions of TCP segmentation or speed.
+
+Forced-GC snapshots cover actual 1/8/32-worker servers: cold idle, every worker
+warm and active, idle after large and small responses, shutdown with retained
+clones, then clone release. Sixteen barrier-controlled waves create no request
+goroutines; process-wide creation counters, live counts, and stack bytes are
+recorded separately. With 32 workers and 512 clones, live heap is 7,127,792 B
+active, 4,991,728 B large-idle, 4,955,824 B small-idle, 4,550,544 B stopped with
+clones, and 403,072 B after releasing clones. Those are whole-process totals,
+including harness/runtime/profiler storage, not exact worker ownership charges.
+Live goroutines fall from 35 to two; stack storage falls from 622,592 to
+589,824 B and need not immediately return to the initial level. Creation is
+zero during the sampled request waves; shutdown's test helper creates one.
+
+Large request maps/value arrays and oversized response buffers are released.
+Response map capacity remains after clearing, and last-response values remain
+until the next `populateHeaders`; map identity is preserved. Separate alternating
+small/large parser profiles retain three 1 KiB blocks for 32 small clones per
+parser, even after the parser is released, and zero text after clone release.
+No second parser, buffering change, or retention-cap change is justified by
+this measurement-only task. The evidence establishes the prerequisite for #11.
+
+Reproducible fixtures/diagnostics are in `internal/storagestudy/study.go`,
+`request/storage_study_test.go`, and `storage_study_test.go`. See the storage
+study section in [`benchmarks/README.md`](benchmarks/README.md) and the tracked
+[`scripts/storage_study.py`](scripts/storage_study.py). Raw samples, heap JSON,
+profiles' text summaries, metadata/hashes, and all medians are locally retained
+under [`studies/request-storage/`](studies/request-storage/README.md), ignored by
+the existing `/studies` rule. Binary profiles/candidate sources are in
+`/tmp/turbo-storage-study`. Validation is recorded with #11 below.
 
 **Evidence:** current fast-path benchmarks predominantly send complete headers
 in one write. `parse` falls back when the first buffered read lacks the header
@@ -118,7 +176,72 @@ bounds. Prefer leaving fallback intact over inventing a second general parser.
 Response map identity is currently exercised by tests; any proposed retention
 cap must explicitly resolve that contract rather than silently replacing it.
 
-### 11. [ ] P3 — Evaluate immutable request-text packing only with retention data
+### 11. [x] P3 — Evaluate immutable request-text packing only with retention data
+
+**Completed 2026-10-28 — no production change retained.** After #10's baseline
+retention measurements, compared current 1,024/256-byte block/sharing bounds
+with 512/128 (smaller), 1,024/512 (wider), and 2,048/1,024 (larger). Candidate
+copies change only those constants; production source and stdlib URL parsing
+remain unchanged. Larger blocks are an exploratory increase of the existing
+worker bound and are rejected. No pool, unsafe reuse, or maintenance goroutine
+was added.
+
+Full allocation profiles count text objects over 20,001 parses, including one
+calibration iteration. The table reports that fractional event rate and the
+uninstrumented parser's B/op; integer benchmark object counts truncate fractions.
+
+| Configuration | 68-byte objects/parse; B/op | 257-byte objects/parse; B/op | 704-byte objects/parse; B/op |
+| --- | --- | --- | --- |
+| Current | 0.066747; 68 | 1.000000; 288 | 1.000000; 704 |
+| Smaller | 0.142943; 73 | 1.000000; 288 | 1.000000; 704 |
+| Wider | 0.066747; 68 | 0.333383; 341 | 1.000000; 704 |
+| Larger | 0.033398; 68 | 0.142943; 292 | 0.500025; 1,024 |
+
+Dense and sparse clone profiles at 1/8/32 parsers retain 32 clones per parser.
+After parser release, sparse 68-byte clones pin 1,024 B each currently, 512 B
+with smaller blocks, and 2,048 B with larger blocks. Dense 68-byte clones pin
+96/80/128 B per clone respectively (aggregate text divided by clone count).
+Wider packing raises sparse 257-byte clone text from 288 to 1,024 B each;
+larger packing raises sparse 704-byte clone text from 704 to 2,048 B each.
+A current small-request parser owns 512 B of struct, 400 B of map, 32 B of value
+storage, and one 1,024-byte current block: 1,968 B excluding retained clones.
+The corresponding smaller/larger totals are 1,456/2,992 B. Current blocks may
+also be pinned by clones, so these ownership figures must not be added twice.
+All 72 candidate/worker/size/clone-pattern profiles release all `ownHeader`
+text when both parsers and clones are dropped.
+
+Six balanced-order samples use the same platform/commit as #10: 100 ms for
+parser/ownership/process/Pipe, 200 requests for TCP. Sizes straddle the bounds;
+original browser/escaped fixtures and alternating sizes/fields are included.
+Pipe uses 1/8/32 workers, queue 1,024, and 1/8 clients; TCP uses 32 workers and
+the same queue/client counts. The original handler and client remain unchanged.
+Smaller blocks regress isolated 68-byte processing **0.97%** (745.6 to 752.85 ns,
+`p=0.026`), and Pipe with one worker/client **0.79%** (`p=0.026`). Their original
+medium-header ownership benchmark regresses **42.01%** after leaving packing.
+Wider packing gives no significant parser/process/Pipe timing gains while
+257-byte B/op rises **18.40%**. Larger blocks improve small ownership alone
+**4.01%**, but regress 704-byte process time **0.75%** and its one-worker/eight-
+client Pipe case **0.97%** (`p=0.024/0.022`). Its real browser case (668 owned
+bytes, rounded to 704 allocated bytes) packs three requests per block and saves
+3.12% B/op, yet parsing regresses **1.61%**; escaped-browser parsing improves
+0.55%. Exact 704-byte requests fit only two per block and instead use 45.45%
+more bytes. These differences argue against tuning only the browser fixture.
+
+Initial TCP samples show several apparent 10–27% gains, including unchanged
+small-request paths. A fresh ten-sample balanced confirmation of the affected
+68/257-byte cases finds every timing difference uncertain (`p>=0.165`). Both
+batches are retained; **no repeatable TCP speedup is established**. No candidate
+has a significant Pipe speedup. Isolated gains do not outweigh allocation,
+retention, and regression costs; retain the current bounds.
+
+Baseline and all three candidates pass `go test -race -count=1 ./... -timeout=2m`,
+both opt-in heap diagnostics under race detection, and both differential parser
+fuzzers for 10 seconds each with eight workers (7,885,176 total executions).
+All completed Pipe/TCP timing runs finish without request errors; the initial
+sandbox-denied TCP bind is recorded separately and rerun with loopback access.
+Reproduction script, raw samples, benchstat, hashes, fractional allocation and
+live-byte tables, regression/uncertainty results, and validation logs are at
+#10's paths. Both tasks retain the existing production implementation.
 
 **Evidence:** SmallGET owns about 68 B and 0.067 blocks/request; browser fields
 own one 704-byte block/request. Escaped browser paths add 184 B and three
