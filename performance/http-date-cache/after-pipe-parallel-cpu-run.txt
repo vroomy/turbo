@@ -1,7 +1,0 @@
-# GOMAXPROCS=8 /private/tmp/turbo-date-cache/after.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^SmallGET$/^Parallel$/^Turbo$' -test.benchtime=3s -test.count=1 -test.timeout=1m -test.cpuprofile=/tmp/turbo-date-cache/after-pipe-parallel-cpu.pprof
-goos: darwin
-goarch: arm64
-pkg: github.com/vroomy/turbo
-cpu: Apple M3
-BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8   	 1716549	      2111 ns/op	  60.63 MB/s	    473653 req/s	    2581 B/op	      29 allocs/op
-PASS
