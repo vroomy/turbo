@@ -33,6 +33,7 @@ func BenchmarkTurboProcessResponseHeaders(b *testing.B) {
 			server := Turbo{h: responseHeaderBenchmarkHandler(count)}
 			writer := makeResponseWriter()
 			var parser request.Parser
+			goroutines := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
@@ -41,6 +42,8 @@ func BenchmarkTurboProcessResponseHeaders(b *testing.B) {
 					b.Fatal(err)
 				}
 			}
+			b.StopTimer()
+			goroutines.report(b)
 		})
 	}
 }
@@ -57,6 +60,7 @@ func BenchmarkHTTP11ResponseHeaders(b *testing.B) {
 						}
 						b.Run(name, func(b *testing.B) {
 							b.StopTimer()
+							goroutines := newBenchmarkGoroutines(b)
 							workload := http11Workloads()[0]
 							config := defaultHTTP11BenchmarkConfig()
 							if parallel {
@@ -70,6 +74,7 @@ func BenchmarkHTTP11ResponseHeaders(b *testing.B) {
 							// Use the same client, body validation, timeout and EOF check
 							// as the original end-to-end benchmarks.
 							b.ReportAllocs()
+							setupGoroutines := goroutines.delta()
 							b.ResetTimer()
 							b.StartTimer()
 							if parallel {
@@ -90,6 +95,8 @@ func BenchmarkHTTP11ResponseHeaders(b *testing.B) {
 								}
 							}
 							b.StopTimer()
+							goroutines.report(b)
+							b.ReportMetric(float64(setupGoroutines), "setup-goroutines")
 						})
 					}
 				})

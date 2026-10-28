@@ -1,5 +1,108 @@
 # Turbo optimization TODO
 
+## Round two: allocation and goroutine profiling (2026-10-28)
+
+The first eight tasks below are complete. A new profiling pass at `37519a3`
+adds cumulative goroutine-creation metrics to the HTTP and isolated process
+benchmarks. Production code is unchanged. Full results, raw timings, profile
+summaries, trace attribution and reproduction scripts are in
+[`profiling/2026-10-28/`](profiling/2026-10-28/README.md).
+
+The priorities remain **simplicity and allocation efficiency**, preferring
+bounded worker-owned reuse over new pools or shared caches. Current SmallGET
+processing is 100 B/op and two reported allocations, primarily the handler's
+two `Header.Set` calls plus fractional immutable request-text blocks. Turbo
+creates no per-request goroutines in the sampled workloads; stdlib creates
+two. Parallel benchmark clients and server startup are reported separately
+from that interpretation. Live goroutine counts cannot measure creation churn.
+
+### 9. [ ] P1 — Reduce repeated canonical header-name allocations
+
+**Evidence:** the reused browser parser uses 704 B/one object with canonical
+names, versus 872 B/ten objects with lowercase or mixed-case names. Full
+allocation profiles attribute the additional nine objects/168 bytes to
+`net/textproto.canonicalMIMEHeaderKey`. The three common names already handled
+as constants do not allocate. This is the strongest newly quantified target.
+
+**Entry points:** `canonicalHeaderKey`, `parseHeaders`, `Parser` in
+`request/request.go`; `BenchmarkParse` browser/casing variants; the new
+`parser-lowercaseheaders-alloc_objects.txt` profile summary.
+
+**Experiment:** start with the simplest treatment of common immutable names.
+Compare a small justified constant-name extension with bounded worker-owned
+name reuse only if the latter earns its extra state. Avoid a global intern
+table/pool, unbounded arbitrary-name caching, or changing immutable string
+backing storage. Do not tune solely to this fixture: include custom names,
+changing names, mixed casing, long names and small requests. Count retained
+bytes as well as allocation events; a short cached substring can retain an
+entire request block.
+
+**Acceptance:** identical differential/fuzz behavior and retained-clone safety;
+repeatable byte/object reductions in lowercase and mixed-case workloads;
+unchanged small/canonical-request allocations and no material timing regression.
+Add matching process/Pipe/TCP cases with unchanged response handlers before
+claiming an end-to-end gain. Benchmark before/after with the same harness and
+run both parser fuzzers and the race suite. Keep the no-change outcome if
+cache bookkeeping or retention outweighs the allocation benefit.
+
+### 10. [ ] P2 — Measure reuse under fragmented requests and changing sizes
+
+**Evidence:** current fast-path benchmarks predominantly send complete headers
+in one write. `parse` falls back when the first buffered read lacks the header
+terminator. The latest POST/fallback profile still spends most allocation
+bytes in `http.ReadRequest`, but it does not quantify fragmented GET traffic.
+The happy-path heap pass shows shutdown cleanup, not adversarial retention.
+
+**Entry points:** `parse`, `Parser.Reset`, `ownHeader`, `responseWriter.reset`,
+`populateHeaders`; existing process connections and Pipe heap diagnostic.
+
+**Experiment:** first add deterministic split-read GET/HEAD benchmarks (early,
+middle and final header boundaries) and alternating small/large request and
+response header sets. Use the same logical request and handler across cases.
+Measure the cost of fallback after partial parsing separately from the
+successful fast path. Collect warmed/idle/shutdown heap profiles at 1/8/32
+workers, including cloned requests that intentionally outlive the worker.
+Report cumulative creation, live goroutines and retained stack/heap storage as
+different quantities. Avoid sleeps or new per-request goroutines in the harness.
+
+**Acceptance:** a reproducible allocation/retention map before proposing a fix.
+Any bounded read/storage-reuse prototype must preserve fallback/error/body
+semantics, prompt handling of complete headers, immutable clones and reset
+bounds. Prefer leaving fallback intact over inventing a second general parser.
+Response map identity is currently exercised by tests; any proposed retention
+cap must explicitly resolve that contract rather than silently replacing it.
+
+### 11. [ ] P3 — Evaluate immutable request-text packing only with retention data
+
+**Evidence:** SmallGET owns about 68 B and 0.067 blocks/request; browser fields
+own one 704-byte block/request. Escaped browser paths add 184 B and three
+objects through `net/url`. These are real remaining costs, but much smaller
+object targets than the casing workload. Zero reported allocations on the
+implicit GET benchmark is truncation, not zero actual allocations.
+
+**Entry points:** `ownHeader`, `headerTextBlockSize`, `maxSharedHeaderSize`,
+`makeRequest`; `BenchmarkOwnHeader` and escaped-path parser cases.
+
+**Experiment:** only after task 10 establishes clone/worker retention, compare
+small changes to immutable block packing thresholds across request sizes and
+worker counts. Preserve append-only ownership and maximum retained storage.
+Larger blocks must not merely exchange fewer allocation events for excessive
+bytes retained by clones. Keep escaped-path URL parsing on stdlib unless an
+independently measured, narrow simplification justifies changing it.
+
+**Acceptance:** report fractional object events from full allocation profiles,
+bytes/op, live bytes per worker and retained clone, plus isolated and round-trip
+timings. No unsafe mutable-string reuse, new background maintenance goroutines
+or pools. A documented no-change result is valid.
+
+Do not reopen the rejected POST fast path, worker-owned reader or custom header
+serializer merely because their stacks still appear. Tasks 6–8 record why
+their complexity/retention costs were not justified. Client Pipe/watchdog and
+response-parser allocations dominate end-to-end allocation totals; changing
+those is a separately labeled harness experiment.
+
+## Completed first round
+
 Profiled on 2026-10-24 at commit `52a75f80c31b9d2ca3a7eb36e10685d37369687b`,
 Go 1.27.2, Darwin arm64, Apple M3, `GOMAXPROCS=8`. No production or benchmark
 code was changed for this baseline. `go test -race ./...` passed.
@@ -10,7 +113,7 @@ not promises of speedups; keep changes only when correctness and measurements
 support them. Each task includes its entry points and acceptance criteria so
 another agent can implement it without this conversation.
 
-## What the current profiles say
+## What the first-round profiles said
 
 Uninstrumented SmallGET medians; parallel ns/op is inverse aggregate throughput,
 not request latency:

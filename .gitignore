@@ -9,3 +9,4 @@
 !/performance/worker-dispatch/
 *.pprof
 *.test
+/profiling

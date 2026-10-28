@@ -24,6 +24,7 @@ func BenchmarkTurboProcessHeaders(b *testing.B) {
 			server := Turbo{h: http11Workloads()[0].handler()}
 			writer := makeResponseWriter()
 			var parser request.Parser
+			goroutines := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
@@ -32,6 +33,8 @@ func BenchmarkTurboProcessHeaders(b *testing.B) {
 					b.Fatal(err)
 				}
 			}
+			b.StopTimer()
+			goroutines.report(b)
 		})
 	}
 }

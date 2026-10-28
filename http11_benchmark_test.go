@@ -141,6 +141,7 @@ func BenchmarkTurboProcess(b *testing.B) {
 			server := Turbo{h: workload.handler()}
 			writer := makeResponseWriter()
 			var parser request.Parser
+			goroutines := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
 			b.ResetTimer()
@@ -150,6 +151,8 @@ func BenchmarkTurboProcess(b *testing.B) {
 					b.Fatal(err)
 				}
 			}
+			b.StopTimer()
+			goroutines.report(b)
 		})
 	}
 }
@@ -177,6 +180,7 @@ func benchmarkHTTP11(b *testing.B, transport, implementation string, workload ht
 
 func benchmarkHTTP11Config(b *testing.B, transport, implementation string, workload http11Workload, config http11BenchmarkConfig, legacyParallel bool) {
 	b.StopTimer()
+	goroutines := newBenchmarkGoroutines(b)
 	dial := startHTTP11BenchmarkServer(b, transport, implementation, workload.handler(), config)
 	request := workload.request()
 	client := newHTTP11BenchmarkClient(dial, request, workload)
@@ -185,6 +189,7 @@ func benchmarkHTTP11Config(b *testing.B, transport, implementation string, workl
 	}
 	b.ReportAllocs()
 	b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
+	setupGoroutines := goroutines.delta()
 	b.ResetTimer()
 	b.StartTimer()
 	if legacyParallel {
@@ -215,6 +220,8 @@ func benchmarkHTTP11Config(b *testing.B, transport, implementation string, workl
 		})
 	}
 	b.StopTimer()
+	goroutines.report(b)
+	b.ReportMetric(float64(setupGoroutines), "setup-goroutines")
 	b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "req/s")
 	b.ReportMetric(float64(config.workers), "workers")
 	b.ReportMetric(float64(config.queue), "queue")

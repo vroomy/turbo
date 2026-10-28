@@ -53,6 +53,24 @@ uses connection-close framing. All other cases explicitly match framing.
 
 ## Run
 
+HTTP round-trip and isolated Turbo process benchmarks report `goroutines/op`
+and total `goroutines` created during the measured workload. These use Go's
+cumulative `/sched/goroutines-created:goroutines` runtime metric, so goroutines
+that finish between samples are counted. Reads happen outside the timer, once
+at each boundary; there is no per-request instrumentation. Counts are
+process-wide and include clients and runtime activity, not just server work.
+Parallel clients contribute a fixed startup count (normally `GOMAXPROCS`),
+which is divided by `b.N`; do not interpret that as per-request server spawning.
+Round-trip `setup-goroutines` counts server startup and the validated preflight
+separately. Cleanup is outside both intervals. The `workers` metric describes
+Turbo's configured worker count; stdlib does not use that worker pool.
+
+The [second profiling round](../profiling/2026-10-28/README.md) includes CPU,
+allocation, blocking, heap and trace evidence, plus a fresh baseline and
+allocation priorities. In the sampled workloads Turbo creates no per-request
+goroutines; stdlib creates two, for connection serving and background reads.
+Live goroutine snapshots alone cannot measure this difference.
+
 Run without the race detector, coverage, or profiling when comparing timing:
 
 ```sh
