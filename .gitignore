@@ -3,6 +3,8 @@
 /testdata
 /examples
 /performance/*
+/performance
+/experiments
 !/performance/http-date-cache/
 !/performance/worker-dispatch/
 *.pprof

@@ -593,7 +593,14 @@ cannot justify its maintenance and correctness cost with a measurable gain.
 **Dependencies:** implement after/rebase onto tasks 2 and 3 to avoid overlapping
 writer changes and to profile the remaining bottleneck.
 
-### 7. [ ] P2 — Extend storage reuse to a narrowly defined POST fast path
+### 7. [x] P2 — Extend storage reuse to a narrowly defined POST fast path
+
+**Completed 2026-10-28 — no improvement retained.** The POST storage-reuse
+prototype was evaluated and reverted. Isolated POST gains came with extra
+framing/body-lifecycle code and measurable costs on fallback and GET paths;
+the tradeoff was not accepted. The existing `http.ReadRequest` POST path is
+retained, with no implementation, test, or benchmark changes for this task.
+No TCP improvement was established.
 
 **Entry points:** `request.parse`, `parseBuffered`, `Parser` in
 `request/request.go`; `Turbo.process`/`finishRequest` in `turbo.go`;
@@ -621,7 +628,47 @@ Accept only if workload gains justify the extra protocol implementation.
 
 **Dependencies:** rebase onto task 5; higher protocol risk than Date or writes.
 
-### 8. [ ] P3 — Evaluate worker-owned readers and redundant reset costs
+### 8. [x] P3 — Evaluate worker-owned readers and redundant reset costs
+
+**Completed 2026-10-28 — no production change retained.** Independently
+evaluated lazy worker-owned readers and a private parser lifecycle flag that
+skips repeated clearing while preserving automatic public reset. Measurements
+use base commit `c9533b0fa6efa5e4627bda147e435a871d953ad9`, Go 1.27.2,
+Darwin arm64, Apple M3 and `GOMAXPROCS=8`. Identical harnesses compare each
+candidate with a pooled-reader/original-reset baseline; a separate unchanged
+source control finds no significant timing effect from the common internal
+signature adjustment. No combined candidate was measured.
+
+Ten balanced-order samples cover all isolated/Pipe workloads, browser/escaped
+headers, bounded TCP GET/HEAD/POST, and task 4's Pipe matrix with workers
+1/8/32, queues 0/1024 and clients 1/8/128. Worker-owned readers improve isolated
+SmallGET **735.0 to 729.55 ns (-0.74%)**, with **100 B/op and two objects**
+unchanged. Initial small LargeGET and high-client round-trip gains do not
+repeat significantly in a separate ten-sample confirmation. Confirmation
+SmallGET Pipe serial regresses **0.69% (`p=0.037`)**; eight workers/queue 1024/
+one client regresses **1.07% (`p=0.007`)**. Every TCP timing difference is
+uncertain. Bounded TCP SmallGET serial B/op rises **18.53%**, reflecting
+per-worker reader warmup; no TCP improvement is established.
+
+Forced-GC profiles with 1/8/32 workers cover cold idle, all workers active,
+warm idle and shutdown. Neither reader strategy allocates buffers before use.
+Both own **131 KiB** of readers/buffers with 32 active workers; only the
+worker-owned candidate retains those 32 pairs after becoming idle and forcing
+two GCs. Both release them at shutdown. The reset flag produces only small
+isolated gains in some workloads, uncertain SmallGET/public-parser timings,
+and no significant default Pipe round-trip gains. Neither tradeoff is accepted.
+
+The baseline and both prototypes pass `go test -race -count=1 ./...
+-timeout=2m`, including lifecycle, failure, retained-clone and concurrent-worker
+tests. All three opt-in heap diagnostics pass under race detection. The reset
+prototype passes both differential fuzzers for 30 s each (4,067,404 parse and
+3,196,824 reuse executions). The final repository race suite also passes.
+Reproduction scripts, prototype patches, raw samples, all ns/op/B/op/object
+medians, benchstat reports, source/binary hashes, CPU/allocation summaries and
+worker heap evidence are locally retained in
+[`experiments/worker-lifecycle/`](experiments/worker-lifecycle/README.md).
+That directory is ignored by the `/experiments` rule; the essential results
+and measurement configuration are recorded above.
 
 **Entry points:** `requestReaders`, `work`, `process`, `finishRequest` in
 `turbo.go`; `Parser.Parse` and `Parser.Reset` in `request/request.go`.
