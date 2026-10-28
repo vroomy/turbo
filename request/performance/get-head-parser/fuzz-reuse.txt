@@ -1,0 +1,15 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/326 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 326/326 completed, now fuzzing with 8 workers
+fuzz: elapsed: 3s, execs: 375425 (125061/sec), new interesting: 17 (total: 343)
+fuzz: elapsed: 6s, execs: 764096 (129620/sec), new interesting: 35 (total: 361)
+fuzz: elapsed: 9s, execs: 1067242 (101035/sec), new interesting: 40 (total: 366)
+fuzz: elapsed: 12s, execs: 1370294 (101023/sec), new interesting: 44 (total: 370)
+fuzz: elapsed: 15s, execs: 1641048 (90234/sec), new interesting: 64 (total: 390)
+fuzz: elapsed: 18s, execs: 1923257 (94108/sec), new interesting: 65 (total: 391)
+fuzz: elapsed: 21s, execs: 2120654 (65756/sec), new interesting: 65 (total: 391)
+fuzz: elapsed: 24s, execs: 2263652 (47666/sec), new interesting: 66 (total: 392)
+fuzz: elapsed: 27s, execs: 2403313 (46554/sec), new interesting: 78 (total: 404)
+fuzz: elapsed: 30s, execs: 2509409 (35389/sec), new interesting: 80 (total: 406)
+fuzz: elapsed: 31s, execs: 2509409 (0/sec), new interesting: 80 (total: 406)
+PASS
+ok  	github.com/vroomy/turbo/request	31.259s

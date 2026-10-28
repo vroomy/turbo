@@ -1,0 +1,39 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-get-head-parser/after-request.test /tmp/turbo-get-head-parser/after-parse-small-cpu.pprof
+File: after-request.test
+Type: cpu
+Time: 2026-10-28 07:53:55 PDT
+Duration: 4.16s, Total samples = 3.53s (84.91%)
+Showing nodes accounting for 3.08s, 87.25% of 3.53s total
+Dropped 31 nodes (cum <= 0.02s)
+Showing top 30 nodes out of 82
+      flat  flat%   sum%        cum   cum%
+     0.44s 12.46% 12.46%      0.44s 12.46%  internal/bytealg.IndexByteString
+     0.33s  9.35% 21.81%      0.33s  9.35%  github.com/vroomy/turbo/request.validValue (inline)
+     0.21s  5.95% 27.76%      0.54s 15.30%  bytes.Index
+     0.20s  5.67% 33.43%      1.44s 40.79%  github.com/vroomy/turbo/request.parseHeaders
+     0.20s  5.67% 39.09%      0.46s 13.03%  internal/stringslite.Index
+     0.17s  4.82% 43.91%      2.45s 69.41%  github.com/vroomy/turbo/request.parseBuffered
+     0.16s  4.53% 48.44%      0.16s  4.53%  runtime.madvise
+     0.15s  4.25% 52.69%      0.24s  6.80%  strings.Trim
+     0.11s  3.12% 55.81%      0.11s  3.12%  runtime.memequal
+     0.09s  2.55% 58.36%      0.09s  2.55%  runtime.kevent
+     0.08s  2.27% 60.62%      0.12s  3.40%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.08s  2.27% 62.89%      0.08s  2.27%  runtime.memclrNoHeapPointers
+     0.07s  1.98% 64.87%      0.26s  7.37%  github.com/vroomy/turbo/request.(*Parser).Reset (inline)
+     0.07s  1.98% 66.86%      0.14s  3.97%  net/textproto.CanonicalMIMEHeaderKey
+     0.07s  1.98% 68.84%      0.07s  1.98%  net/textproto.validHeaderFieldByte (inline)
+     0.06s  1.70% 70.54%      0.06s  1.70%  internal/runtime/maps.(*Map).putSlotSmallFastStr
+     0.06s  1.70% 72.24%      0.06s  1.70%  internal/runtime/maps.memHashAES
+     0.06s  1.70% 73.94%      0.14s  3.97%  runtime.mapassign_faststr
+     0.06s  1.70% 75.64%      0.06s  1.70%  strings.EqualFold
+     0.05s  1.42% 77.05%      0.19s  5.38%  github.com/vroomy/turbo/request.makeRequest
+     0.05s  1.42% 78.47%      0.51s 14.45%  internal/stringslite.Cut
+     0.05s  1.42% 79.89%      0.05s  1.42%  strings.makeASCIISet (inline)
+     0.04s  1.13% 81.02%      3.24s 91.78%  github.com/vroomy/turbo/request.BenchmarkParse.func1.1
+     0.04s  1.13% 82.15%      0.04s  1.13%  io.copyBuffer
+     0.04s  1.13% 83.29%      0.04s  1.13%  strings.(*Builder).Write (inline)
+     0.03s  0.85% 84.14%      0.03s  0.85%  bufio.(*Reader).reset (inline)
+     0.03s  0.85% 84.99%      0.03s  0.85%  github.com/vroomy/turbo/request.canonicalHeaderKey
+     0.03s  0.85% 85.84%      0.16s  4.53%  github.com/vroomy/turbo/request.connectionClose
+     0.03s  0.85% 86.69%      0.03s  0.85%  internal/bytealg.Cutover (inline)
+     0.02s  0.57% 87.25%      0.03s  0.85%  bufio.(*Reader).fill

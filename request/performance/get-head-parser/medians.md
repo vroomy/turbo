@@ -1,0 +1,62 @@
+# All benchmark medians
+
+Ten alternating-order samples per case.
+
+| Case | Before ns/op | After ns/op | Change | Before B/op | After B/op | Before allocs/op | After allocs/op |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| BenchmarkParse/SmallGET/Turbo-8 | 439.95 | 387.5 | -11.92% | 960 | 960 | 5 | 5 |
+| BenchmarkParse/SmallGET/Reused-8 | 361.1 | 290.35 | -19.59% | 68 | 68 | 0 | 0 |
+| BenchmarkParse/SmallGET/Stdlib-8 | 607.55 | 609.7 | +0.35% | 957 | 957 | 8 | 8 |
+| BenchmarkParse/LowercaseSmallGET/Turbo-8 | 490.25 | 385.25 | -21.42% | 960 | 960 | 5 | 5 |
+| BenchmarkParse/LowercaseSmallGET/Reused-8 | 410.2 | 290.8 | -29.11% | 68 | 68 | 0 | 0 |
+| BenchmarkParse/LowercaseSmallGET/Stdlib-8 | 608 | 609.55 | +0.25% | 957 | 957 | 8 | 8 |
+| BenchmarkParse/MixedCaseSmallGET/Turbo-8 | 494 | 490.25 | -0.76% | 960 | 960 | 5 | 5 |
+| BenchmarkParse/MixedCaseSmallGET/Reused-8 | 418.3 | 396.85 | -5.13% | 68 | 68 | 0 | 0 |
+| BenchmarkParse/MixedCaseSmallGET/Stdlib-8 | 614.35 | 619.7 | +0.87% | 957 | 957 | 8 | 8 |
+| BenchmarkParse/Headers/Turbo-8 | 680.95 | 617.4 | -9.33% | 1072 | 1072 | 5 | 5 |
+| BenchmarkParse/Headers/Reused-8 | 600.4 | 520 | -13.39% | 146 | 146 | 0 | 0 |
+| BenchmarkParse/Headers/Stdlib-8 | 913.65 | 918.4 | +0.52% | 1048 | 1048 | 13 | 13 |
+| BenchmarkParse/BrowserHeaders/Turbo-8 | 1953 | 1802 | -7.73% | 2936 | 2936 | 7 | 7 |
+| BenchmarkParse/BrowserHeaders/Reused-8 | 1824.5 | 1644.5 | -9.87% | 704 | 704 | 1 | 1 |
+| BenchmarkParse/BrowserHeaders/Stdlib-8 | 2393.5 | 2409 | +0.65% | 2864 | 2864 | 34 | 34 |
+| BenchmarkParse/LowercaseHeaders/Turbo-8 | 2339.5 | 2236 | -4.42% | 3104 | 3104 | 16 | 16 |
+| BenchmarkParse/LowercaseHeaders/Reused-8 | 2217.5 | 2087.5 | -5.86% | 872 | 872 | 10 | 10 |
+| BenchmarkParse/LowercaseHeaders/Stdlib-8 | 2387.5 | 2398.5 | +0.46% | 2864 | 2864 | 34 | 34 |
+| BenchmarkParse/MixedCaseHeaders/Turbo-8 | 2404 | 2382.5 | -0.89% | 3104 | 3104 | 16 | 16 |
+| BenchmarkParse/MixedCaseHeaders/Reused-8 | 2277 | 2232.5 | -1.95% | 872 | 872 | 10 | 10 |
+| BenchmarkParse/MixedCaseHeaders/Stdlib-8 | 2458.5 | 2450 | -0.35% | 2864 | 2864 | 34 | 34 |
+| BenchmarkParse/EscapedHeaders/Turbo-8 | 2062.5 | 1896.5 | -8.05% | 2992 | 2992 | 10 | 10 |
+| BenchmarkParse/EscapedHeaders/Reused-8 | 1923.5 | 1756.5 | -8.68% | 888 | 888 | 4 | 4 |
+| BenchmarkParse/EscapedHeaders/Stdlib-8 | 2472 | 2474 | +0.08% | 2904 | 2904 | 36 | 36 |
+| BenchmarkParse/POST/Turbo-8 | 689.5 | 689.65 | +0.02% | 1074 | 1074 | 11 | 11 |
+| BenchmarkParse/POST/Reused-8 | 695.35 | 698.6 | +0.47% | 1074 | 1074 | 11 | 11 |
+| BenchmarkParse/POST/Stdlib-8 | 682.9 | 686.65 | +0.55% | 1074 | 1074 | 11 | 11 |
+| BenchmarkParse/EscapedPath/Turbo-8 | 419.85 | 389.35 | -7.26% | 936 | 936 | 7 | 7 |
+| BenchmarkParse/EscapedPath/Reused-8 | 339.7 | 305.5 | -10.07% | 200 | 200 | 2 | 2 |
+| BenchmarkParse/EscapedPath/Stdlib-8 | 560.4 | 558.55 | -0.33% | 952 | 952 | 9 | 9 |
+| BenchmarkParse/Chunked/Turbo-8 | 706.35 | 701.8 | -0.64% | 1114 | 1114 | 12 | 12 |
+| BenchmarkParse/Chunked/Reused-8 | 707.85 | 704.15 | -0.52% | 1114 | 1114 | 12 | 12 |
+| BenchmarkParse/Chunked/Stdlib-8 | 698.05 | 696.85 | -0.17% | 1114 | 1114 | 12 | 12 |
+| BenchmarkOwnHeader/SmallGET/Fresh-8 | 17.755 | 17.79 | +0.20% | 80 | 80 | 1 | 1 |
+| BenchmarkOwnHeader/SmallGET/Reused-8 | 12.12 | 12.15 | +0.25% | 68 | 68 | 0 | 0 |
+| BenchmarkOwnHeader/Headers/Fresh-8 | 22.815 | 22.995 | +0.79% | 144 | 144 | 1 | 1 |
+| BenchmarkOwnHeader/Headers/Reused-8 | 16.195 | 16.255 | +0.37% | 146 | 146 | 0 | 0 |
+| BenchmarkOwnHeader/Large/Fresh-8 | 152.15 | 152.65 | +0.33% | 2304 | 2304 | 1 | 1 |
+| BenchmarkOwnHeader/Large/Reused-8 | 152.95 | 152.65 | -0.20% | 2304 | 2304 | 1 | 1 |
+| BenchmarkTurboProcess/SmallGET-8 | 834.4 | 762.8 | -8.58% | 100 | 100 | 2 | 2 |
+| BenchmarkTurboProcess/ImplicitGET-8 | 948.55 | 872.45 | -8.02% | 68 | 68 | 0 | 0 |
+| BenchmarkTurboProcess/LargeGET-8 | 839.65 | 767.3 | -8.62% | 100 | 100 | 2 | 2 |
+| BenchmarkTurboProcess/POST-8 | 1192.5 | 1183.5 | -0.75% | 1107 | 1107 | 13 | 13 |
+| BenchmarkTurboProcess/HEAD-8 | 832.3 | 761.65 | -8.49% | 100 | 100 | 2 | 2 |
+| BenchmarkTurboProcess/Empty-8 | 745.05 | 675.9 | -9.28% | 84 | 84 | 1 | 1 |
+| BenchmarkTurboProcess/StreamGET-8 | 859.9 | 788.2 | -8.34% | 100 | 100 | 2 | 2 |
+| BenchmarkTurboProcessHeaders/BrowserHeaders-8 | 2298.5 | 2122.5 | -7.66% | 736 | 736 | 3 | 3 |
+| BenchmarkTurboProcessHeaders/EscapedHeaders-8 | 2404.5 | 2239.5 | -6.86% | 920 | 920 | 6 | 6 |
+| BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8 | 4898 | 4585.5 | -6.38% | 2575.5 | 2575 | 29 | 29 |
+| BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8 | 1964 | 1950 | -0.71% | 2572.5 | 2572.5 | 29 | 29 |
+| BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8 | 4881.5 | 4754.5 | -2.60% | 2458 | 2458 | 27 | 27 |
+| BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8 | 1926.5 | 1896.5 | -1.56% | 2465 | 2466 | 27 | 27 |
+| BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8 | 68374.5 | 64343 | -5.90% | 3232.5 | 3233.5 | 45 | 45 |
+| BenchmarkHTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8 | 24412 | 25242 | +3.40% | 3756.5 | 3767.5 | 45.5 | 46 |
+| BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8 | 65421 | 63145.5 | -3.48% | 2882 | 2875.5 | 43 | 43 |
+| BenchmarkHTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8 | 23713 | 23179 | -2.25% | 3197 | 3197.5 | 43 | 43 |

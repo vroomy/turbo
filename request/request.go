@@ -215,7 +215,12 @@ func simpleTarget(target []byte) bool {
 
 func parseHeaders(fields string, storage *Parser) (http.Header, string, bool) {
 	// Host lives in Request.Host, so it needs no map entry or value slice.
-	count := max(strings.Count(fields, "\n")-1, 0)
+	// Size fresh storage once. Reused storage usually has enough capacity; only
+	// count the remaining lines if its value slice actually needs to grow.
+	var count int
+	if storage == nil || storage.headers == nil {
+		count = max(strings.Count(fields, "\n")-1, 0)
+	}
 	headers, values := headerStorage(storage, count)
 	if storage != nil {
 		defer func() { storage.values = values }()
@@ -229,11 +234,11 @@ func parseHeaders(fields string, storage *Parser) (http.Header, string, bool) {
 		}
 		fields = rest
 		key, value, ok := strings.Cut(line, ":")
-		if !ok || !validToken(key) || !validValue(value) {
+		if !ok || !validValue(value) {
 			return nil, "", false
 		}
-		key = http.CanonicalHeaderKey(key)
-		if _, duplicate := headers[key]; duplicate {
+		key, ok = canonicalHeaderKey(key)
+		if !ok {
 			return nil, "", false
 		}
 		value = strings.Trim(value, " \t")
@@ -250,6 +255,20 @@ func parseHeaders(fields string, storage *Parser) (http.Header, string, bool) {
 			if value != "0" {
 				return nil, "", false
 			}
+		}
+		if _, duplicate := headers[key]; duplicate {
+			return nil, "", false
+		}
+		if len(values) == cap(values) {
+			remaining := strings.Count(fields, "\n")
+			if !sawHost {
+				// Reserve no value slot for a Host still to come, just as
+				// fresh storage excludes Host from its initial count.
+				remaining = max(remaining-1, 0)
+			}
+			grown := make([]string, len(values), len(values)+1+remaining)
+			copy(grown, values)
+			values = grown
 		}
 		values = append(values, value)
 		// Cap each slice so a handler's append cannot overwrite another field.
@@ -272,16 +291,40 @@ func headerStorage(storage *Parser, count int) (http.Header, []string) {
 	return storage.headers, storage.values[:0]
 }
 
-func validToken(s string) bool {
+// Common spellings are already validated constants. For other fields, check
+// token validity and canonical casing together, avoiding a second scan for
+// canonical names. Uncommon casing still uses the standard canonicalizer.
+func canonicalHeaderKey(s string) (string, bool) {
+	switch s {
+	case "Host", "host":
+		return "Host", true
+	case "Connection", "connection":
+		return "Connection", true
+	case "Content-Length", "content-length":
+		return "Content-Length", true
+	}
 	if s == "" {
-		return false
+		return "", false
 	}
+	upper := true
 	for i := range s {
-		if !tokenBytes[s[i]] {
-			return false
+		c := s[i]
+		if !tokenBytes[c] {
+			return "", false
 		}
+		if (upper && 'a' <= c && c <= 'z') || (!upper && 'A' <= c && c <= 'Z') {
+			// Casing is already noncanonical. Only token validation remains
+			// before handing the uncommon spelling to the standard library.
+			for j := i + 1; j < len(s); j++ {
+				if !tokenBytes[s[j]] {
+					return "", false
+				}
+			}
+			return http.CanonicalHeaderKey(s), true
+		}
+		upper = c == '-'
 	}
-	return true
+	return s, true
 }
 
 func validValue(s string) bool {

@@ -1,0 +1,70 @@
+# GOMAXPROCS=8 benchstat /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                               sec/op                                                │                                   sec/op                                     vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                            68.37µ ± 29%                                                                  64.34µ ± 13%       ~ (p=0.165 n=10)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                          24.41µ ± 39%                                                                  25.24µ ± 22%       ~ (p=0.739 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                65.42µ ± 10%                                                                  63.15µ ±  8%       ~ (p=0.684 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                              23.71µ ± 33%                                                                  23.18µ ± 14%       ~ (p=0.280 n=10)
+geomean                                                                                                                                  40.11µ                                                                        39.27µ        -2.12%
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                                 B/s                                                 │                                     B/s                                      vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                           1.783Mi ± 22%                                                                 1.898Mi ± 12%       ~ (p=0.148 n=10)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                         5.007Mi ± 28%                                                                 4.840Mi ± 18%       ~ (p=0.699 n=10)
+geomean                                                                                                                                 2.988Mi                                                                       3.031Mi        +1.42%
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                               clients                                               │                                  clients                                   vs base                 │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                              1.000 ± 0%                                                                  1.000 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                            8.000 ± 0%                                                                  8.000 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                  1.000 ± 0%                                                                  1.000 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                                8.000 ± 0%                                                                  8.000 ± 0%       ~ (p=1.000 n=10) ¹
+geomean                                                                                                                                    2.828                                                                       2.828       +0.00%
+¹ all samples are equal
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                                queue                                                │                                   queue                                    vs base                 │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                             1.024k ± 0%                                                                 1.024k ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                           1.024k ± 0%                                                                 1.024k ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                 1.024k ± 0%                                                                 1.024k ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                               1.024k ± 0%                                                                 1.024k ± 0%       ~ (p=1.000 n=10) ¹
+geomean                                                                                                                                   1.024k                                                                      1.024k       +0.00%
+¹ all samples are equal
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                                req/s                                                │                                    req/s                                     vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                            14.63k ± 22%                                                                  15.54k ± 12%       ~ (p=0.165 n=10)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                          41.02k ± 28%                                                                  39.62k ± 18%       ~ (p=0.739 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                15.29k ± 11%                                                                  15.84k ±  7%       ~ (p=0.684 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                              42.17k ± 25%                                                                  43.16k ± 12%       ~ (p=0.280 n=10)
+geomean                                                                                                                                  24.94k                                                                        25.47k        +2.13%
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                               workers                                               │                                  workers                                   vs base                 │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                              32.00 ± 0%                                                                  32.00 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                            32.00 ± 0%                                                                  32.00 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                  32.00 ± 0%                                                                  32.00 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                                32.00 ± 0%                                                                  32.00 ± 0%       ~ (p=1.000 n=10) ¹
+geomean                                                                                                                                    32.00                                                                       32.00       +0.00%
+¹ all samples are equal
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                                B/op                                                 │                                    B/op                                      vs base               │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                            3.157Ki ± 1%                                                                  3.158Ki ± 1%       ~ (p=0.447 n=10)
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                          3.668Ki ± 2%                                                                  3.679Ki ± 1%       ~ (p=0.363 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                2.814Ki ± 1%                                                                  2.808Ki ± 1%       ~ (p=0.196 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                              3.122Ki ± 1%                                                                  3.123Ki ± 1%       ~ (p=0.926 n=10)
+geomean                                                                                                                                  3.176Ki                                                                       3.177Ki       +0.03%
+
+                                                │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/before-tcp.txt │ /Users/itsmontoya/go/src/github.com/vroomy/turbo/request/performance/get-head-parser/after-tcp.txt │
+                                                │                                              allocs/op                                              │                                 allocs/op                                  vs base                 │
+HTTP11NoKeepAlive/TCP/SmallGET/Serial/Turbo-8                                                                                              45.00 ± 0%                                                                  45.00 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/SmallGET/Parallel/Turbo-8                                                                                            45.50 ± 1%                                                                  46.00 ± 2%       ~ (p=0.350 n=10)
+HTTP11NoKeepAlive/TCP/HEAD/Serial/Turbo-8                                                                                                  43.00 ± 0%                                                                  43.00 ± 0%       ~ (p=1.000 n=10) ¹
+HTTP11NoKeepAlive/TCP/HEAD/Parallel/Turbo-8                                                                                                43.00 ± 0%                                                                  43.00 ± 0%       ~ (p=1.000 n=10) ¹
+geomean                                                                                                                                    44.11                                                                       44.23       +0.27%
+¹ all samples are equal

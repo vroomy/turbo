@@ -1,0 +1,7 @@
+# GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkTurboProcess$/^SmallGET$' -test.benchtime=3s -test.cpuprofile=/tmp/turbo-get-head-parser/before-process-small-cpu.pprof
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8         	 4219441	       865.1 ns/op	 147.96 MB/s	     100 B/op	       2 allocs/op
+PASS

@@ -427,9 +427,58 @@ drain, exactly-once connection close, malformed-request handling, and
 **Dependencies:** coordinate benchmark infrastructure with task 1; rebaseline
 after its harness changes. Avoid changing public defaults from one microbenchmark.
 
-### 5. [ ] P1 — Reduce repeated work in the GET/HEAD header parser
+### 5. [x] P1 — Reduce repeated work in the GET/HEAD header parser
 
-**Entry points:** `request/request.go`: `parseHeaders`, `validToken`,
+**Completed 2026-10-28.** Canonical/lowercase Host, Connection, and
+Content-Length names use validated constants. General canonical names combine
+token validation and casing checks in one scan; uncommon casing retains the
+standard canonicalizer after validation. Host avoids a redundant map lookup.
+Reused value arrays skip the full newline pre-scan and count remaining fields
+only on growth. Growth excludes a pending Host, preserving reuse at the
+128-value bound even with Host last. Capped value slices, reset bounds,
+immutable 1 KiB string blocks, and fallback without consuming input remain.
+No parser fields, shared state, or supported request forms were added.
+
+Measurements compare base commit `214bf58eca07af9b18edb6ba314a7d50d82e5c64`
+with identical expanded harnesses, Go 1.27.2, Darwin arm64, Apple M3,
+`GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients. Ten alternating-order
+samples use 200 ms for parser/process/Pipe and bounded 200-request TCP runs.
+Reused SmallGET parsing improves **361.1 to 290.35 ns (-19.59%)**, lowercase
+SmallGET 29.11%, the six-field set 13.39%, a 19-field browser set 9.87%, and
+escaped HEAD/browser headers 8.68% (`p<0.001` each). Larger lowercase/mixed-case
+sets improve 5.86/1.95%. Every parser/storage benchmark preserves B/op and
+objects, including SmallGET's 68 B/op in immutable blocks; its reported zero
+objects is rounded down. POST/chunked fallback parser timings are uncertain.
+
+Isolated SmallGET processing improves **834.4 to 762.8 ns (-8.58%)**, staying
+at **100 B/op, two objects**. All six original GET/HEAD process cases improve
+8.02–9.28%; browser and escaped HEAD/browser processing improve 7.66/6.86%,
+with unchanged allocation counts/bytes. The unchanged POST parser path's small
+0.75% process decrease does not establish a POST parsing optimization. Pipe
+SmallGET/HEAD serial improves 6.38/2.60% (`p<0.001`); parallel changes are
+uncertain. Every TCP timing/allocation change is uncertain, including a 3.40%
+SmallGET parallel median time increase. No TCP speedup is established. All
+final timing runs complete without request errors; the matrix has no significant
+timing or allocation regressions.
+
+Separate CPU profiles show `parseHeaders`' cumulative sampled share changing
+from 44.64 to 40.79% in reused SmallGET parsing, 42.40 to 35.34% for browser
+parsing, and 20.38 to 10.96% for SmallGET processing. Browser processing's
+share is approximately unchanged (36.29/36.00%); cumulative shares overlap
+and are not exact per-request costs. Full allocation profiles confirm identical
+`ownHeader` storage: 1,335 blocks for 20,000 SmallGETs and 20,001 owned strings
+for browser headers, including setup. Handler header allocations remain.
+
+`go test -race -count=1 ./... -timeout=2m` passes with loopback access. Both
+differential fuzzers pass 30 s runs with eight workers (2,430,840 parse and
+2,509,409 reuse cases). New tests cover all 256 bytes at key/value boundaries,
+mixed casing and duplicate framing fields, fragmentation and late fallback,
+handler appends, clone retention across growth, and retained-capacity limits.
+They also pass against the baseline parser. Raw samples, all medians,
+benchstat, metadata, profile summaries and reproduction instructions are in
+[`request/performance/get-head-parser/`](request/performance/get-head-parser/README.md).
+
+**Entry points:** `request/request.go`: `parseHeaders`, `canonicalHeaderKey`,
 `validValue`, `headerStorage`, `ownHeader`, `Parser.Reset`;
 `BenchmarkParse`/`BenchmarkOwnHeader` in `request/request_test.go`.
 

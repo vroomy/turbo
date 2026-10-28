@@ -1,0 +1,39 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-get-head-parser/after.test /tmp/turbo-get-head-parser/after-process-small-cpu.pprof
+File: after.test
+Type: cpu
+Time: 2026-10-28 07:54:06 PDT
+Duration: 4.54s, Total samples = 3740ms (82.39%)
+Showing nodes accounting for 2830ms, 75.67% of 3740ms total
+Dropped 56 nodes (cum <= 18.70ms)
+Showing top 30 nodes out of 137
+      flat  flat%   sum%        cum   cum%
+     430ms 11.50% 11.50%      430ms 11.50%  runtime.madvise
+     270ms  7.22% 18.72%      270ms  7.22%  runtime.kevent
+     230ms  6.15% 24.87%      230ms  6.15%  runtime.pthread_cond_signal
+     180ms  4.81% 29.68%      180ms  4.81%  internal/bytealg.IndexByteString
+     160ms  4.28% 33.96%      200ms  5.35%  internal/runtime/maps.(*Iter).Next
+     150ms  4.01% 37.97%      150ms  4.01%  net/textproto.validHeaderFieldByte (inline)
+     150ms  4.01% 41.98%      150ms  4.01%  runtime.memmove
+      90ms  2.41% 44.39%      140ms  3.74%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+      70ms  1.87% 46.26%      150ms  4.01%  bytes.Index
+      70ms  1.87% 48.13%      410ms 10.96%  github.com/vroomy/turbo/request.parseHeaders
+      70ms  1.87% 50.00%      220ms  5.88%  net/textproto.CanonicalMIMEHeaderKey
+      70ms  1.87% 51.87%       80ms  2.14%  runtime.nanotime1
+      70ms  1.87% 53.74%       70ms  1.87%  runtime.walltime
+      60ms  1.60% 55.35%       60ms  1.60%  bufio.(*Reader).reset
+      60ms  1.60% 56.95%      180ms  4.81%  bytes.(*Buffer).WriteString
+      60ms  1.60% 58.56%      750ms 20.05%  github.com/vroomy/turbo/request.parseBuffered
+      60ms  1.60% 60.16%       60ms  1.60%  internal/runtime/maps.memHashAES
+      60ms  1.60% 61.76%       70ms  1.87%  strings.Trim
+      50ms  1.34% 63.10%       50ms  1.34%  github.com/vroomy/turbo/request.validValue (inline)
+      50ms  1.34% 64.44%       70ms  1.87%  internal/runtime/maps.(*Iter).Init
+      50ms  1.34% 65.78%      100ms  2.67%  runtime.mapassign_faststr
+      50ms  1.34% 67.11%       50ms  1.34%  runtime.memequal
+      40ms  1.07% 68.18%       40ms  1.07%  bytes.(*Buffer).tryGrowByReslice (inline)
+      40ms  1.07% 69.25%       40ms  1.07%  internal/runtime/maps.(*Map).putSlotSmallFastStr
+      40ms  1.07% 70.32%      180ms  4.81%  internal/stringslite.Index
+      40ms  1.07% 71.39%      240ms  6.42%  net/http.Header.sortedKeyValues
+      40ms  1.07% 72.46%      450ms 12.03%  net/http.Header.writeSubset
+      40ms  1.07% 73.53%       50ms  1.34%  runtime.mallocgcSmallScanNoHeaderSC2
+      40ms  1.07% 74.60%      150ms  4.01%  runtime.mapIterNext
+      40ms  1.07% 75.67%       40ms  1.07%  strings.(*byteReplacer).Replace

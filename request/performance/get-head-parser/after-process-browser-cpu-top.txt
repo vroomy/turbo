@@ -1,0 +1,39 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=30 /tmp/turbo-get-head-parser/after.test /tmp/turbo-get-head-parser/after-process-browser-cpu.pprof
+File: after.test
+Type: cpu
+Time: 2026-10-28 07:54:11 PDT
+Duration: 5.95s, Total samples = 5s (84.01%)
+Showing nodes accounting for 4.38s, 87.60% of 5s total
+Dropped 88 nodes (cum <= 0.03s)
+Showing top 30 nodes out of 118
+      flat  flat%   sum%        cum   cum%
+     1.32s 26.40% 26.40%      1.32s 26.40%  runtime.kevent
+     0.41s  8.20% 34.60%      0.41s  8.20%  github.com/vroomy/turbo/request.canonicalHeaderKey
+     0.31s  6.20% 40.80%      0.31s  6.20%  github.com/vroomy/turbo/request.validValue (inline)
+     0.29s  5.80% 46.60%      0.29s  5.80%  runtime.madvise
+     0.27s  5.40% 52.00%      0.27s  5.40%  internal/bytealg.IndexByteString
+     0.22s  4.40% 56.40%      0.27s  5.40%  strings.Trim
+     0.14s  2.80% 59.20%      1.80s 36.00%  github.com/vroomy/turbo/request.parseHeaders
+     0.13s  2.60% 61.80%      0.35s  7.00%  bytes.Index
+     0.13s  2.60% 64.40%      0.18s  3.60%  runtime.mapassign_faststr
+     0.10s  2.00% 66.40%      0.10s  2.00%  internal/runtime/maps.(*groupsReference).group (inline)
+     0.09s  1.80% 68.20%      0.34s  6.80%  runtime.mapaccess2_faststr
+     0.08s  1.60% 69.80%      0.08s  1.60%  internal/runtime/maps.(*Iter).Next
+     0.07s  1.40% 71.20%      0.08s  1.60%  bytes.(*Buffer).WriteString
+     0.07s  1.40% 72.60%      0.07s  1.40%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.07s  1.40% 74.00%      0.07s  1.40%  internal/runtime/maps.memHashAES
+     0.07s  1.40% 75.40%      0.16s  3.20%  internal/stringslite.Index
+     0.06s  1.20% 76.60%      0.06s  1.20%  runtime.pthread_kill
+     0.06s  1.20% 77.80%      0.06s  1.20%  runtime.usleep
+     0.05s  1.00% 78.80%         2s 40.00%  github.com/vroomy/turbo/request.parseBuffered
+     0.05s  1.00% 79.80%      0.21s  4.20%  internal/stringslite.Cut
+     0.05s  1.00% 80.80%      0.05s  1.00%  net/textproto.validHeaderFieldByte (inline)
+     0.04s   0.8% 81.60%      0.09s  1.80%  github.com/vroomy/turbo/request.(*Parser).Reset
+     0.04s   0.8% 82.40%      0.09s  1.80%  net/textproto.CanonicalMIMEHeaderKey
+     0.04s   0.8% 83.20%      0.04s   0.8%  runtime.memclrNoHeapPointers
+     0.04s   0.8% 84.00%      0.04s   0.8%  runtime.memequal
+     0.04s   0.8% 84.80%      0.04s   0.8%  runtime.memmove
+     0.04s   0.8% 85.60%      0.04s   0.8%  strings.(*byteReplacer).Replace
+     0.04s   0.8% 86.40%      0.25s  5.00%  strings.Cut (inline)
+     0.03s   0.6% 87.00%      0.11s  2.20%  net/http.Header.sortedKeyValues
+     0.03s   0.6% 87.60%      0.03s   0.6%  runtime.pthread_cond_wait

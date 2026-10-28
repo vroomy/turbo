@@ -1,0 +1,95 @@
+# GOMAXPROCS=8 go tool pprof -trim_path=/Users/itsmontoya/go/src/github.com/vroomy/turbo -source_path=/Users/itsmontoya/go/src/github.com/vroomy/turbo '-list=parseHeaders|canonicalHeaderKey|validToken' /tmp/turbo-get-head-parser/after-request.test /tmp/turbo-get-head-parser/after-parse-small-cpu.pprof
+Total: 3.53s
+ROUTINE ======================== github.com/vroomy/turbo/request.canonicalHeaderKey in request/request.go
+      30ms       30ms (flat, cum)  0.85% of Total
+      10ms       10ms    297:func canonicalHeaderKey(s string) (string, bool) {
+         .          .    298:	switch s {
+         .          .    299:	case "Host", "host":
+      10ms       10ms    300:		return "Host", true
+         .          .    301:	case "Connection", "connection":
+         .          .    302:		return "Connection", true
+         .          .    303:	case "Content-Length", "content-length":
+      10ms       10ms    304:		return "Content-Length", true
+         .          .    305:	}
+         .          .    306:	if s == "" {
+         .          .    307:		return "", false
+         .          .    308:	}
+         .          .    309:	upper := true
+ROUTINE ======================== github.com/vroomy/turbo/request.parseHeaders in request/request.go
+     200ms      1.44s (flat, cum) 40.79% of Total
+         .          .    216:func parseHeaders(fields string, storage *Parser) (http.Header, string, bool) {
+         .          .    217:	// Host lives in Request.Host, so it needs no map entry or value slice.
+         .          .    218:	// Size fresh storage once. Reused storage usually has enough capacity; only
+         .          .    219:	// count the remaining lines if its value slice actually needs to grow.
+         .          .    220:	var count int
+         .          .    221:	if storage == nil || storage.headers == nil {
+         .          .    222:		count = max(strings.Count(fields, "\n")-1, 0)
+         .          .    223:	}
+         .          .    224:	headers, values := headerStorage(storage, count)
+         .          .    225:	if storage != nil {
+         .          .    226:		defer func() { storage.values = values }()
+         .          .    227:	}
+         .          .    228:	var host string
+         .          .    229:	var sawHost bool
+      10ms       10ms    230:	for fields != "" {
+         .      310ms    231:		line, rest, ok := strings.Cut(fields, "\r\n")
+      10ms       10ms    232:		if !ok {
+         .          .    233:			return nil, "", false
+         .          .    234:		}
+         .          .    235:		fields = rest
+         .      150ms    236:		key, value, ok := strings.Cut(line, ":")
+      90ms      420ms    237:		if !ok || !validValue(value) {
+         .          .    238:			return nil, "", false
+         .          .    239:		}
+         .       30ms    240:		key, ok = canonicalHeaderKey(key)
+         .          .    241:		if !ok {
+         .          .    242:			return nil, "", false
+         .          .    243:		}
+         .      180ms    244:		value = strings.Trim(value, " \t")
+         .          .    245:		switch key {
+      10ms       10ms    246:		case "Host":
+      10ms       10ms    247:			if sawHost {
+         .          .    248:				return nil, "", false
+         .          .    249:			}
+         .          .    250:			host, sawHost = value, true
+         .          .    251:			continue
+         .          .    252:		case "Transfer-Encoding", "Upgrade", "Pragma":
+         .          .    253:			return nil, "", false
+      20ms       20ms    254:		case "Content-Length":
+         .          .    255:			if value != "0" {
+         .          .    256:				return nil, "", false
+         .          .    257:			}
+         .          .    258:		}
+         .       80ms    259:		if _, duplicate := headers[key]; duplicate {
+         .          .    260:			return nil, "", false
+         .          .    261:		}
+         .          .    262:		if len(values) == cap(values) {
+         .          .    263:			remaining := strings.Count(fields, "\n")
+         .          .    264:			if !sawHost {
+         .          .    265:				// Reserve no value slot for a Host still to come, just as
+         .          .    266:				// fresh storage excludes Host from its initial count.
+         .          .    267:				remaining = max(remaining-1, 0)
+         .          .    268:			}
+         .          .    269:			grown := make([]string, len(values), len(values)+1+remaining)
+         .          .    270:			copy(grown, values)
+         .          .    271:			values = grown
+         .          .    272:		}
+      10ms       10ms    273:		values = append(values, value)
+         .          .    274:		// Cap each slice so a handler's append cannot overwrite another field.
+         .          .    275:		i := len(values) - 1
+         .      140ms    276:		headers[key] = values[i : i+1 : i+1]
+         .          .    277:	}
+      40ms       60ms    278:	return headers, host, true
+         .          .    279:}
+         .          .    280:
+         .          .    281:func headerStorage(storage *Parser, count int) (http.Header, []string) {
+         .          .    282:	if storage == nil {
+         .          .    283:		return make(http.Header, count), make([]string, 0, count)
+ROUTINE ======================== github.com/vroomy/turbo/request.parseHeaders.func1 in request/request.go
+      20ms       20ms (flat, cum)  0.57% of Total
+      20ms       20ms    226:		defer func() { storage.values = values }()
+         .          .    227:	}
+         .          .    228:	var host string
+         .          .    229:	var sawHost bool
+         .          .    230:	for fields != "" {
+         .          .    231:		line, rest, ok := strings.Cut(fields, "\r\n")

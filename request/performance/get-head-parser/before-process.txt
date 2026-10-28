@@ -1,0 +1,150 @@
+# round 1, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  278014	       836.3 ns/op	 153.05 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  251451	       961.8 ns/op	 133.09 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  286075	       842.1 ns/op	77820.24 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  193402	      1199 ns/op	 961.17 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  285522	       845.9 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  321141	       761.8 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  271706	       866.3 ns/op	 591.00 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  101576	      2311 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	   98508	      2435 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 2, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  288103	       831.2 ns/op	 154.00 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  255985	       946.0 ns/op	 135.31 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  285985	       839.6 ns/op	78059.98 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  195937	      1192 ns/op	 966.26 MB/s	    1106 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  289318	       839.9 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  325174	       747.6 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  283179	       859.3 ns/op	 595.84 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  104142	      2306 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	  100242	      2405 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 3, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  285956	       835.8 ns/op	 153.16 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  254929	       948.9 ns/op	 134.89 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  282818	       839.7 ns/op	78043.40 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  202424	      1214 ns/op	 949.15 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  286570	       827.0 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  330066	       743.2 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  284936	       853.3 ns/op	 600.04 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  104942	      2300 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	  100597	      2401 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 4, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  283360	       833.4 ns/op	 153.59 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  259615	       948.8 ns/op	 134.90 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  287536	       834.0 ns/op	78576.28 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  203018	      1183 ns/op	 973.48 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  287551	       825.9 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  319995	       744.3 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  285147	       858.1 ns/op	 596.68 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  102508	      2297 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	  100014	      2400 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 5, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  287529	       831.5 ns/op	 153.93 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  255870	       942.3 ns/op	 135.84 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  294486	       836.5 ns/op	78343.30 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  197352	      1188 ns/op	 969.89 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  288974	       827.6 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  327302	       740.4 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  275641	       876.2 ns/op	 584.35 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  102502	      2295 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	   98977	      2409 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 6, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  286870	       842.7 ns/op	 151.90 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  253072	       948.3 ns/op	 134.98 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  288886	       841.6 ns/op	77869.63 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  196390	      1188 ns/op	 969.48 MB/s	    1106 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  291885	       833.9 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  320748	       748.6 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  283093	       870.8 ns/op	 587.95 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  103506	      2317 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	  100336	      2427 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 7, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  282898	       835.4 ns/op	 153.22 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  262482	       946.9 ns/op	 135.17 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  284710	       839.6 ns/op	78058.28 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  202954	      1193 ns/op	 965.38 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  290839	       833.0 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  317505	       745.8 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  283681	       864.6 ns/op	 592.21 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  104342	      2287 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	   99658	      2391 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 8, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  286345	       836.8 ns/op	 152.96 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  256414	       947.8 ns/op	 135.04 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  289572	       845.1 ns/op	77551.59 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  198964	      1194 ns/op	 965.07 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  293870	       834.8 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  320802	       747.7 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  279681	       860.5 ns/op	 594.98 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  102344	      2284 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	   98500	      2422 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 9, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  288594	       831.8 ns/op	 153.89 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  249066	       993.8 ns/op	 128.80 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  290300	       842.1 ns/op	77821.64 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  198459	      1209 ns/op	 953.02 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  290569	       828.1 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  332353	       741.1 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  280300	       854.5 ns/op	 599.17 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  103941	      2285 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	   96604	      2404 ns/op	     920 B/op	       6 allocs/op
+PASS
+# round 10, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^(BenchmarkTurboProcess|BenchmarkTurboProcessHeaders)$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkTurboProcess/SmallGET-8 	  287466	       832.5 ns/op	 153.75 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/ImplicitGET-8         	  252640	       954.7 ns/op	 134.07 MB/s	      68 B/op	       0 allocs/op
+BenchmarkTurboProcess/LargeGET-8            	  284707	       836.8 ns/op	78316.02 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/POST-8                	  196432	      1185 ns/op	 972.45 MB/s	    1107 B/op	      13 allocs/op
+BenchmarkTurboProcess/HEAD-8                	  288974	       831.6 ns/op	     100 B/op	       2 allocs/op
+BenchmarkTurboProcess/Empty-8               	  323973	       743.0 ns/op	      84 B/op	       1 allocs/op
+BenchmarkTurboProcess/StreamGET-8           	  282526	       854.7 ns/op	 599.06 MB/s	     100 B/op	       2 allocs/op
+BenchmarkTurboProcessHeaders/BrowserHeaders-8         	  104136	      2303 ns/op	     736 B/op	       3 allocs/op
+BenchmarkTurboProcessHeaders/EscapedHeaders-8         	   99372	      2401 ns/op	     920 B/op	       6 allocs/op
+PASS

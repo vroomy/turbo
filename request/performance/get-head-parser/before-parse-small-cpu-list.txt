@@ -1,0 +1,66 @@
+# GOMAXPROCS=8 go tool pprof -trim_path=/Users/itsmontoya/go/src/github.com/vroomy/turbo -source_path=/tmp/turbo-get-head-parser/before-source '-list=parseHeaders|canonicalHeaderKey|validToken' /tmp/turbo-get-head-parser/before-request.test /tmp/turbo-get-head-parser/before-parse-small-cpu.pprof
+Total: 3.36s
+ROUTINE ======================== github.com/vroomy/turbo/request.parseHeaders in /private/tmp/turbo-get-head-parser/before-source/request/request.go
+     100ms      1.50s (flat, cum) 44.64% of Total
+         .          .    216:func parseHeaders(fields string, storage *Parser) (http.Header, string, bool) {
+         .          .    217:	// Host lives in Request.Host, so it needs no map entry or value slice.
+      10ms      180ms    218:	count := max(strings.Count(fields, "\n")-1, 0)
+      10ms       30ms    219:	headers, values := headerStorage(storage, count)
+         .          .    220:	if storage != nil {
+         .          .    221:		defer func() { storage.values = values }()
+         .          .    222:	}
+         .          .    223:	var host string
+         .          .    224:	var sawHost bool
+      10ms       10ms    225:	for fields != "" {
+         .      300ms    226:		line, rest, ok := strings.Cut(fields, "\r\n")
+         .          .    227:		if !ok {
+         .          .    228:			return nil, "", false
+         .          .    229:		}
+         .          .    230:		fields = rest
+         .      110ms    231:		key, value, ok := strings.Cut(line, ":")
+      20ms      290ms    232:		if !ok || !validToken(key) || !validValue(value) {
+         .          .    233:			return nil, "", false
+         .          .    234:		}
+         .      310ms    235:		key = http.CanonicalHeaderKey(key)
+      10ms       70ms    236:		if _, duplicate := headers[key]; duplicate {
+         .          .    237:			return nil, "", false
+         .          .    238:		}
+         .       90ms    239:		value = strings.Trim(value, " \t")
+         .          .    240:		switch key {
+         .          .    241:		case "Host":
+         .          .    242:			if sawHost {
+         .          .    243:				return nil, "", false
+         .          .    244:			}
+         .          .    245:			host, sawHost = value, true
+         .          .    246:			continue
+         .          .    247:		case "Transfer-Encoding", "Upgrade", "Pragma":
+         .          .    248:			return nil, "", false
+      10ms       10ms    249:		case "Content-Length":
+         .          .    250:			if value != "0" {
+         .          .    251:				return nil, "", false
+         .          .    252:			}
+         .          .    253:		}
+      10ms       10ms    254:		values = append(values, value)
+         .          .    255:		// Cap each slice so a handler's append cannot overwrite another field.
+         .          .    256:		i := len(values) - 1
+         .       70ms    257:		headers[key] = values[i : i+1 : i+1]
+         .          .    258:	}
+      20ms       20ms    259:	return headers, host, true
+         .          .    260:}
+         .          .    261:
+         .          .    262:func headerStorage(storage *Parser, count int) (http.Header, []string) {
+         .          .    263:	if storage == nil {
+         .          .    264:		return make(http.Header, count), make([]string, 0, count)
+ROUTINE ======================== github.com/vroomy/turbo/request.validToken in /private/tmp/turbo-get-head-parser/before-source/request/request.go
+     120ms      120ms (flat, cum)  3.57% of Total
+         .          .    275:func validToken(s string) bool {
+         .          .    276:	if s == "" {
+         .          .    277:		return false
+         .          .    278:	}
+      50ms       50ms    279:	for i := range s {
+      70ms       70ms    280:		if !tokenBytes[s[i]] {
+         .          .    281:			return false
+         .          .    282:		}
+         .          .    283:	}
+         .          .    284:	return true
+         .          .    285:}

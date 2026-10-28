@@ -1,0 +1,7 @@
+# GOMAXPROCS=8 /tmp/turbo-get-head-parser/after-request.test '-test.run=^$' '-test.bench=^BenchmarkParse$/^BrowserHeaders$/^Reused$' -test.benchtime=3s -test.cpuprofile=/tmp/turbo-get-head-parser/after-parse-browser-cpu.pprof
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo/request
+cpu: Apple M3
+BenchmarkParse/BrowserHeaders/Reused-8  	 2046584	      1710 ns/op	     704 B/op	       1 allocs/op
+PASS

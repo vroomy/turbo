@@ -1,0 +1,27 @@
+# GOMAXPROCS=8 go tool pprof -top -nodecount=25 -sample_index=alloc_objects /tmp/turbo-get-head-parser/after.test /tmp/turbo-get-head-parser/after-process-browser-memory.pprof
+File: after.test
+Type: alloc_objects
+Time: 2026-10-28 07:54:18 PDT
+Showing nodes accounting for 60054, 98.98% of 60673 total
+Dropped 185 nodes (cum <= 303)
+      flat  flat%   sum%        cum   cum%
+     40009 65.94% 65.94%      40009 65.94%  net/textproto.MIMEHeader.Set (inline)
+     20011 32.98% 98.92%      20011 32.98%  internal/bytealg.MakeNoZero
+        13 0.021% 98.95%        346  0.57%  regexp.compile
+         9 0.015% 98.96%      60347 99.46%  testing.(*B).runN
+         8 0.013% 98.97%      60096 99.05%  github.com/vroomy/turbo.BenchmarkTurboProcessHeaders.func1
+         3 0.0049% 98.98%        317  0.52%  testing.(*M).Run
+         1 0.0016% 98.98%      60060 98.99%  github.com/vroomy/turbo.(*Turbo).process
+         0     0% 98.98%      40032 65.98%  github.com/vroomy/turbo.http11Workload.handler.func1
+         0     0% 98.98%      20011 32.98%  github.com/vroomy/turbo/request.(*Parser).Parse
+         0     0% 98.98%      20001 32.97%  github.com/vroomy/turbo/request.ownHeader
+         0     0% 98.98%      20011 32.98%  github.com/vroomy/turbo/request.parse
+         0     0% 98.98%      20011 32.98%  github.com/vroomy/turbo/request.parseBuffered
+         0     0% 98.98%        317  0.52%  main.main
+         0     0% 98.98%      40009 65.94%  net/http.Header.Set (inline)
+         0     0% 98.98%        346  0.57%  regexp.Compile (inline)
+         0     0% 98.98%        317  0.52%  runtime.main
+         0     0% 98.98%      20003 32.97%  strings.(*Builder).Grow
+         0     0% 98.98%      20003 32.97%  strings.(*Builder).grow
+         0     0% 98.98%      60059 98.99%  testing.(*B).launch
+         0     0% 98.98%        357  0.59%  testing/internal/testdeps.TestDeps.MatchString

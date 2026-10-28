@@ -3,6 +3,7 @@ package request
 import (
 	"bufio"
 	"context"
+	_ "embed"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,6 +21,9 @@ func TestParse(t *testing.T) {
 		{"head", "HEAD / HTTP/1.1\r\nHost: example.com\r\n\r\n"},
 		{"custom method", "M-SEARCH / HTTP/1.1\r\nHost: example.com\r\n\r\n"},
 		{"lowercase headers", "GET / HTTP/1.1\r\nhost: example.com\r\nx-custom: hello\r\nconnection: CLOSE\r\n\r\n"},
+		{"mixed common headers", "HEAD / HTTP/1.1\r\nhOsT: example.com\r\ncOnNeCtIoN: ClOsE\r\ncOnTeNt-LeNgTh: 0\r\n\r\n"},
+		{"lowercase common headers", "GET / HTTP/1.1\r\nhost: example.com\r\nconnection: close\r\ncontent-length: 0\r\n\r\n"},
+		{"host last", "GET / HTTP/1.1\r\nConnection: close\r\nX-Test: value\r\nHost: example.com\r\n\r\n"},
 		{"header whitespace", "GET / HTTP/1.1\r\nHost:\texample.com \t\r\nX-Empty:\t \r\nX-Tab: a\tb\r\n\r\n"},
 		{"connection tokens", "GET / HTTP/1.1\r\nConnection: keep-alive, \tClOsE, upgrade\r\n\r\n"},
 		{"connection substring", "GET / HTTP/1.1\r\nConnection: disclose\r\n\r\n"},
@@ -59,6 +63,13 @@ func TestParse(t *testing.T) {
 		{"duplicate fields", "GET / HTTP/1.1\r\nX-Test: one\r\nX-Test: two\r\n\r\n"},
 		{"duplicate host", "GET / HTTP/1.1\r\nHost: a\r\nhost: a\r\n\r\n"},
 		{"empty duplicate host", "GET / HTTP/1.1\r\nHost:\r\nHost: a\r\n\r\n"},
+		{"late duplicate host", "GET / HTTP/1.1\r\nHost: a\r\nX-Test: value\r\nhOsT: a\r\n\r\n"},
+		{"get duplicate zero length", "GET / HTTP/1.1\r\nX-Test: value\r\nContent-Length: 0\r\ncOnTeNt-LeNgTh: 0\r\n\r\n"},
+		{"get conflicting length", "GET / HTTP/1.1\r\nHost: a\r\nX-Test: value\r\nContent-Length: 0\r\ncontent-length: 4\r\n\r\nbody"},
+		{"late body fallback", "GET / HTTP/1.1\r\nHost: a\r\nX-Test: value\r\nContent-Length: 4\r\n\r\nbody"},
+		{"late chunked fallback", "GET / HTTP/1.1\r\nHost: a\r\nX-Test: value\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nbody\r\n0\r\n\r\n"},
+		{"late duplicate connection", "GET / HTTP/1.1\r\nHost: a\r\nX-Test: value\r\nConnection: keep-alive\r\ncOnNeCtIoN: close\r\n\r\n"},
+		{"late mixed duplicate field", "GET / HTTP/1.1\r\nHost: a\r\nX-Test: first\r\nx-tEsT: second\r\n\r\n"},
 		{"folded field", "GET / HTTP/1.1\r\nX-Test: one\r\n two\r\n\r\n"},
 		{"lf lines", "GET / HTTP/1.1\nHost: example.com\n\n"},
 		{"whitespace before colon", "GET / HTTP/1.1\r\nHost : example.com\r\n\r\n"},
@@ -396,6 +407,9 @@ func FuzzParse(f *testing.F) {
 		"POST / HTTP/1.1\r\nContent-Length: 4\r\n\r\nbody",
 		"POST / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n",
 		"GET /a%2fb HTTP/1.0\nHost: example.com\n\n",
+		"GET / HTTP/1.1\r\nhost: example.com\r\nconnection: close\r\ncontent-length: 0\r\n\r\n",
+		"HEAD /a%2fb HTTP/1.1\r\nhOsT: example.com\r\ncOnNeCtIoN: close\r\ncOnTeNt-LeNgTh: 0\r\n\r\n",
+		"GET / HTTP/1.1\r\n" + browserHeaders + "\r\n",
 	} {
 		f.Add(wire)
 	}
@@ -416,6 +430,8 @@ func FuzzParserReuse(f *testing.F) {
 		"POST / HTTP/1.1\r\nContent-Length: 4\r\n\r\nbody",
 		"POST / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\nX-Trailer: value\r\n\r\n",
 		"GET /%zz HTTP/1.1\r\nX-Test: invalid\r\n\r\n",
+		"GET / HTTP/1.1\r\n" + browserHeaders + "\r\n",
+		"HEAD / HTTP/1.1\r\nhOsT: a\r\ncOnNeCtIoN: close\r\ncOnTeNt-LeNgTh: 0\r\n\r\n",
 		"",
 	} {
 		f.Add(get, wire)
@@ -436,7 +452,13 @@ func FuzzParserReuse(f *testing.F) {
 func BenchmarkParse(b *testing.B) {
 	for _, workload := range []struct{ name, wire string }{
 		{"SmallGET", "GET /bench HTTP/1.1\r\nHost: benchmark.local\r\nConnection: close\r\nContent-Length: 0\r\n\r\n"},
+		{"LowercaseSmallGET", "GET /bench HTTP/1.1\r\nhost: benchmark.local\r\nconnection: close\r\ncontent-length: 0\r\n\r\n"},
+		{"MixedCaseSmallGET", "GET /bench HTTP/1.1\r\nhOsT: benchmark.local\r\ncOnNeCtIoN: close\r\ncOnTeNt-LeNgTh: 0\r\n\r\n"},
 		{"Headers", "GET /a?b=c HTTP/1.1\r\nHost: benchmark.local\r\nUser-Agent: benchmark/1.0\r\nAccept: */*\r\nAccept-Encoding: gzip\r\nConnection: close\r\nX-Request-Id: 12345\r\n\r\n"},
+		{"BrowserHeaders", "GET /products/items?page=2 HTTP/1.1\r\n" + browserHeaders + "\r\n"},
+		{"LowercaseHeaders", "GET /products/items?page=2 HTTP/1.1\r\n" + mapHeaderNames(browserHeaders, strings.ToLower) + "\r\n"},
+		{"MixedCaseHeaders", "GET /products/items?page=2 HTTP/1.1\r\n" + mapHeaderNames(browserHeaders, mixedHeaderCase) + "\r\n"},
+		{"EscapedHeaders", "HEAD /products/a%2fb%20c?page=2 HTTP/1.1\r\n" + browserHeaders + "\r\n"},
 		{"POST", "POST /bench HTTP/1.1\r\nHost: benchmark.local\r\nConnection: close\r\nContent-Length: 1024\r\n\r\n" + strings.Repeat("x", 1024)},
 		{"EscapedPath", "GET /a%2fb HTTP/1.1\r\nHost: benchmark.local\r\nConnection: close\r\n\r\n"},
 		{"Chunked", "POST /bench HTTP/1.1\r\nHost: benchmark.local\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nbody\r\n0\r\n\r\n"},
@@ -474,6 +496,38 @@ func BenchmarkParse(b *testing.B) {
 			}
 		})
 	}
+}
+
+// A larger, realistic header set exercises canonical names beyond the common
+// three, and exceeds the shared immutable block's per-request size threshold.
+//
+//go:embed testdata/browser-headers.txt
+var browserHeaderText string
+
+var browserHeaders = strings.ReplaceAll(browserHeaderText, "\n", "\r\n")
+
+func mapHeaderNames(fields string, transform func(string) string) string {
+	var result strings.Builder
+	for _, line := range strings.SplitAfter(fields, "\r\n") {
+		key, value, ok := strings.Cut(line, ":")
+		if ok {
+			result.WriteString(transform(key))
+			result.WriteByte(':')
+			result.WriteString(value)
+		}
+	}
+	return result.String()
+}
+
+func mixedHeaderCase(key string) string {
+	key = strings.ToLower(key)
+	result := []byte(key)
+	for i := 1; i < len(result); i += 2 {
+		if 'a' <= result[i] && result[i] <= 'z' {
+			result[i] -= 'a' - 'A'
+		}
+	}
+	return string(result)
 }
 
 var ownedHeaderResult string

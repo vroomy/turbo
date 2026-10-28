@@ -1,0 +1,100 @@
+# round 1, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48532	      4890 ns/op	  26.18 MB/s	         1.000 clients	      1024 queue	    204496 req/s	        32.00 workers	    2575 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  125857	      2467 ns/op	  51.89 MB/s	         8.000 clients	      1024 queue	    405390 req/s	        32.00 workers	    2571 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   48781	      4889 ns/op	         1.000 clients	      1024 queue	    204549 req/s	        32.00 workers	    2458 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  125096	      1906 ns/op	         8.000 clients	      1024 queue	    524592 req/s	        32.00 workers	    2465 B/op	      27 allocs/op
+PASS
+# round 2, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48924	      4900 ns/op	  26.12 MB/s	         1.000 clients	      1024 queue	    204100 req/s	        32.00 workers	    2574 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  106341	      1934 ns/op	  66.18 MB/s	         8.000 clients	      1024 queue	    517020 req/s	        32.00 workers	    2574 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   48813	      4929 ns/op	         1.000 clients	      1024 queue	    202888 req/s	        32.00 workers	    2457 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  123032	      1980 ns/op	         8.000 clients	      1024 queue	    505024 req/s	        32.00 workers	    2467 B/op	      27 allocs/op
+PASS
+# round 3, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48678	      4868 ns/op	  26.29 MB/s	         1.000 clients	      1024 queue	    205423 req/s	        32.00 workers	    2574 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  120969	      1967 ns/op	  65.07 MB/s	         8.000 clients	      1024 queue	    508336 req/s	        32.00 workers	    2572 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49422	      4874 ns/op	         1.000 clients	      1024 queue	    205168 req/s	        32.00 workers	    2457 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  127131	      1893 ns/op	         8.000 clients	      1024 queue	    528197 req/s	        32.00 workers	    2466 B/op	      27 allocs/op
+PASS
+# round 4, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48073	      4899 ns/op	  26.13 MB/s	         1.000 clients	      1024 queue	    204132 req/s	        32.00 workers	    2576 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  122312	      1973 ns/op	  64.87 MB/s	         8.000 clients	      1024 queue	    506826 req/s	        32.00 workers	    2573 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49021	      4906 ns/op	         1.000 clients	      1024 queue	    203835 req/s	        32.00 workers	    2459 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  124238	      1956 ns/op	         8.000 clients	      1024 queue	    511351 req/s	        32.00 workers	    2465 B/op	      27 allocs/op
+PASS
+# round 5, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48448	      4845 ns/op	  26.42 MB/s	         1.000 clients	      1024 queue	    206381 req/s	        32.00 workers	    2575 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  127954	      1948 ns/op	  65.70 MB/s	         8.000 clients	      1024 queue	    513268 req/s	        32.00 workers	    2573 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49208	      4869 ns/op	         1.000 clients	      1024 queue	    205366 req/s	        32.00 workers	    2458 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  126978	      1886 ns/op	         8.000 clients	      1024 queue	    530348 req/s	        32.00 workers	    2465 B/op	      27 allocs/op
+PASS
+# round 6, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48829	      4897 ns/op	  26.14 MB/s	         1.000 clients	      1024 queue	    204212 req/s	        32.00 workers	    2576 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  125697	      1958 ns/op	  65.37 MB/s	         8.000 clients	      1024 queue	    510685 req/s	        32.00 workers	    2573 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49244	      4813 ns/op	         1.000 clients	      1024 queue	    207780 req/s	        32.00 workers	    2458 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  127178	      1923 ns/op	         8.000 clients	      1024 queue	    520002 req/s	        32.00 workers	    2465 B/op	      27 allocs/op
+PASS
+# round 7, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48243	      4872 ns/op	  26.27 MB/s	         1.000 clients	      1024 queue	    205256 req/s	        32.00 workers	    2576 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  125720	      2001 ns/op	  63.96 MB/s	         8.000 clients	      1024 queue	    499685 req/s	        32.00 workers	    2572 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   48192	      4893 ns/op	         1.000 clients	      1024 queue	    204382 req/s	        32.00 workers	    2459 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  121018	      1941 ns/op	         8.000 clients	      1024 queue	    515068 req/s	        32.00 workers	    2466 B/op	      27 allocs/op
+PASS
+# round 8, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48235	      4916 ns/op	  26.04 MB/s	         1.000 clients	      1024 queue	    203420 req/s	        32.00 workers	    2576 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  121107	      1992 ns/op	  64.26 MB/s	         8.000 clients	      1024 queue	    502006 req/s	        32.00 workers	    2572 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49273	      4863 ns/op	         1.000 clients	      1024 queue	    205621 req/s	        32.00 workers	    2457 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  126786	      1878 ns/op	         8.000 clients	      1024 queue	    532433 req/s	        32.00 workers	    2465 B/op	      27 allocs/op
+PASS
+# round 9, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   48702	      4899 ns/op	  26.13 MB/s	         1.000 clients	      1024 queue	    204116 req/s	        32.00 workers	    2575 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  121166	      1928 ns/op	  66.38 MB/s	         8.000 clients	      1024 queue	    518565 req/s	        32.00 workers	    2572 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49380	      4920 ns/op	         1.000 clients	      1024 queue	    203253 req/s	        32.00 workers	    2457 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  124508	      1930 ns/op	         8.000 clients	      1024 queue	    518151 req/s	        32.00 workers	    2466 B/op	      27 allocs/op
+PASS
+# round 10, GOMAXPROCS=8 /tmp/turbo-get-head-parser/before.test '-test.run=^$' '-test.bench=^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^(SmallGET|HEAD)$/.*/^Turbo$' -test.benchmem -test.benchtime=200ms -test.timeout=1m
+goos: darwin
+goarch: arm64
+pkg: github.com/vroomy/turbo
+cpu: Apple M3
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Serial/Turbo-8         	   49057	      5437 ns/op	  23.54 MB/s	         1.000 clients	      1024 queue	    183908 req/s	        32.00 workers	    2576 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/SmallGET/Parallel/Turbo-8       	  121453	      1961 ns/op	  65.27 MB/s	         8.000 clients	      1024 queue	    509953 req/s	        32.00 workers	    2573 B/op	      29 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Serial/Turbo-8             	   49566	      4871 ns/op	         1.000 clients	      1024 queue	    205301 req/s	        32.00 workers	    2458 B/op	      27 allocs/op
+BenchmarkHTTP11NoKeepAlive/Pipe/HEAD/Parallel/Turbo-8           	  116943	      2189 ns/op	         8.000 clients	      1024 queue	    456865 req/s	        32.00 workers	    2465 B/op	      27 allocs/op
+PASS
