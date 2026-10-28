@@ -410,6 +410,8 @@ func FuzzParse(f *testing.F) {
 		"GET / HTTP/1.1\r\nhost: example.com\r\nconnection: close\r\ncontent-length: 0\r\n\r\n",
 		"HEAD /a%2fb HTTP/1.1\r\nhOsT: example.com\r\ncOnNeCtIoN: close\r\ncOnTeNt-LeNgTh: 0\r\n\r\n",
 		"GET / HTTP/1.1\r\n" + browserHeaders + "\r\n",
+		"GET / HTTP/1.1\r\n" + mapHeaderNames(browserHeaders, strings.ToLower) + "\r\n",
+		"GET / HTTP/1.1\r\n" + mapHeaderNames(browserHeaders, mixedHeaderCase) + "\r\n",
 	} {
 		f.Add(wire)
 	}
@@ -431,6 +433,8 @@ func FuzzParserReuse(f *testing.F) {
 		"POST / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\nX-Trailer: value\r\n\r\n",
 		"GET /%zz HTTP/1.1\r\nX-Test: invalid\r\n\r\n",
 		"GET / HTTP/1.1\r\n" + browserHeaders + "\r\n",
+		"GET / HTTP/1.1\r\n" + mapHeaderNames(browserHeaders, strings.ToLower) + "\r\n",
+		"GET / HTTP/1.1\r\n" + mapHeaderNames(browserHeaders, mixedHeaderCase) + "\r\n",
 		"HEAD / HTTP/1.1\r\nhOsT: a\r\ncOnNeCtIoN: close\r\ncOnTeNt-LeNgTh: 0\r\n\r\n",
 		"",
 	} {

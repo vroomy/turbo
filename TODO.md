@@ -2,7 +2,7 @@
 
 ## Round two: allocation and goroutine profiling (2026-10-28)
 
-The first eight tasks below are complete. A new profiling pass at `37519a3`
+Tasks 1–9 below are complete. A new profiling pass at `37519a3`
 adds cumulative goroutine-creation metrics to the HTTP and isolated process
 benchmarks. Production code is unchanged. Full results, raw timings, profile
 summaries, trace attribution and reproduction scripts are in
@@ -16,7 +16,53 @@ creates no per-request goroutines in the sampled workloads; stdlib creates
 two. Parallel benchmark clients and server startup are reported separately
 from that interpretation. Live goroutine counts cannot measure creation churn.
 
-### 9. [ ] P1 — Reduce repeated canonical header-name allocations
+### 9. [x] P1 — Reduce repeated canonical header-name allocations
+
+**Completed 2026-10-28.** Noncanonical, validated names now use a fixed set of
+immutable browser-metadata and tracing constants before the standard
+canonicalizer. Length checks plus case-insensitive comparisons add no cache,
+parser fields, pools, goroutines or request-substring retention. Canonical
+names and the existing three common-name fast paths remain unchanged. Mixed
+spellings of those three names also return constants. Unsupported names keep
+stdlib canonicalization; immutable text ownership and reset bounds are unchanged.
+
+Ten balanced-order samples compare base commit
+`bbfefc7183c80cecfdb923621f9f84ead65f8a0d` with identical expanded harnesses,
+Go 1.27.2, Darwin arm64, Apple M3, GOMAXPROCS=8, 32 workers, queue 1,024,
+and one/eight clients. Parser/process/Pipe use 200 ms; TCP uses 200 requests.
+Lowercase/mixed-case browser parsing drops **872 B/10 objects to 704 B/one
+object**, improving **11.37/12.44%**. Matching process cases drop **904 B/12
+objects to 736 B/three objects**, improving **10.78/11.85%**. These timing
+changes have p<0.001. The unchanged handlers retain both Header.Set calls.
+Small/canonical-request allocations are unchanged, and their timing changes
+are uncertain. Independent tracing names save 16 B/one object and improve
+11.24%; custom, changing and long names retain their allocation counts.
+
+Matching Pipe serial lowercase/mixed cases improve **4.73/4.49%** (p<0.001),
+removing nine objects. Lowercase parallel improves 2.58% (p=0.030); mixed-case
+parallel is uncertain. TCP removes nine objects in the matching workloads,
+but every TCP timing change is uncertain: **no TCP speedup is established**.
+The final matrix has no significant timing or allocation regressions. An
+initial 2.49% changing-name regression was removed by skipping irrelevant
+same-length comparisons based on the first byte; fresh final samples show
+265.9 to 265.25 ns (p=0.781).
+
+Full allocation profiles preserve identical request-text allocation while
+removing 180,009 canonical-name objects / 3,281.41 KiB for 20,000 browser
+requests plus setup. With 128 retained clones, request text remains 48 KiB;
+canonical-name storage falls by **10.5 KiB / 576 objects**. After clone release,
+worker storage remains a 512-byte Parser, a 1 KiB text block, and the same
+map/value storage. A cache prototype was unnecessary because constants remove
+the entire measured nine-object target without additional retained state.
+
+`go test -race -count=1 ./... -timeout=2m` passes with loopback access. Both
+parser fuzzers pass 30 s runs with eight workers (1,720,910 parse and 3,049,030
+reuse executions), including new lowercase/mixed browser seeds. Tests cover
+all byte mutations of recognized/custom/long names and clones retained across
+changing names and handler mutation; the new tests also pass on the baseline.
+All final TCP/Pipe runs complete without request errors. Raw samples, benchstat,
+heap/allocation summaries, hashes, and reproduction scripts are stored in
+[`request/performance/header-names/`](request/performance/header-names/README.md).
 
 **Evidence:** the reused browser parser uses 704 B/one object with canonical
 names, versus 872 B/ten objects with lowercase or mixed-case names. Full

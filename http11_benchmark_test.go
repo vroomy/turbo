@@ -22,6 +22,7 @@ const http11BenchmarkTimeout = 10 * time.Second
 
 type http11Workload struct {
 	name         string
+	requestWire  []byte
 	method       string
 	requestBody  []byte
 	responseBody []byte
@@ -71,6 +72,9 @@ func (w http11Workload) handler() http.HandlerFunc {
 }
 
 func (w http11Workload) request() []byte {
+	if w.requestWire != nil {
+		return w.requestWire
+	}
 	header := fmt.Sprintf("%s /bench HTTP/1.1\r\nHost: benchmark.local\r\nConnection: close\r\nContent-Length: %d\r\n\r\n", w.method, len(w.requestBody))
 	return append([]byte(header), w.requestBody...)
 }

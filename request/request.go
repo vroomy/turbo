@@ -293,7 +293,8 @@ func headerStorage(storage *Parser, count int) (http.Header, []string) {
 
 // Common spellings are already validated constants. For other fields, check
 // token validity and canonical casing together, avoiding a second scan for
-// canonical names. Uncommon casing still uses the standard canonicalizer.
+// canonical names. Noncanonical names try immutable common names before the
+// standard canonicalizer.
 func canonicalHeaderKey(s string) (string, bool) {
 	switch s {
 	case "Host", "host":
@@ -314,17 +315,87 @@ func canonicalHeaderKey(s string) (string, bool) {
 		}
 		if (upper && 'a' <= c && c <= 'z') || (!upper && 'A' <= c && c <= 'Z') {
 			// Casing is already noncanonical. Only token validation remains
-			// before handing the uncommon spelling to the standard library.
+			// before checking common names or using the standard library.
 			for j := i + 1; j < len(s); j++ {
 				if !tokenBytes[s[j]] {
 					return "", false
 				}
 			}
-			return http.CanonicalHeaderKey(s), true
+			return canonicalUncommonHeaderKey(s), true
 		}
 		upper = c == '-'
 	}
 	return s, true
+}
+
+// Only noncanonical, validated ASCII names reach here. In addition to the
+// three framing names, recognize browser metadata and tracing names that
+// net/textproto does not intern. Return immutable constants
+// without retaining request substrings or adding per-worker cache storage.
+func canonicalUncommonHeaderKey(s string) string {
+	switch len(s) {
+	case 4:
+		if strings.EqualFold(s, "Host") {
+			return "Host"
+		}
+	case 9:
+		if strings.EqualFold(s, "Sec-Ch-Ua") {
+			return "Sec-Ch-Ua"
+		}
+	case 10:
+		if strings.EqualFold(s, "Connection") {
+			return "Connection"
+		}
+		if strings.EqualFold(s, "Tracestate") {
+			return "Tracestate"
+		}
+	case 11:
+		if strings.EqualFold(s, "Traceparent") {
+			return "Traceparent"
+		}
+	case 12:
+		if strings.EqualFold(s, "X-Request-Id") {
+			return "X-Request-Id"
+		}
+	case 14:
+		// Several names share this length. Reject unrelated prefixes before
+		// doing case-insensitive comparisons (for example custom X- names).
+		switch s[0] {
+		case 'C', 'c':
+			if strings.EqualFold(s, "Content-Length") {
+				return "Content-Length"
+			}
+		case 'S', 's':
+			if strings.EqualFold(s, "Sec-Fetch-Dest") {
+				return "Sec-Fetch-Dest"
+			}
+			if strings.EqualFold(s, "Sec-Fetch-Mode") {
+				return "Sec-Fetch-Mode"
+			}
+			if strings.EqualFold(s, "Sec-Fetch-Site") {
+				return "Sec-Fetch-Site"
+			}
+			if strings.EqualFold(s, "Sec-Fetch-User") {
+				return "Sec-Fetch-User"
+			}
+		}
+	case 16:
+		if strings.EqualFold(s, "Sec-Ch-Ua-Mobile") {
+			return "Sec-Ch-Ua-Mobile"
+		}
+		if strings.EqualFold(s, "X-Correlation-Id") {
+			return "X-Correlation-Id"
+		}
+	case 18:
+		if strings.EqualFold(s, "Sec-Ch-Ua-Platform") {
+			return "Sec-Ch-Ua-Platform"
+		}
+	case 25:
+		if strings.EqualFold(s, "Upgrade-Insecure-Requests") {
+			return "Upgrade-Insecure-Requests"
+		}
+	}
+	return http.CanonicalHeaderKey(s)
 }
 
 func validValue(s string) bool {
