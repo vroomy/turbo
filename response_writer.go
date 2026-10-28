@@ -73,11 +73,11 @@ type responseWriter struct {
 }
 
 func (r *responseWriter) populateHeaders() {
-	for key := range r.headers {
-		if key != "Connection" && key != "Date" {
-			delete(r.headers, key)
-		}
-	}
+	// Keep matching default slices without walking and deleting every field.
+	// Replacing changed defaults below never overwrites handler-owned slices.
+	connection, date := r.headers["Connection"], r.headers["Date"]
+	clear(r.headers)
+	r.headers["Connection"], r.headers["Date"] = connection, date
 	r.populateHeader("Connection", "close")
 	r.populateHeader("Date", r.dateHeader(time.Now()))
 	r.contentLength = -1

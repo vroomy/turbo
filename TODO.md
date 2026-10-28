@@ -505,7 +505,68 @@ Show parser and process CPU/time improvements without allocation regressions.
 **Dependencies:** coordinate parser edits with tasks 7 and 8. Does not require
 a change to supported request forms.
 
-### 6. [ ] P2 — Reduce response header-map and serialization work
+### 6. [x] P2 — Reduce response header-map and serialization work
+
+**Completed 2026-10-28.** `populateHeaders` saves the current Connection and
+Date slices, clears the existing map in place, and restores defaults through
+the existing helper. Matching slices remain reusable; changed or aliased
+handler values are replaced without overwriting their backing arrays. There
+are no new worker fields or scratch buffers. Header commitment, Date caching,
+framing and the 16 KiB serialized-buffer retention bound remain unchanged.
+
+`Header.WriteSubset` is retained. A separate serializer prototype rebuilds
+sorted worker-local key/value scratch on every commitment, clears references
+immediately, caps scratch at 64 fields and delegates larger maps to stdlib.
+Six balanced-order samples compare original, reset-only, serializer-only and
+combined binaries. Serialization alone improves isolated SmallGET by 4.07%
+(`p=0.026`) but its SmallGET Pipe changes are uncertain. Adding it to map
+clearing has no significant difference in any of four sampled Pipe cases
+(`p>=0.132`); the extra protocol code and retained storage are not justified.
+The prototype passes exact-byte differential tests and the full race suite.
+
+Final measurements compare base commit `0b60ce0beeb0767415bfdf0106128482c7c3f15a`
+with identical original/expanded harnesses, Go 1.27.2, Darwin arm64, Apple M3,
+`GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients. Ten alternating-order
+samples use 200 ms for isolated/Pipe and bounded 200-request TCP cases. The
+original handlers, including both Header.Set allocations, are unchanged.
+Isolated SmallGET improves **753.25 to 709.95 ns (-5.75%, `p=0.005`)** and
+stays **100 B/op, two objects**. Other original isolated workloads improve
+1.88–6.19%, except ImplicitGET's uncertain +0.94%. Adding 8/32/128 response
+headers improves isolated time 11.17/5.81/9.56%, with unchanged object counts.
+
+Pipe SmallGET serial improves **4.7125 to 4.5205 µs (-4.07%, `p=0.001`)**;
+its parallel difference is uncertain. HEAD/LargeGET serial improve 4.04/1.80%.
+With 32 extra response headers, Pipe serial/parallel improves 5.69/3.35%;
+128 extra headers improves 6.32/6.25%. Pipe ImplicitGET parallel regresses
+**0.87% (`p=0.037`)**. Pipe object counts are unchanged; 32-extra-header serial
+B/op rises 9 B (+0.12%) and 128-extra-header serial falls 22 B (-0.08%).
+Every TCP timing/allocation change is uncertain, including large parallel
+median increases; **no TCP speedup is established**. All final timing runs
+complete without errors. This small reset change accepts the recorded
+default-only cost in exchange for repeated SmallGET and larger-map gains.
+
+Separate SmallGET CPU profiles attribute 10.70/10.20% cumulative sampled CPU
+to `populateHeaders` before/after; 32-extra-header profiles show 10.96/2.07%.
+Shares overlap and are not exact request costs. Allocation profiles preserve
+the handler's two value-slice allocations. `go test -race -count=1 ./...
+-timeout=2m` passes with loopback access. New tests cover all key/value bytes,
+invalid names, sanitization, multiple/nil values, exact-key exclusions,
+informational/bodyless statuses, small/large maps, retained clones, default
+aliasing, map/slice reuse, and the serialized-buffer bound. Existing snapshot,
+streaming, lifecycle and framing tests pass.
+
+Raw samples, benchstat reports, all medians, source/binary hashes, prototype
+source, profile summaries and reproduction scripts are locally retained in
+[`performance/response-headers/`](performance/response-headers/README.md),
+ignored by the existing `/performance` rule. Binaries/raw profiles are in
+`/tmp/turbo-response-headers`. To reproduce on a fresh checkout, archive the
+base commit there, copy `response_headers_benchmark_test.go` into it, and
+compile baseline/current tests with `go test -c`. Use `GOMAXPROCS=8`,
+`-run '^$' -bench '^(BenchmarkTurboProcess|BenchmarkResponseWriter|BenchmarkTurboProcessResponseHeaders)$' -benchmem -benchtime=200ms -count=10`
+for isolated measurements; use
+`-bench '^BenchmarkHTTP11NoKeepAlive$/^Pipe$/.*/.*/^Turbo$|^BenchmarkHTTP11ResponseHeaders$/^Pipe$/'`
+for Pipe, and replace Pipe with TCP plus `-benchtime=200x` for bounded TCP.
+Alternate before/after binary order, and collect profiles separately.
 
 **Entry points:** `response_writer.go`: `populateHeaders`, `prepareHeader`,
 `headerExclusions`, `appendFramingHeaders`; local `net/http/header.go`.
