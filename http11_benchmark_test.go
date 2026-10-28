@@ -103,28 +103,33 @@ func BenchmarkHTTP11NoKeepAlive(b *testing.B) {
 }
 
 func BenchmarkHTTP11Accept(b *testing.B) {
-	workload := http11Workload{method: http.MethodGet, responseBody: bytes.Repeat([]byte("x"), 128)}
+	workload := http11Workloads()[0]
 	for _, transport := range []string{"TCP", "Pipe"} {
-		for _, mode := range []struct {
-			name        string
-			parallelism int
-		}{
-			{name: "Serial"},
-			{name: "Parallel", parallelism: 1},
-			{name: "Parallel4", parallelism: 4},
-			{name: "Parallel16", parallelism: 16},
-		} {
-			b.Run(transport+"/"+mode.name, func(b *testing.B) {
-				b.SetParallelism(mode.parallelism)
-				benchmarkHTTP11(b, transport, "Turbo", workload, mode.parallelism > 0)
-				clients := 1
-				if mode.parallelism > 0 {
-					clients = runtime.GOMAXPROCS(0) * mode.parallelism
-				}
-				b.ReportMetric(float64(clients), "clients")
-			})
-		}
+		b.Run(transport, func(b *testing.B) {
+			for _, workers := range []int{1, 8, 32} {
+				b.Run(fmt.Sprintf("Workers%d", workers), func(b *testing.B) {
+					for _, queue := range []int{0, 8, 32, 1024} {
+						b.Run(fmt.Sprintf("Queue%d", queue), func(b *testing.B) {
+							for _, clients := range []int{1, 8, 32, 128} {
+								b.Run(fmt.Sprintf("Clients%d", clients), func(b *testing.B) {
+									benchmarkHTTP11Config(b, transport, "Turbo", workload,
+										http11BenchmarkConfig{workers, queue, clients}, false)
+								})
+							}
+						})
+					}
+				})
+			}
+		})
 	}
+}
+
+type http11BenchmarkConfig struct {
+	workers, queue, clients int
+}
+
+func defaultHTTP11BenchmarkConfig() http11BenchmarkConfig {
+	return http11BenchmarkConfig{workers: 32, queue: 1024, clients: 1}
 }
 
 // Isolate request parsing and response writing from clients and connections.
@@ -163,8 +168,16 @@ func (*http11ProcessConn) SetReadDeadline(time.Time) error  { return nil }
 func (*http11ProcessConn) SetWriteDeadline(time.Time) error { return nil }
 
 func benchmarkHTTP11(b *testing.B, transport, implementation string, workload http11Workload, parallel bool) {
+	config := defaultHTTP11BenchmarkConfig()
+	if parallel {
+		config.clients = runtime.GOMAXPROCS(0)
+	}
+	benchmarkHTTP11Config(b, transport, implementation, workload, config, parallel)
+}
+
+func benchmarkHTTP11Config(b *testing.B, transport, implementation string, workload http11Workload, config http11BenchmarkConfig, legacyParallel bool) {
 	b.StopTimer()
-	dial := startHTTP11BenchmarkServer(b, transport, implementation, workload.handler())
+	dial := startHTTP11BenchmarkServer(b, transport, implementation, workload.handler(), config)
 	request := workload.request()
 	client := newHTTP11BenchmarkClient(dial, request, workload)
 	if err := client.roundTrip(true); err != nil {
@@ -174,7 +187,7 @@ func benchmarkHTTP11(b *testing.B, transport, implementation string, workload ht
 	b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
 	b.ResetTimer()
 	b.StartTimer()
-	if parallel {
+	if legacyParallel {
 		b.RunParallel(func(pb *testing.PB) {
 			client := newHTTP11BenchmarkClient(dial, request, workload)
 			for pb.Next() {
@@ -184,15 +197,47 @@ func benchmarkHTTP11(b *testing.B, transport, implementation string, workload ht
 				}
 			}
 		})
-	} else {
+	} else if config.clients == 1 {
 		for i := 0; i < b.N; i++ {
 			if err := client.roundTrip(false); err != nil {
 				b.Fatal(err)
 			}
 		}
+	} else {
+		runHTTP11Clients(b.N, config.clients, func(_ int, count int) {
+			client := newHTTP11BenchmarkClient(dial, request, workload)
+			for range count {
+				if err := client.roundTrip(false); err != nil {
+					b.Error(err)
+					return
+				}
+			}
+		})
 	}
 	b.StopTimer()
 	b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "req/s")
+	b.ReportMetric(float64(config.workers), "workers")
+	b.ReportMetric(float64(config.queue), "queue")
+	b.ReportMetric(float64(config.clients), "clients")
+}
+
+// Partition requests without RunParallel's GOMAXPROCS-dependent client count or
+// a shared per-request counter. Small calibration runs may use fewer clients.
+func runHTTP11Clients(requests, clients int, run func(client, count int)) {
+	var done sync.WaitGroup
+	start := make(chan struct{})
+	for client := range min(requests, clients) {
+		count := requests / clients
+		if client < requests%clients {
+			count++
+		}
+		done.Go(func() {
+			<-start
+			run(client, count)
+		})
+	}
+	close(start)
+	done.Wait()
 }
 
 // The preflight check validates the payload as well as the timed checks for
@@ -257,6 +302,8 @@ type http11BenchmarkClient struct {
 	response *bufio.Reader
 	method   *http.Request
 	expected []byte
+	// Diagnostics only; invoked before error cleanup closes the connection.
+	onError func(error, net.Conn)
 }
 
 func newHTTP11BenchmarkClient(dial func() (net.Conn, error), request []byte, workload http11Workload) *http11BenchmarkClient {
@@ -273,6 +320,9 @@ func (c *http11BenchmarkClient) roundTrip(verifyBody bool) (err error) {
 	}
 	var body io.ReadCloser
 	defer func() {
+		if err != nil && c.onError != nil {
+			c.onError(err, conn)
+		}
 		// Close before Body.Close: an invalid response can leave an unread body
 		// whose Close would otherwise drain from a stalled peer.
 		_ = conn.Close()
@@ -307,7 +357,7 @@ func (c *http11BenchmarkClient) roundTrip(verifyBody bool) (err error) {
 		return fmt.Errorf("unexpected response: %s %s, Close=%v", res.Proto, res.Status, res.Close)
 	}
 	if err := c.readBody(res.Body, verifyBody); err != nil {
-		return err
+		return fmt.Errorf("read response body: %w", err)
 	}
 	if _, err := c.response.ReadByte(); err != io.EOF {
 		return fmt.Errorf("expected connection EOF after response, got %v", err)
@@ -336,13 +386,28 @@ func (c *http11BenchmarkClient) readBody(body io.Reader, verify bool) error {
 	return nil
 }
 
-func startHTTP11BenchmarkServer(tb testing.TB, transport, implementation string, handler http.HandlerFunc) func() (net.Conn, error) {
+func startHTTP11BenchmarkServer(tb testing.TB, transport, implementation string, handler http.HandlerFunc, options ...http11BenchmarkConfig) func() (net.Conn, error) {
 	tb.Helper()
+	config := defaultHTTP11BenchmarkConfig()
+	if len(options) > 0 {
+		config = options[0]
+	}
+	if len(options) > 1 || config.workers < 1 || config.queue < 0 || config.clients < 1 {
+		tb.Fatal("invalid HTTP/1.1 benchmark configuration")
+	}
 	listener, dial := newHTTP11BenchmarkListener(tb, transport)
+	startHTTP11BenchmarkServerOnListener(tb, listener, implementation, handler, config)
+	return dial
+}
+
+func startHTTP11BenchmarkServerOnListener(tb testing.TB, listener net.Listener, implementation string, handler http.HandlerFunc, config http11BenchmarkConfig) *Turbo {
+	tb.Helper()
 	gate := &http11StartListener{Listener: listener, ready: make(chan struct{})}
+	var turbo *Turbo
 	switch implementation {
 	case "Turbo":
-		server := newTurbo(gate, 32, 1024, handler)
+		server := newTurbo(gate, config.workers, config.queue, handler)
+		turbo = server
 		tb.Cleanup(func() {
 			if err := server.Close(); err != nil {
 				tb.Error(err)
@@ -366,7 +431,7 @@ func startHTTP11BenchmarkServer(tb testing.TB, transport, implementation string,
 	}
 	// Publish handler initialization before either server can accept a connection.
 	close(gate.ready)
-	return dial
+	return turbo
 }
 
 func newHTTP11BenchmarkListener(tb testing.TB, transport string) (net.Listener, func() (net.Conn, error)) {

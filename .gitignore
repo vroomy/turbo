@@ -1,7 +1,9 @@
-/benchmarks
+/benchmarks/*
+!/benchmarks/README.md
 /testdata
 /examples
 /performance/*
 !/performance/http-date-cache/
+!/performance/worker-dispatch/
 *.pprof
 *.test
