@@ -299,3 +299,120 @@ goroutine creation, live goroutines, stack bytes, and heap bytes separately;
 process totals include test/runtime/profiler storage. The packing table measures
 512/128, 1,024/256 (current), 1,024/512, and 2,048/1,024-byte block/sharing bounds.
 Larger blocks are an exploration of increased retention, not an adopted change.
+
+## Sustained OpenRTB and GC
+
+`BenchmarkOpenRTBHTTP11` exchanges a matched banner bid request/response adapted
+from the IAB Tech Lab [OpenRTB 2.6 examples](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/blob/main/2.6.md#6-bid-requestresponse-samples).
+The checked-in fixtures and attribution are in
+[`internal/benchdata/openrtb/`](../internal/benchdata/openrtb/README.md).
+The POST request body is 528 B; the JSON response is 533 B. Both implementations
+consume the whole request, set application/json and explicit Content-Length,
+return the same bytes, and close the connection. This measures HTTP/body
+transfer and cleanup with prebuilt JSON, without an auction or JSON codec.
+Turbo's POST parsing continues to use the existing stdlib fallback.
+
+Run exactly one sustained sample per implementation in separate processes:
+
+```sh
+python3 scripts/openrtb_benchmark.py
+# Optional socket comparison; choose a fresh output directory:
+python3 scripts/openrtb_benchmark.py --transport TCP --output /tmp/openrtb-tcp
+```
+
+The default uses Pipe, one client, 32 Turbo workers, queue 1,024,
+`GOMAXPROCS=8`, `GOGC=100`, and `GOMEMLIMIT=off`. Pipe avoids TCP churn during
+the sustained GC comparison. The common client, connection and owned watchdog
+allocations are included. Contract checks validate the request/response JSON
+relationship, exact transferred bytes, HTTP framing and EOF on both transports.
+The TCP checks require local loopback access.
+
+Each sample uses `B.Loop` with `-benchtime=60s -count=1`, providing one continuous
+measured window; actual duration can exceed the target and is recorded. A forced
+baseline GC precedes timing and is excluded from the counters. No forced GC,
+profiler, race detector, or per-request metric sampling runs during timing.
+Boundary snapshots report natural GC cycles, total stop-the-world pause time,
+cycles per million requests, pause ns/op, requests/s, bytes/op and allocations/op.
+These are process-wide metrics. Total GC cycles depend on completed request
+count, so compare the normalized counters too. GC pause time is the runtime's
+stop-the-world total, not all concurrent GC CPU time or request latency.
+
+The collector saves raw benchmark output, exact request counts/elapsed time,
+GC counters, source/binary hashes and a results table under
+`benchmarks/openrtb-2026-10-29/` by default. It refuses to overwrite prior JSON
+results; select another `--output` directory to repeat. One sample per server
+shows sustained behavior and confirms GC activity, without establishing timing
+significance. Run the race suite separately before timing.
+
+Measured on 2026-10-29 at base commit `ae3a0b6` with this added benchmark,
+Go 1.27.2, Darwin arm64, Apple M3. One sample per server completed without
+request errors; both contract checks and `go test -race -count=1 ./... -timeout=2m`
+passed. Both samples use the default Pipe configuration above. The 60 s target
+produced the actual elapsed times shown below.
+
+| Metric | Turbo | Stdlib |
+| --- | ---: | ---: |
+| Actual duration | 74.939 s | 71.864 s |
+| Completed requests | 12,503,314 | 6,120,942 |
+| Requests/s | 166,847 | 85,174 |
+| µs/op | 5.994 | 11.741 |
+| B/op | 3,749.3 | 6,007.0 |
+| Allocations/op | 47.025 | 69.109 |
+| Natural GC cycles | 14,759 | 12,247 |
+| GC cycles / million requests | 1,180.41 | 2,000.84 |
+| Total STW pause | 614.652 ms | 424.925 ms |
+| STW pause / request | 49.16 ns | 69.42 ns |
+| STW pause / measured time | 0.8202% | 0.5913% |
+| Forced GC during timing | 0 | 0 |
+
+The observed throughput ratio is 1.96×; Turbo allocates 37.6% fewer bytes per
+request in this sample. Turbo's raw GC/pause totals are higher because it
+completes more work and runs slightly longer; its cycles and pauses per request
+are lower. This does not establish statistical significance from one run each.
+Raw logs, GC JSON, the compiled binary and source/binary hashes are locally
+retained in [`openrtb-2026-10-29/`](openrtb-2026-10-29/RESULTS.md), ignored by the
+existing benchmark rule. Allocation fractions above use full runtime counter
+deltas, while Go's standard benchmark output truncates objects/bytes per op.
+
+
+## Sustained SmallGET over TCP (2026-10-29)
+
+To extend one of the earlier close TCP comparisons, the same SmallGET workload
+and handler were run through the sustained GC harness. The collector now accepts
+`--workload SmallGET`; its default remains OpenRTB. Reproduce into a fresh directory:
+
+```sh
+python3 scripts/openrtb_benchmark.py --workload SmallGET --transport TCP --output /tmp/smallget-tcp
+```
+
+One client, fresh connection per request, 128 B response, 32 Turbo workers,
+queue 1,024; Go 1.27.2, Darwin arm64, Apple M3, `GOMAXPROCS=8`, `GOGC=100`,
+`GOMEMLIMIT=off`. Each implementation runs in a separate process, Turbo first,
+with a 60-second target using `B.Loop`. Actual durations exceed the target.
+GC/allocations include both client and server. No forced GC occurs during timing.
+
+| Metric | Turbo | Stdlib |
+| --- | ---: | ---: |
+| Actual duration | 67.120 s | 73.328 s |
+| Completed requests | 1,000,000 | 1,000,000 |
+| Requests/s | 14,899 | 13,637 |
+| µs/op | 67.120 | 73.328 |
+| B/op | 2,706.2 | 5,774.2 |
+| Allocations/op | 44.110 | 75.126 |
+| Natural GC cycles | 939 | 2,088 |
+| Total STW pause | 34.806 ms | 83.806 ms |
+| STW pause / request | 34.81 ns | 83.81 ns |
+| Forced GC during timing | 0 | 0 |
+
+Observed Turbo throughput is 9.25% higher (8.47% less time/op), with 53.13%
+fewer allocated bytes, 55.03% fewer GC cycles, and 58.47% less STW pause per
+request. Both servers collect repeatedly, but the sustained TCP throughput gap
+remains modest, unlike the earlier OpenRTB Pipe result. The workload and
+transport differ, so these results do not isolate GC as the cause of either gap.
+One sample per server does not establish statistical significance.
+
+The SmallGET TCP contract checks and full race suite passed. Smoke runs also
+passed for both sustained workloads over Pipe after sharing the measurement
+helper. Raw outputs, exact counters, source/binary hashes, contract log and binary
+are retained locally in [`smallget-tcp-2026-10-29/`](smallget-tcp-2026-10-29/RESULTS.md)
+under the existing ignored benchmark directory rule. Production code is unchanged.

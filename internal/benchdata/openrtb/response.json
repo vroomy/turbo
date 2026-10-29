@@ -1,0 +1,23 @@
+{
+  "id": "80ce30c53c16e6ede735f123ef6e32361bfc7b22",
+  "bidid": "abc1123",
+  "cur": "USD",
+  "seatbid": [
+    {
+      "seat": "512",
+      "bid": [
+        {
+          "id": "1",
+          "impid": "1",
+          "price": 9.43,
+          "nurl": "http://adserver.com/winnotice?impid=1",
+          "iurl": "http://adserver.com/pathtosampleimage",
+          "adomain": ["advertiserdomain.com"],
+          "cid": "campaign111",
+          "crid": "creative112",
+          "attr": [1, 2, 3, 4, 5, 6, 7, 12]
+        }
+      ]
+    }
+  ]
+}

@@ -2,11 +2,12 @@
 !/benchmarks/README.md
 /testdata
 /examples
-/performance/*
 /performance
+/request/performance
 /experiments
 !/performance/http-date-cache/
 !/performance/worker-dispatch/
 *.pprof
 *.test
 /profiling
+/studies
