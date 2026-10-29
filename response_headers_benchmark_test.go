@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
-
-	"github.com/vroomy/turbo/request"
 )
 
 // Keep the original workload handlers intact, including their Header.Set calls.
@@ -32,13 +30,12 @@ func BenchmarkTurboProcessResponseHeaders(b *testing.B) {
 			conn := new(http11ProcessConn)
 			server := Turbo{h: responseHeaderBenchmarkHandler(count)}
 			writer := makeResponseWriter()
-			var parser request.Parser
 			goroutines := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				conn.request.Reset(wire)
-				if err := server.process(conn, &writer, &parser); err != nil {
+				if err := server.process(conn, &writer); err != nil {
 					b.Fatal(err)
 				}
 			}

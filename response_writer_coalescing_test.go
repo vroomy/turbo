@@ -10,8 +10,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"github.com/vroomy/turbo/request"
 )
 
 const coalescingTestHeader = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nConnection: close\r\n\r\n"
@@ -131,12 +129,11 @@ func TestResponseWriterRejectedFirstBody(t *testing.T) {
 func TestTurboProcessWriteCounts(t *testing.T) {
 	wantCalls := map[string]int{"SmallGET": 1, "ImplicitGET": 1, "LargeGET": 2, "POST": 1, "HEAD": 1, "Empty": 1, "StreamGET": 4}
 	writer := makeResponseWriter()
-	var parser request.Parser
 	for _, workload := range http11Workloads() {
 		t.Run(workload.name, func(t *testing.T) {
 			conn := newTurboTestConn(string(workload.request()))
 			server := Turbo{h: workload.handler()}
-			if err := server.process(conn, &writer, &parser); err != nil {
+			if err := server.process(conn, &writer); err != nil {
 				t.Fatal(err)
 			}
 			if conn.calls != wantCalls[workload.name] {

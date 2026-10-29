@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/vroomy/turbo/internal/storagestudy"
-	"github.com/vroomy/turbo/request"
 )
 
 type storageStudyConn struct {
@@ -53,13 +52,12 @@ func BenchmarkProcessStorage(b *testing.B) {
 			conn := &storageStudyConn{}
 			server := Turbo{h: storageStudyHandler()}
 			writer := makeResponseWriter()
-			var parser request.Parser
 			g := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				conn.source = storagestudy.Reader{Wire: c.Wires[i%len(c.Wires)], Cut: c.Cut}
-				if err := server.process(conn, &writer, &parser); err != nil {
+				if err := server.process(conn, &writer); err != nil {
 					b.Fatal(err)
 				}
 			}

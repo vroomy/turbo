@@ -12,8 +12,6 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
-
-	"github.com/vroomy/turbo/request"
 )
 
 func TestNew(t *testing.T) {
@@ -101,7 +99,6 @@ func TestTurboProcess(t *testing.T) {
 		}},
 	}
 	writer := makeResponseWriter()
-	var parser request.Parser
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, server := net.Pipe()
@@ -130,7 +127,7 @@ func TestTurboProcess(t *testing.T) {
 				tt.handler(w, req)
 			}}
 			done := make(chan error, 1)
-			go func() { done <- turbo.process(server, &writer, &parser) }()
+			go func() { done <- turbo.process(server, &writer) }()
 			protocol := tt.protocol
 			if protocol == "" {
 				protocol = "HTTP/1.1"
@@ -182,7 +179,6 @@ func TestTurboProcessErrors(t *testing.T) {
 		{name: "write error survives close failure", request: wire, failWrite: 2, writeErr: writeFailure, closeErr: closeFailure, wantErr: writeFailure, wantHandler: true},
 	}
 	writer := makeResponseWriter()
-	var parser request.Parser
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			conn := newTurboTestConn(tt.request)
@@ -196,7 +192,7 @@ func TestTurboProcessErrors(t *testing.T) {
 				_, _ = w.Write([]byte("resp"))
 				_, _ = w.Write([]byte("onse"))
 			}}
-			err := server.process(conn, &writer, &parser)
+			err := server.process(conn, &writer)
 			if tt.wantErr != nil && !errors.Is(err, tt.wantErr) {
 				t.Errorf("process error = %v, want %v", err, tt.wantErr)
 			}
@@ -213,6 +209,43 @@ func TestTurboProcessErrors(t *testing.T) {
 	}
 }
 
+func TestTurboProcessRetainedRequestMetadata(t *testing.T) {
+	tests := []struct {
+		method, target, path, host, value, body string
+	}{
+		{"GET", "/first?q=one", "/first", "first.local", "one", ""},
+		{"HEAD", "/second%2fitem", "/second/item", "second.local", "two", ""},
+		{"POST", "/third", "/third", "third.local", "three", "payload"},
+		{"GET", "/fourth", "/fourth", "fourth.local", "four", ""},
+	}
+	writer := makeResponseWriter()
+	var retained []*http.Request
+	server := Turbo{h: func(_ http.ResponseWriter, req *http.Request) {
+		retained = append(retained, req)
+		body, err := io.ReadAll(req.Body)
+		if err != nil || string(body) != tests[len(retained)-1].body {
+			t.Errorf("request body = %q, error = %v", body, err)
+		}
+	}}
+	for _, tt := range tests {
+		wire := fmt.Sprintf("%s %s HTTP/1.1\r\nHost: %s\r\nX-Value: %s\r\nContent-Length: %d\r\n\r\n%s",
+			tt.method, tt.target, tt.host, tt.value, len(tt.body), tt.body)
+		if err := server.process(newTurboTestConn(wire), &writer); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(retained) != len(tests) {
+		t.Fatalf("handler received %d requests, want %d", len(retained), len(tests))
+	}
+	for i, req := range retained {
+		want := tests[i]
+		if req.Method != want.method || req.RequestURI != want.target || req.URL.Path != want.path ||
+			req.Host != want.host || req.Header.Get("X-Value") != want.value {
+			t.Errorf("request %d metadata changed after subsequent requests: %+v", i, req)
+		}
+	}
+}
+
 func TestTurboRequestBodyLifecycle(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -226,7 +259,6 @@ func TestTurboRequestBodyLifecycle(t *testing.T) {
 		{name: "client never sends declared body"},
 	}
 	writer := makeResponseWriter()
-	var parser request.Parser
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, conn := net.Pipe()
@@ -254,7 +286,7 @@ func TestTurboRequestBodyLifecycle(t *testing.T) {
 				}
 			}}
 			done := make(chan error, 1)
-			go func() { done <- server.process(conn, &writer, &parser) }()
+			go func() { done <- server.process(conn, &writer) }()
 			request := "POST / HTTP/1.1\r\nHost: example.com\r\nContent-Length: 4\r\n\r\n" + tt.body
 			if _, err := io.WriteString(client, request); err != nil {
 				t.Fatal(err)
@@ -305,7 +337,6 @@ func TestTurboWorkers(t *testing.T) {
 			})
 			started := make(chan struct{}, count)
 			var writer http.ResponseWriter
-			var previousRequest *http.Request
 			server.h = func(w http.ResponseWriter, req *http.Request) {
 				if tt.workers == 1 {
 					if writer == nil {
@@ -313,10 +344,6 @@ func TestTurboWorkers(t *testing.T) {
 					} else if w != writer {
 						t.Error("worker replaced its response writer between requests")
 					}
-					if previousRequest != nil && req != previousRequest {
-						t.Error("worker replaced its request between requests")
-					}
-					previousRequest = req
 				}
 				started <- struct{}{}
 				<-release

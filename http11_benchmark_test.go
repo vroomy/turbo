@@ -14,8 +14,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"github.com/vroomy/turbo/request"
 )
 
 const http11BenchmarkTimeout = 10 * time.Second
@@ -144,14 +142,13 @@ func BenchmarkTurboProcess(b *testing.B) {
 			conn := &http11ProcessConn{}
 			server := Turbo{h: workload.handler()}
 			writer := makeResponseWriter()
-			var parser request.Parser
 			goroutines := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.SetBytes(int64(len(workload.requestBody) + len(workload.expectedBody())))
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				conn.request.Reset(wire)
-				if err := server.process(conn, &writer, &parser); err != nil {
+				if err := server.process(conn, &writer); err != nil {
 					b.Fatal(err)
 				}
 			}

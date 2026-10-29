@@ -4,8 +4,6 @@ import (
 	_ "embed"
 	"strings"
 	"testing"
-
-	"github.com/vroomy/turbo/request"
 )
 
 //go:embed request/testdata/browser-headers.txt
@@ -20,13 +18,12 @@ func BenchmarkTurboProcessHeaders(b *testing.B) {
 			conn := &http11ProcessConn{}
 			server := Turbo{h: http11Workloads()[0].handler()}
 			writer := makeResponseWriter()
-			var parser request.Parser
 			goroutines := newBenchmarkGoroutines(b)
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				conn.request.Reset(wire)
-				if err := server.process(conn, &writer, &parser); err != nil {
+				if err := server.process(conn, &writer); err != nil {
 					b.Fatal(err)
 				}
 			}

@@ -1,19 +1,34 @@
 # Allocation optimization TODO
 
+## Stdlib request parsing — implemented 2026-10-29
+
+Turbo now uses `http.ReadRequest` for every request and no longer owns custom
+parser state. The experimental `request` package and its tests/benchmarks remain
+available but are unused by the server. [ROADMAP.md](ROADMAP.md) records the plan
+and acceptance criteria for revisiting an internal parser. This decision
+supersedes the GET/HEAD reuse guidance in the historical reviews below.
+The full race suite and both 30-second parser fuzzers pass; repeated benchmark
+confirmation and validation are in the
+[local integration report](research/parser-uniformity-2026-10-29/stdlib-integration/README.md).
+
 ## Parser uniformity review — completed 2026-10-29
 
 Compared current parsing with a stdlib-only overlay inside the same Turbo server.
 Internal small-GET parsing is 2.1× faster; stdlib-only adds 0.34 µs and 890 B per
 isolated small GET. POST/OpenRTB timing is unchanged within measurement noise.
-GET/HEAD Pipe time rises 7–17%; bounded TCP timing is inconclusive. Production
-code remains unchanged. Full results, validation and implementation-effort estimates:
+GET/HEAD Pipe time rises 7–17%; bounded TCP timing is inconclusive. These measured
+GET/HEAD costs were accepted for uniformity. Full results, validation and effort
+estimates:
 [local parser uniformity report](research/parser-uniformity-2026-10-29/README.md).
 
 Profiled 2026-10-29 against `7758a06` (Go 1.27.2, Darwin arm64, Apple M3).
-Production code is unchanged. The only new benchmark isolates the existing
-OpenRTB request and handler from the client and transport.
+At that profiling baseline, production code was unchanged. Its new benchmark
+isolates the existing OpenRTB request and handler from the client and transport.
 
 ## Read this first
+
+The following review records the earlier parser/reuse baseline; consult the
+current decision and ROADMAP before proposing parser changes.
 
 Our priorities are simplicity, low allocation churn, and bounded worker-owned
 storage reset between requests. HTTP/1.1 still serves one request per connection.

@@ -11,8 +11,6 @@ import (
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/vroomy/turbo/request"
 )
 
 // IAB OpenRTB 2.6 examples, adapted into a matched banner request/response.
@@ -80,12 +78,11 @@ func BenchmarkOpenRTBTurboProcess(b *testing.B) {
 	conn := &http11ProcessConn{}
 	server := Turbo{h: openRTBHandler(w)}
 	writer := makeResponseWriter()
-	var parser request.Parser
 	b.ReportAllocs()
 	b.SetBytes(int64(len(w.requestBody) + len(w.responseBody)))
 	for b.Loop() {
 		conn.request.Reset(w.requestWire)
-		if err := server.process(conn, &writer, &parser); err != nil {
+		if err := server.process(conn, &writer); err != nil {
 			b.Fatal(err)
 		}
 	}

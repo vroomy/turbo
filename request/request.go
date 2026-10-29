@@ -1,4 +1,7 @@
-// Package request parses incoming HTTP/1.x requests.
+// Package request preserves Turbo's experimental HTTP/1.x request parser for
+// future development. Turbo currently uses net/http.ReadRequest for all requests
+// and does not use this package. See the repository's ROADMAP.md for plans to
+// revisit the parser.
 package request
 
 import (
@@ -23,7 +26,7 @@ func Parse(r io.Reader) (*http.Request, error) {
 // Parser reuses request, URL, and header storage. Its zero value is ready to use.
 // Small header strings share immutable 1 KiB blocks, which retained clones can
 // keep alive.
-// A Parser belongs to one worker and must not be copied or used concurrently
+// A Parser belongs to one caller and must not be copied or used concurrently
 // after its first use.
 type Parser struct {
 	req        http.Request
