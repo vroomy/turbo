@@ -1,0 +1,7 @@
+# Local benchmark results, research notes, profiles, and experiments.
+/research/
+
+# Local examples and generated Go artifacts.
+/examples/
+*.pprof
+*.test
