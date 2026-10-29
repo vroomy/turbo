@@ -1,13 +1,7 @@
-/benchmarks/*
-!/benchmarks/README.md
-/testdata
-/examples
-/performance
-/request/performance
-/experiments
-!/performance/http-date-cache/
-!/performance/worker-dispatch/
+# Local benchmark results, research notes, profiles, and experiments.
+/research/
+
+# Local examples and generated Go artifacts.
+/examples/
 *.pprof
 *.test
-/profiling
-/studies

@@ -1,979 +1,188 @@
-# Turbo optimization TODO
-
-## Round two: allocation and goroutine profiling (2026-10-28)
-
-Tasks 1–11 below are complete; tasks 10–11 retain the existing production code.
-A new profiling pass at `37519a3`
-adds cumulative goroutine-creation metrics to the HTTP and isolated process
-benchmarks. Production code is unchanged. Full results, raw timings, profile
-summaries, trace attribution and reproduction scripts are in
-[`profiling/2026-10-28/`](profiling/2026-10-28/README.md).
-
-The priorities remain **simplicity and allocation efficiency**, preferring
-bounded worker-owned reuse over new pools or shared caches. Current SmallGET
-processing is 100 B/op and two reported allocations, primarily the handler's
-two `Header.Set` calls plus fractional immutable request-text blocks. Turbo
-creates no per-request goroutines in the sampled workloads; stdlib creates
-two. Parallel benchmark clients and server startup are reported separately
-from that interpretation. Live goroutine counts cannot measure creation churn.
-
-### 9. [x] P1 — Reduce repeated canonical header-name allocations
-
-**Completed 2026-10-28.** Noncanonical, validated names now use a fixed set of
-immutable browser-metadata and tracing constants before the standard
-canonicalizer. Length checks plus case-insensitive comparisons add no cache,
-parser fields, pools, goroutines or request-substring retention. Canonical
-names and the existing three common-name fast paths remain unchanged. Mixed
-spellings of those three names also return constants. Unsupported names keep
-stdlib canonicalization; immutable text ownership and reset bounds are unchanged.
-
-Ten balanced-order samples compare base commit
-`bbfefc7183c80cecfdb923621f9f84ead65f8a0d` with identical expanded harnesses,
-Go 1.27.2, Darwin arm64, Apple M3, GOMAXPROCS=8, 32 workers, queue 1,024,
-and one/eight clients. Parser/process/Pipe use 200 ms; TCP uses 200 requests.
-Lowercase/mixed-case browser parsing drops **872 B/10 objects to 704 B/one
-object**, improving **11.37/12.44%**. Matching process cases drop **904 B/12
-objects to 736 B/three objects**, improving **10.78/11.85%**. These timing
-changes have p<0.001. The unchanged handlers retain both Header.Set calls.
-Small/canonical-request allocations are unchanged, and their timing changes
-are uncertain. Independent tracing names save 16 B/one object and improve
-11.24%; custom, changing and long names retain their allocation counts.
-
-Matching Pipe serial lowercase/mixed cases improve **4.73/4.49%** (p<0.001),
-removing nine objects. Lowercase parallel improves 2.58% (p=0.030); mixed-case
-parallel is uncertain. TCP removes nine objects in the matching workloads,
-but every TCP timing change is uncertain: **no TCP speedup is established**.
-The final matrix has no significant timing or allocation regressions. An
-initial 2.49% changing-name regression was removed by skipping irrelevant
-same-length comparisons based on the first byte; fresh final samples show
-265.9 to 265.25 ns (p=0.781).
-
-Full allocation profiles preserve identical request-text allocation while
-removing 180,009 canonical-name objects / 3,281.41 KiB for 20,000 browser
-requests plus setup. With 128 retained clones, request text remains 48 KiB;
-canonical-name storage falls by **10.5 KiB / 576 objects**. After clone release,
-worker storage remains a 512-byte Parser, a 1 KiB text block, and the same
-map/value storage. A cache prototype was unnecessary because constants remove
-the entire measured nine-object target without additional retained state.
-
-`go test -race -count=1 ./... -timeout=2m` passes with loopback access. Both
-parser fuzzers pass 30 s runs with eight workers (1,720,910 parse and 3,049,030
-reuse executions), including new lowercase/mixed browser seeds. Tests cover
-all byte mutations of recognized/custom/long names and clones retained across
-changing names and handler mutation; the new tests also pass on the baseline.
-All final TCP/Pipe runs complete without request errors. Raw samples, benchstat,
-heap/allocation summaries, hashes, and reproduction scripts are stored in
-[`request/performance/header-names/`](request/performance/header-names/README.md).
-
-**Evidence:** the reused browser parser uses 704 B/one object with canonical
-names, versus 872 B/ten objects with lowercase or mixed-case names. Full
-allocation profiles attribute the additional nine objects/168 bytes to
-`net/textproto.canonicalMIMEHeaderKey`. The three common names already handled
-as constants do not allocate. This is the strongest newly quantified target.
-
-**Entry points:** `canonicalHeaderKey`, `parseHeaders`, `Parser` in
-`request/request.go`; `BenchmarkParse` browser/casing variants; the new
-`parser-lowercaseheaders-alloc_objects.txt` profile summary.
-
-**Experiment:** start with the simplest treatment of common immutable names.
-Compare a small justified constant-name extension with bounded worker-owned
-name reuse only if the latter earns its extra state. Avoid a global intern
-table/pool, unbounded arbitrary-name caching, or changing immutable string
-backing storage. Do not tune solely to this fixture: include custom names,
-changing names, mixed casing, long names and small requests. Count retained
-bytes as well as allocation events; a short cached substring can retain an
-entire request block.
-
-**Acceptance:** identical differential/fuzz behavior and retained-clone safety;
-repeatable byte/object reductions in lowercase and mixed-case workloads;
-unchanged small/canonical-request allocations and no material timing regression.
-Add matching process/Pipe/TCP cases with unchanged response handlers before
-claiming an end-to-end gain. Benchmark before/after with the same harness and
-run both parser fuzzers and the race suite. Keep the no-change outcome if
-cache bookkeeping or retention outweighs the allocation benefit.
-
-### 10. [x] P2 — Measure reuse under fragmented requests and changing sizes
-
-**Completed 2026-10-28 — measurement map; fallback unchanged.** Added fixed
-first-read boundaries for GET/HEAD (early, middle, final byte), valid duplicate
-Content-Length for fallback after partial fast-path parsing, and alternating
-68/2,048-byte and 2/129-field request sets. The process harness keeps the existing
-SmallGET handler; large field sets additionally produce 129 response headers
-and a 20 KiB value. No sleeps or per-request goroutines control the reads.
-Differential fixture tests cover all cases and clones across parser resets.
-
-Six uninstrumented 100 ms samples at `7ab87f1c7e12d99ee80198b27b07a300e038e9db`,
-Go 1.27.2, Darwin arm64, Apple M3, `GOMAXPROCS=8` give these GET medians:
-
-| Read pattern | Parser ns/op | Parser B/op | Process ns/op | Process B/op |
-| --- | ---: | ---: | ---: | ---: |
-| Complete | 291.15 | 68 | 719.5 | 100 |
-| Early split | 627.9 | 957 | 1,082 | 990 |
-| Middle split | 667.65 | 957 | 1,117 | 990 |
-| Final-byte split | 672.55 | 957 | 1,135 | 990 |
-| Late fallback | 1,066 | 1,114 | 1,530.5 | 1,147 |
-
-HEAD follows the same allocation pattern. Reported parser objects are
-0/8/9/8/10 respectively; process objects are 2/10/11/10/12. Full allocation
-profiles show 1,335 immutable blocks for 20,001 complete parses (0.066747
-objects/parse), zero such blocks for split reads, and 1,820 for late fallback.
-Thus late fallback pays both ownership and stdlib parsing costs. Alternating
-bytes process at 1.6225 µs, 1,091 B/op, two reported objects; alternating large
-request/response fields at 19.728 µs, 49,800.5 B/op, 78 reported objects.
-These are isolated measurements, not predictions of TCP segmentation or speed.
-
-Forced-GC snapshots cover actual 1/8/32-worker servers: cold idle, every worker
-warm and active, idle after large and small responses, shutdown with retained
-clones, then clone release. Sixteen barrier-controlled waves create no request
-goroutines; process-wide creation counters, live counts, and stack bytes are
-recorded separately. With 32 workers and 512 clones, live heap is 7,127,792 B
-active, 4,991,728 B large-idle, 4,955,824 B small-idle, 4,550,544 B stopped with
-clones, and 403,072 B after releasing clones. Those are whole-process totals,
-including harness/runtime/profiler storage, not exact worker ownership charges.
-Live goroutines fall from 35 to two; stack storage falls from 622,592 to
-589,824 B and need not immediately return to the initial level. Creation is
-zero during the sampled request waves; shutdown's test helper creates one.
-
-Large request maps/value arrays and oversized response buffers are released.
-Response map capacity remains after clearing, and last-response values remain
-until the next `populateHeaders`; map identity is preserved. Separate alternating
-small/large parser profiles retain three 1 KiB blocks for 32 small clones per
-parser, even after the parser is released, and zero text after clone release.
-No second parser, buffering change, or retention-cap change is justified by
-this measurement-only task. The evidence establishes the prerequisite for #11.
-
-Reproducible fixtures/diagnostics are in `internal/storagestudy/study.go`,
-`request/storage_study_test.go`, and `storage_study_test.go`. See the storage
-study section in [`benchmarks/README.md`](benchmarks/README.md) and the tracked
-[`scripts/storage_study.py`](scripts/storage_study.py). Raw samples, heap JSON,
-profiles' text summaries, metadata/hashes, and all medians are locally retained
-under [`studies/request-storage/`](studies/request-storage/README.md), ignored by
-the existing `/studies` rule. Binary profiles/candidate sources are in
-`/tmp/turbo-storage-study`. Validation is recorded with #11 below.
-
-**Evidence:** current fast-path benchmarks predominantly send complete headers
-in one write. `parse` falls back when the first buffered read lacks the header
-terminator. The latest POST/fallback profile still spends most allocation
-bytes in `http.ReadRequest`, but it does not quantify fragmented GET traffic.
-The happy-path heap pass shows shutdown cleanup, not adversarial retention.
-
-**Entry points:** `parse`, `Parser.Reset`, `ownHeader`, `responseWriter.reset`,
-`populateHeaders`; existing process connections and Pipe heap diagnostic.
-
-**Experiment:** first add deterministic split-read GET/HEAD benchmarks (early,
-middle and final header boundaries) and alternating small/large request and
-response header sets. Use the same logical request and handler across cases.
-Measure the cost of fallback after partial parsing separately from the
-successful fast path. Collect warmed/idle/shutdown heap profiles at 1/8/32
-workers, including cloned requests that intentionally outlive the worker.
-Report cumulative creation, live goroutines and retained stack/heap storage as
-different quantities. Avoid sleeps or new per-request goroutines in the harness.
-
-**Acceptance:** a reproducible allocation/retention map before proposing a fix.
-Any bounded read/storage-reuse prototype must preserve fallback/error/body
-semantics, prompt handling of complete headers, immutable clones and reset
-bounds. Prefer leaving fallback intact over inventing a second general parser.
-Response map identity is currently exercised by tests; any proposed retention
-cap must explicitly resolve that contract rather than silently replacing it.
-
-### 11. [x] P3 — Evaluate immutable request-text packing only with retention data
-
-**Completed 2026-10-28 — no production change retained.** After #10's baseline
-retention measurements, compared current 1,024/256-byte block/sharing bounds
-with 512/128 (smaller), 1,024/512 (wider), and 2,048/1,024 (larger). Candidate
-copies change only those constants; production source and stdlib URL parsing
-remain unchanged. Larger blocks are an exploratory increase of the existing
-worker bound and are rejected. No pool, unsafe reuse, or maintenance goroutine
-was added.
-
-Full allocation profiles count text objects over 20,001 parses, including one
-calibration iteration. The table reports that fractional event rate and the
-uninstrumented parser's B/op; integer benchmark object counts truncate fractions.
-
-| Configuration | 68-byte objects/parse; B/op | 257-byte objects/parse; B/op | 704-byte objects/parse; B/op |
-| --- | --- | --- | --- |
-| Current | 0.066747; 68 | 1.000000; 288 | 1.000000; 704 |
-| Smaller | 0.142943; 73 | 1.000000; 288 | 1.000000; 704 |
-| Wider | 0.066747; 68 | 0.333383; 341 | 1.000000; 704 |
-| Larger | 0.033398; 68 | 0.142943; 292 | 0.500025; 1,024 |
-
-Dense and sparse clone profiles at 1/8/32 parsers retain 32 clones per parser.
-After parser release, sparse 68-byte clones pin 1,024 B each currently, 512 B
-with smaller blocks, and 2,048 B with larger blocks. Dense 68-byte clones pin
-96/80/128 B per clone respectively (aggregate text divided by clone count).
-Wider packing raises sparse 257-byte clone text from 288 to 1,024 B each;
-larger packing raises sparse 704-byte clone text from 704 to 2,048 B each.
-A current small-request parser owns 512 B of struct, 400 B of map, 32 B of value
-storage, and one 1,024-byte current block: 1,968 B excluding retained clones.
-The corresponding smaller/larger totals are 1,456/2,992 B. Current blocks may
-also be pinned by clones, so these ownership figures must not be added twice.
-All 72 candidate/worker/size/clone-pattern profiles release all `ownHeader`
-text when both parsers and clones are dropped.
-
-Six balanced-order samples use the same platform/commit as #10: 100 ms for
-parser/ownership/process/Pipe, 200 requests for TCP. Sizes straddle the bounds;
-original browser/escaped fixtures and alternating sizes/fields are included.
-Pipe uses 1/8/32 workers, queue 1,024, and 1/8 clients; TCP uses 32 workers and
-the same queue/client counts. The original handler and client remain unchanged.
-Smaller blocks regress isolated 68-byte processing **0.97%** (745.6 to 752.85 ns,
-`p=0.026`), and Pipe with one worker/client **0.79%** (`p=0.026`). Their original
-medium-header ownership benchmark regresses **42.01%** after leaving packing.
-Wider packing gives no significant parser/process/Pipe timing gains while
-257-byte B/op rises **18.40%**. Larger blocks improve small ownership alone
-**4.01%**, but regress 704-byte process time **0.75%** and its one-worker/eight-
-client Pipe case **0.97%** (`p=0.024/0.022`). Its real browser case (668 owned
-bytes, rounded to 704 allocated bytes) packs three requests per block and saves
-3.12% B/op, yet parsing regresses **1.61%**; escaped-browser parsing improves
-0.55%. Exact 704-byte requests fit only two per block and instead use 45.45%
-more bytes. These differences argue against tuning only the browser fixture.
-
-Initial TCP samples show several apparent 10–27% gains, including unchanged
-small-request paths. A fresh ten-sample balanced confirmation of the affected
-68/257-byte cases finds every timing difference uncertain (`p>=0.165`). Both
-batches are retained; **no repeatable TCP speedup is established**. No candidate
-has a significant Pipe speedup. Isolated gains do not outweigh allocation,
-retention, and regression costs; retain the current bounds.
-
-Baseline and all three candidates pass `go test -race -count=1 ./... -timeout=2m`,
-both opt-in heap diagnostics under race detection, and both differential parser
-fuzzers for 10 seconds each with eight workers (7,885,176 total executions).
-All completed Pipe/TCP timing runs finish without request errors; the initial
-sandbox-denied TCP bind is recorded separately and rerun with loopback access.
-Reproduction script, raw samples, benchstat, hashes, fractional allocation and
-live-byte tables, regression/uncertainty results, and validation logs are at
-#10's paths. Both tasks retain the existing production implementation.
-
-**Evidence:** SmallGET owns about 68 B and 0.067 blocks/request; browser fields
-own one 704-byte block/request. Escaped browser paths add 184 B and three
-objects through `net/url`. These are real remaining costs, but much smaller
-object targets than the casing workload. Zero reported allocations on the
-implicit GET benchmark is truncation, not zero actual allocations.
-
-**Entry points:** `ownHeader`, `headerTextBlockSize`, `maxSharedHeaderSize`,
-`makeRequest`; `BenchmarkOwnHeader` and escaped-path parser cases.
-
-**Experiment:** only after task 10 establishes clone/worker retention, compare
-small changes to immutable block packing thresholds across request sizes and
-worker counts. Preserve append-only ownership and maximum retained storage.
-Larger blocks must not merely exchange fewer allocation events for excessive
-bytes retained by clones. Keep escaped-path URL parsing on stdlib unless an
-independently measured, narrow simplification justifies changing it.
-
-**Acceptance:** report fractional object events from full allocation profiles,
-bytes/op, live bytes per worker and retained clone, plus isolated and round-trip
-timings. No unsafe mutable-string reuse, new background maintenance goroutines
-or pools. A documented no-change result is valid.
-
-Do not reopen the rejected POST fast path, worker-owned reader or custom header
-serializer merely because their stacks still appear. Tasks 6–8 record why
-their complexity/retention costs were not justified. Client Pipe/watchdog and
-response-parser allocations dominate end-to-end allocation totals; changing
-those is a separately labeled harness experiment.
-
-## Completed first round
-
-Profiled on 2026-10-24 at commit `52a75f80c31b9d2ca3a7eb36e10685d37369687b`,
-Go 1.27.2, Darwin arm64, Apple M3, `GOMAXPROCS=8`. No production or benchmark
-code was changed for this baseline. `go test -race ./...` passed.
-
-The target remains HTTP/1.1 with **one request per connection**. Keep-alive,
-TLS, and HTTP/2 changes would be separate projects. Tasks below are experiments,
-not promises of speedups; keep changes only when correctness and measurements
-support them. Each task includes its entry points and acceptance criteria so
-another agent can implement it without this conversation.
-
-## What the first-round profiles said
-
-Uninstrumented SmallGET medians; parallel ns/op is inverse aggregate throughput,
-not request latency:
-
-| Case | Turbo time/op | Stdlib time/op | Turbo B/op | Stdlib B/op | Turbo allocs/op | Stdlib allocs/op |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| TCP serial | 58.35 µs | 63.55 µs | 3,182.5 | 6,025 | 46 | 75 |
-| TCP parallel, 8 clients | 23.77 µs | 24.23 µs | 3,691 | 6,632 | 46 | 75 |
-| Pipe serial | 5.417 µs | 11.086 µs | 2,724 | 5,885 | 30 | 58 |
-| Pipe parallel, 8 clients | 2.052 µs | 3.057 µs | 2,753 | 5,730 | 30 | 58 |
-
-TCP serial takes 8.2% less time with Turbo (`benchstat p=0.002`, n=10).
-The TCP parallel difference is **not statistically significant** (`p=0.579`).
-Pipe serial takes 51.1% less time; Pipe parallel takes 32.9% less time
-(`p=0.002`, n=6 for both). Pipe includes client parsing, allocations, deadlines,
-and synchronization, so it is not a server-only measurement.
-
-`BenchmarkTurboProcess/SmallGET` isolates parsing, handler execution, response
-serialization, and cleanup: **887 ns/op, 132 B/op, 3 allocs/op**. POST is
-**1,224 ns/op, 1,139 B/op, 14 allocs/op**. The connection in this benchmark
-discards writes and has no socket/dispatch costs. Allocation counts are rounded
-down by Go's benchmark reporting; GET also allocates a header block roughly
-once per 15 requests. Its real average is slightly above three objects.
-
-The allocation reduction is real, but allocations are only part of the work:
-
-- **TCP CPU:** Turbo serial samples are dominated by `syscall.rawsyscalln`
-  (56.5%), `runtime.kevent` (26.9%), and runtime thread wait/wakeup functions.
-  Stdlib shows the same broad pattern (50.8% and 24.8% for the first two).
-  Both sides still dial, accept, read, write, and close a connection per request.
-  These are sampled stack shares on this OS, not an exact wall-time breakdown.
-  The 887 ns isolated benchmark cannot be subtracted directly from TCP latency.
-- **Server-only CPU:** cumulative shares include `Parser.Parse` 27.6%,
-  `parseHeaders` 17.5%, `populateHeaders` 18.9%, `time.Time.Format` 8.4%, and
-  `http.Header.writeSubset` 11.7%. Nested cumulative percentages overlap.
-  The Date expression in `populateHeaders` accounts for 440 ms of 3.59 s
-  sampled, including time lookup, formatting, and setting the header.
-- **Blocking:** Pipe parallel records 782.5 ms waiting to receive from the
-  worker queue, 68.6% of 1.141 s total cumulative blocked goroutine time.
-  TCP parallel similarly attributes 83.5% to worker queue receives.
-  With 32 workers and only 8 clients, this largely represents idle workers,
-  **not evidence that the queue is full or that a lock needs replacing**.
-  In the 128-client Pipe run, 92.0% of blocked time is in `selectgo`, with
-  substantial client dial/request-write and server read stacks. The queue has
-  1,024 slots, so this run does not test a full queue either.
-  Go block profiles measure synchronization waits, not all socket/netpoll waits;
-  use execution traces to attribute network and runnable delays.
-- **GET allocations:** of the isolated process's allocation bytes, about
-  68 B/request comes from immutable request-header blocks, 32 B from Date
-  formatting, and 32 B from the benchmark handler's two `Header.Set` calls.
-  Whole-profile shares including setup are 47.7% `ownHeader`, 22.3% Date, and
-  22.4% `MIMEHeader.Set`. Do not remove handler work to claim a server gain.
-- **POST allocations:** the `http.ReadRequest` fallback accounts for 93.1%
-  of allocation bytes. Header maps, requests, URLs, and body readers dominate.
-- **Harness memory:** in Turbo's full Pipe allocation profile, `net.Pipe`
-  accounts for 50.4% of allocated bytes, response parsing 29.0%, and setting
-  client deadlines 14.2%. Server `process` accounts for only 5.3%.
-  Both implementations retain approximately **25 MiB** after 20,000 requests,
-  mostly pipes and deadline timers; isolated GET retains only about 44 KiB
-  including runtime/testing/pools. Local Go source (`net/pipe.go`) shows
-  `SetDeadline` uses `time.AfterFunc`, while `Close` only closes a channel.
-  Timer-driven retention is the leading explanation, not evidence of a Turbo
-  server leak. Verify with a post-expiry heap snapshot in task 1.
-
-The actual benchmark uses **32 workers and a 1,024-slot queue**, hard-coded in
-`startHTTP11BenchmarkServer`. The existing `benchmarks/README.md` incorrectly
-says both are `GOMAXPROCS`; `-cpu` currently changes clients/CPU capacity only.
-Older allocation reports also predate parser/header reuse and are not current.
-
-## Evidence and reproduction
-
-Local artifacts are in [`benchmarks/current-2026-10-24/`](benchmarks/current-2026-10-24/):
-`collect.py`, `summarize.py`, the matching `turbo.test`, raw `timing-*.txt`,
-`timing-summary.json`, `pipe-comparison.txt`, `tcp-comparison.txt`, and
-23 successful `.pprof` files with text summaries. This directory and profile
-binaries are ignored by the existing `.gitignore`; the essential findings and
-reproduction commands are therefore included here for agents on fresh checkouts.
-
-Timing runs were sequential, without profiling/race instrumentation:
-
-```sh
-GOMAXPROCS=8 go test -run '^$' -bench '^(BenchmarkTurboProcess|BenchmarkResponseWriter)$' -benchmem -benchtime=200ms -count=6 .
-GOMAXPROCS=8 go test -run '^$' -bench '^BenchmarkHTTP11NoKeepAlive$/^Pipe$/' -benchmem -benchtime=200ms -count=6 .
-GOMAXPROCS=8 go test -run '^$' -bench '^BenchmarkHTTP11NoKeepAlive$/^TCP$/^SmallGET$/' -benchmem -benchtime=200x -count=10 .
-GOMAXPROCS=8 go test -run '^$' -bench '^BenchmarkHTTP11Accept$' -benchmem -benchtime=200x -count=6 .
-```
-
-The recorded runs invoke a compiled test binary with equivalent `-test.*`
-flags. Fixed-count TCP samples include more setup/pool warmup per request than
-the longer Pipe runs. Do not compare their allocation counts as equivalent
-steady-state measurements. Do not run benchmarks concurrently with other work.
-
-Collect each profile separately from timing and from other profile types:
-
-```sh
-mkdir -p /tmp/turbo-profile
-go test -c -o /tmp/turbo-profile/turbo.test .
-GOMAXPROCS=8 /tmp/turbo-profile/turbo.test -test.run '^$' -test.bench '^BenchmarkTurboProcess$/^SmallGET$' -test.benchtime=3s -test.cpuprofile=/tmp/turbo-profile/get-cpu.pprof
-GOMAXPROCS=8 /tmp/turbo-profile/turbo.test -test.run '^$' -test.bench '^BenchmarkTurboProcess$/^SmallGET$' -test.benchtime=20000x -test.memprofilerate=1 -test.memprofile=/tmp/turbo-profile/get-memory.pprof
-GOMAXPROCS=8 /tmp/turbo-profile/turbo.test -test.run '^$' -test.bench '^BenchmarkHTTP11NoKeepAlive$/^Pipe$/^SmallGET$/^Parallel$/^Turbo$' -test.benchtime=10000x -test.blockprofilerate=1 -test.blockprofile=/tmp/turbo-profile/pipe-block.pprof
-go tool pprof -top /tmp/turbo-profile/turbo.test /tmp/turbo-profile/get-cpu.pprof
-go tool pprof -top -alloc_space /tmp/turbo-profile/turbo.test /tmp/turbo-profile/get-memory.pprof
-go tool pprof -top -alloc_objects /tmp/turbo-profile/turbo.test /tmp/turbo-profile/get-memory.pprof
-go tool pprof -top -inuse_space /tmp/turbo-profile/turbo.test /tmp/turbo-profile/get-memory.pprof
-go tool pprof -top -sample_index=delay /tmp/turbo-profile/turbo.test /tmp/turbo-profile/pipe-block.pprof
-go tool pprof -top -sample_index=contentions /tmp/turbo-profile/turbo.test /tmp/turbo-profile/pipe-block.pprof
-```
-
-Coverage collected: CPU for isolated GET/POST and SmallGET across
-Pipe/TCP × serial/parallel × Turbo/Stdlib; full-allocation sampling for isolated
-GET/POST and Pipe serial Turbo/Stdlib; blocking for all eight round-trip cases
-plus Pipe `BenchmarkHTTP11Accept/Parallel16` (128 clients).
-CPU runs used 3 s, except TCP parallel retries used `10000x -count=3`.
-Block runs used 10,000 requests for Pipe and 2,000 for TCP; memory runs used
-20,000 requests. Profiles include calibration/setup/cleanup, unlike benchmark
-timers. Raw cumulative totals cannot be compared across different run lengths.
-
-A 3 s TCP parallel Turbo CPU run failed with eight read timeouts after longer
-serial TCP runs. Its log is `cpu-tcp-parallel-turbo-failed.txt`, and its profile
-has suffix `.pprof.failed`; neither is used for conclusions. Bounded retries
-passed. This does not establish whether TCP churn, scheduling, or a server
-problem caused the failure. Investigate it in task 4; do not silently increase
-timeouts or claim all sustained-load runs passed.
-
-## Tasks
-
-### 1. [x] P0 — Remove Pipe deadline retention from the measurement harness
-
-**Completed 2026-10-24.** Pipe now owns one 10 s watchdog per fresh connection,
-starting before the listener handoff. Closing the connection stops its timer
-and joins an already-running callback; successful requests create no watchdog
-goroutine. Expiry closes the Pipe and returns a timeout error, including during
-dial or the required EOF check. TCP retains its 5 s dial timeout and native
-10 s I/O deadline. Error cleanup closes the connection before closing an
-unread response body, then releases the response reader's connection reference.
-The watchdog costs a wrapper, channel, callback and timer (about 288 B and four
-objects per connection), replacing the old Pipe deadline timers/closures.
-
-Fresh before/after runs used this document's base commit/toolchain/CPU,
-32 workers, queue 1,024, and 1/8 clients at `GOMAXPROCS=8`. After 20,000 GETs,
-forced-GC live heaps with the servers still running changed from **25.528 to
-0.441 MiB (Turbo)** and **25.658 to 0.462 MiB (stdlib)**. Stopping the old servers
-left 25.420/25.654 MiB with only two goroutines, separating the retention from
-worker storage. After deadline expiry these fell to 1.017/1.239 MiB and the
-Pipe allocations disappeared from the heap profiles; residual runtime timer
-and callback storage remained. Revised heaps after shutdown were 0.333/0.456 MiB
-and stayed at approximately those levels after expiry. Turbo idle worker/queue
-allocation stacks are tens of KiB, not the approximately 25 MiB of old Pipe/timer
-retention. Full allocation-byte/object profiles were collected separately.
-
-The full Pipe timing matrix (six workloads × serial/parallel × both servers,
-six 200 ms samples each) is retained alongside the original samples. SmallGET
-serial medians changed from 5.490 to 5.017 µs for Turbo and 11.126 to 10.528 µs
-for stdlib (`p=0.002` each); parallel changes were not significant. SmallGET
-remains 30/58 allocs/op. Some parallel cases regress: Turbo LargeGET by 3.2%,
-and stdlib ImplicitGET/LargeGET/POST/Empty by 6.2–10.7%. Several B/op values rise.
-These mixed results establish a **new harness baseline**, not a production
-Turbo optimization. Use the same revised harness for future comparisons.
-
-`go test -race -count=1 ./... -timeout=2m` passed, including TCP/Pipe contract
-coverage. New tests exercise stalled dial/write/header/body/EOF, malformed and
-rejected responses, error cleanup, listener closure, and concurrent close/expiry.
-Detailed costs, all timing/B/op/allocation samples, benchstat, heap counters,
-profile summaries, binary hashes and collection scripts are in
-[`testdata/pipe-timeouts/`](testdata/pipe-timeouts/README.md). That directory and
-binary profiles are locally retained and ignored; essential results are above.
-The original `benchmarks/current-2026-10-24/` baseline was preserved.
-
-The opt-in `TestHTTP11PipeHeap` diagnostic is in the source tree. It collects
-initial/idle/completed/stopped/post-expiry snapshots, with two forced GCs per
-snapshot. Run each implementation in a separate process (use a separate output
-directory and change `Turbo` to `Stdlib` for the second run):
-
-```sh
-TURBO_PIPE_PROFILE_DIR=/tmp/turbo-pipe-heap TURBO_PIPE_PROFILE_SERVER=Turbo GOMAXPROCS=8 go test -run '^TestHTTP11PipeHeap$' -memprofilerate=1 -timeout=1m .
-GOMAXPROCS=8 go test -run '^$' -bench '^BenchmarkHTTP11NoKeepAlive$/^Pipe$/' -benchmem -benchtime=200ms -count=6 .
-```
-
-**Entry points:** `http11BenchmarkClient.roundTrip`,
-`newHTTP11BenchmarkListener`, `http11PipeListener` in `http11_benchmark_test.go`;
-the local Go toolchain's `src/net/pipe.go`.
-
-**Work:** reproduce the approximately 25 MiB retained heap in both servers,
-then take a forced-GC snapshot after the 10 s deadlines expire. Attribute
-timer/pipe retention separately from worker storage. Introduce a bounded Pipe
-timeout/watchdog mechanism whose timers and goroutines stop on completion and
-failure, while preserving fresh connections, EOF checks, and identical client
-work for both servers. A deferred `SetDeadline(time.Time{})` after EOF is not a
-sufficient fix: `net.Pipe` rejects deadline changes after either end closes.
-Keep TCP and Pipe timeout implementations explicit and document their costs.
-
-**Validation/done:** exercise normal completion, stalled peers, and errors;
-show before/after retained heaps and allocation profiles, including after
-deadline expiry. Rerun the full Pipe timing matrix and retain the original
-baseline. Label improvements as harness changes, not Turbo optimizations.
-Preserve `TestHTTP11BenchmarkContract` and bounded test completion.
-
-**Dependencies:** none. Establish the revised Pipe baseline before judging
-the end-to-end effect of other tasks. Server-only work can use this baseline
-independently. Coordinate benchmark-file edits with task 4.
-
-### 2. [x] P1 — Combine response headers and the first body write
-
-**Completed 2026-10-24.** First body writes are appended to the worker's
-serialized header buffer when the total is at most 4 KiB, then sent
-immediately. Later writes, oversized first writes/headers, HEAD, and bodyless
-statuses keep their existing paths. A 64 KiB body is never copied into the
-buffer. The existing 16 KiB retention limit/reset remains; no new fields or
-handler-return buffering were introduced. Counting connections verify one
-write instead of two for SmallGET/ImplicitGET/POST and four instead of five
-for the new four-chunk StreamGET workload. Partial writes count body bytes
-only and preserve sticky errors. Go's local `net.Buffers` implementation uses
-`writev` for TCP but separate writes for Pipe; bounded copying supports both.
-
-Before/after measurements use base commit `f8a9868`, Go 1.27.2, Darwin arm64,
-Apple M3, `GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients, with task 1's
-revised Pipe harness identical in both binaries. Both an initial sequential
-matrix and an alternating-order confirmation used ten samples per case:
-200 ms for isolated/Pipe and 200 requests for bounded TCP. Confirmation Pipe
-SmallGET serial changes from **5.177 to 5.060 µs** (-2.27%, `p=0.001`),
-ImplicitGET serial/parallel improves 1.79/5.02%, POST 9.67/5.83%, and StreamGET
-6.09/4.60%. These gains also appeared in the initial matrix. SmallGET parallel
-confirmation is uncertain (`p=0.052`); LargeGET, HEAD, Empty, and all isolated
-timing changes are not significant. Small initial isolated regressions and
-0.94/1.00% Pipe LargeGET/HEAD serial regressions did not reproduce as
-significant differences in the alternating run.
-
-Initial TCP SmallGET gains of 4.74/5.51% did not repeat significantly in the
-noisy confirmation matrix; **no TCP speedup is established**. Initial TCP
-HEAD/Empty regressions also did not reproduce significantly. Isolated
-SmallGET remains **132 B/op, 3 allocs/op**, with no isolated allocation changes
-for any workload. Pipe object counts are unchanged. Short TCP samples include
-larger worker-buffer warmup costs: SmallGET serial rises 62 B/op (+1.94%) and
-parallel reports 46 to 47 allocs/op; all costs and uncertain results are
-retained. Acceptance rests on repeated Pipe round-trip gains, verified prompt
-streaming, and no demonstrated material large-body regression.
-
-`go test -race -count=1 ./... -timeout=2m` passed, including committed headers,
-informational/bodyless responses, content sniffing, length enforcement,
-partial-write boundaries, reset bounds, and gated streaming over TCP/Pipe.
-Tracked raw samples, all ns/op/B/op/object medians, benchstat, metadata,
-profile summaries, and reproduction scripts are in
-[`performance/response-coalescing/`](performance/response-coalescing/README.md).
-
-**Entry points:** `response_writer.go`: `Write`, `writeHeader`, `writeBody`,
-`recordWriteResult`, `reset`; `Turbo.process` in `turbo.go`.
-
-**Evidence:** nonempty responses currently call `net.Conn.Write` once for
-headers and again for body. Stdlib buffers small responses. TCP samples include
-both write stacks; each `net.Pipe.Write` also requires synchronous exchanges.
-
-**Work:** prototype bounded coalescing of serialized headers with a small first
-body chunk, using worker-owned storage. Compare with `net.Buffers` for TCP if
-appropriate; check the actual connection type's implementation rather than
-assuming scatter/gather gives one syscall for every `net.Conn`. Avoid copying
-entire 64 KiB bodies. A first-write optimization should retain prompt streaming;
-buffering until handler return needs a separate behavioral decision.
-
-**Validation/done:** add a counting connection to verify fewer underlying writes
-for SmallGET and correct wire bytes. Preserve committed-header snapshots,
-informational responses, HEAD, 204/304, content sniffing, empty handlers,
-Content-Length enforcement, sticky errors, and partial writes spanning the
-header/body boundary. `Write` must report body bytes, not header bytes.
-Keep buffer retention bounded and reset all new fields. Run response-writer and
-process tests plus race tests; compare SmallGET, ImplicitGET, LargeGET, HEAD,
-POST, and multi-write streaming in isolated, Pipe, and bounded TCP benchmarks.
-Accept only with a repeatable end-to-end gain and no material streaming or
-large-body regression.
-
-**Dependencies:** none for implementation; use task 1's revised Pipe baseline
-when available. Coordinate `response_writer.go` edits with tasks 3 and 6.
-
-### 3. [x] P1 — Cache formatted HTTP Date at one-second resolution
-
-**Completed 2026-10-25.** Each response writer retains a Unix second and an
-immutable formatted Date string across `reset`. `populateHeaders` still reads
-the clock on every response, but formats only on first use or when the second
-differs, including backward changes. The empty-string sentinel handles Unix
-second zero. The cache adds 24 bytes per worker on arm64, with no shared state,
-locks, ticker, or background goroutine. Handler Date overrides and nil/empty
-suppression still apply to the current response and are restored to the cached
-default on reuse. Header value slices remain independently owned.
-
-Measurements compare base commit `45364e7d1c6c0b1cf71211d5f2b8ae4bfb0d8a8d`
-against this change with the identical harness, Go 1.27.2, Darwin arm64,
-Apple M3, `GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients. Ten
-alternating-order samples per case use 200 ms for isolated/Pipe and 200
-requests for bounded TCP. SmallGET isolated improves **918.25 to 791 ns/op**
-(-13.86%, `p<0.001`), **132 to 100 B/op**, and **3 to 2 allocs/op**. All seven
-isolated workloads save 32 B and one reported object; their time improves
-8.00–13.86%. ResponseWriter final/informational improves 17.26/15.44% and
-48 to 16 B/op. Rounded object counts do not imply allocation-free requests.
-
-Pipe SmallGET serial/parallel improves **2.54/1.74%** (`p=0.017/<0.001`),
-with one fewer reported object in every Pipe case. Other significant Pipe
-gains range from 1.76–3.66%; ImplicitGET, LargeGET parallel, POST parallel,
-and StreamGET serial are uncertain. There are no significant timing
-regressions in the matrix. All TCP timing differences are uncertain,
-including HEAD/Empty parallel increases of 4.88/9.54%; no TCP speedup is
-established. Short TCP samples include per-worker cache initialization and
-other warmup costs. All timing/profile TCP requests completed without errors.
-
-Separate 20,000-request allocation profiles reduce `time.Time.Format` from
-20,003 allocations (625.09 KiB) to two (64 bytes, setup), confirming that
-formatting no longer allocates per request. CPU profiles cover isolated GET
-and full SmallGET round trips over Pipe/TCP, serial/parallel. The isolated
-Date expression's sampled share drops from 11.33% to 5.29%, while clock and
-map work remain; full round-trip profiles are dominated by synchronization
-and system calls. `go test -race -count=1 ./... -timeout=2m` passed with
-loopback enabled. Deterministic helper tests cover same-second hits, rollover,
-backward time, epoch initialization, UTC output, immutable prior values, and
-reset reuse; parallel override tests cover suppression and committed headers.
-Raw samples, benchstat, metadata, profile summaries, and reproduction scripts
-are tracked in [`performance/http-date-cache/`](performance/http-date-cache/README.md).
-
-**Entry points:** `responseWriter.populateHeaders`, `populateHeader`, `reset`
-in `response_writer.go`; `BenchmarkResponseWriter` and `BenchmarkTurboProcess`.
-
-**Evidence:** Date formatting costs 32 B/request, one allocation, and 8.4% of
-the isolated GET CPU samples; the full Date expression accounts for 12.3%.
-The same formatted string is recomputed even when the second has not changed.
-
-**Work:** prototype a worker-local cached Unix second and immutable formatted
-string, retaining that cache across `reset`. Compare to an immutable shared
-cache only if measurements justify its synchronization cost. Reformat when
-the second differs, including backward clock changes. Avoid a background
-goroutine/ticker unless lifecycle and contention are justified.
-
-**Validation/done:** use a controllable clock/helper to test repeated calls
-within a second, rollover, backward time, and worker reuse. Preserve handler
-overrides and nil Date suppression, and ensure an override on one response
-does not affect the next. Run parallel race checks. Demonstrate removal of the
-per-request Format allocation and compare isolated plus full round-trip CPU
-and timings. Expect roughly 32 B/request savings; any TCP speedup may be small.
-
-**Dependencies:** independent of task 2's write strategy; coordinate edits.
-
-### 4. [x] P1 — Measure and tune worker dispatch, and diagnose sustained TCP timeouts
-
-**Completed 2026-10-28, with no production dispatch change.**
-`BenchmarkHTTP11Accept` now independently names workers 1/8/32, queue capacity
-0/8/32/1,024 and clients 1/8/32/128. The full TCP/Pipe sweep has six samples per
-configuration at `GOMAXPROCS=8`, plus selected fixed-client `-cpu=1,4,8` cases.
-The same revised Pipe harness and compiled binary are used throughout,
-at base commit `ca70fcb42db2182812708350c8a3546bce8809e1`, Go 1.27.2,
-Darwin arm64, Apple M3. Documentation now explains the independent parameters,
-legacy client scaling, timeout costs and throughput/latency distinction.
-
-An eight-worker/unbuffered candidate initially improves Pipe at 128 clients
-by 5.73% (`p=0.002`, n=6), but its benefit does not repeat in an alternating
-confirmation: Pipe at 8/128 clients has `p=1.000/0.937`, TCP `p=0.132/0.818`.
-One worker materially regresses concurrent Pipe throughput. Instrumented
-latency/live-heap tables cover all 96 configurations separately from timing;
-36 slow-client/handler runs demonstrate saturation and its costs. Pipe slow
-handlers with 128 clients and queue 1,024 reach p95 142.84/17.56/4.29 ms at
-1/8/32 workers. Fewer workers save idle memory but reduce blocking-handler
-capacity; no broadly justified configuration or dispatch replacement emerged.
-
-Five short traces distinguish empty receives, blocked sends, runnable delay,
-accept and network wait. With 32 workers/eight clients the sampled queue stays
-empty and receives account for 81.21 ms of 100.39 ms synchronization wait.
-With one worker/eight slots/slow handlers, the queue reaches eight and the
-listener blocks on sends for 545.78 ms of a 562.97 ms load interval. These
-cumulative trace delays are not wall-time percentages or latency estimates.
-
-The sustained TCP timeout reproduces in **both implementations**. Three
-rounds reverse run order and test a 15 s pause, retaining failed CPU-profile
-retries and diagnostic state. All six bounded 10,000-request runs pass;
-three of six 3 s and all six 10 s diagnostic runs fail, totaling 72 EOF read
-timeouts after successful response validation. Failure captures show all
-accepted connections already closed, empty Turbo queues, idle workers,
-server sockets in `FIN_WAIT_1` and clients still `ESTABLISHED`. This locates
-the reproduced stall at TCP teardown, not pending dispatch. Port exhaustion
-and the precise kernel/packet mechanism remain unproven. Separate 35 s
-cooldowns without preceding serial churn allow both 3 s and both 10 s runs
-to pass; churn history matters, but sustained reliability is not established.
-No deadlines, EOF checks or socket settings were weakened.
-
-`go test -race -count=1 ./... -timeout=2m` passes, including existing worker,
-close, protocol and lifecycle tests. New deterministic full-queue coverage
-checks blocked-send shutdown, drain, malformed work and exactly-once close;
-the opt-in study also runs under race detection. Reproduction scripts, raw
-samples, benchstat, all configuration/latency/memory tables, trace summaries,
-request/connection counters and preserved failure captures are tracked in
-[`performance/worker-dispatch/`](performance/worker-dispatch/README.md).
-
-**Entry points:** `startHTTP11BenchmarkServer`, `BenchmarkHTTP11Accept`,
-`benchmarkHTTP11` in `http11_benchmark_test.go`; `newTurbo`, `listen`, `work`,
-`Close` in `turbo.go`. Current setup: 32 workers, queue 1,024.
-
-**Work:** expose workers, queue capacity, and client count as independently
-named benchmark parameters. Sweep workers 1/8/32, queue 0/8/32/1,024, and
-clients 1/8/32/128 at fixed `GOMAXPROCS`, then selected `-cpu=1,4,8` cases.
-Correct benchmark documentation. Use short traces to distinguish empty-queue
-receives, blocked sends, runnable delay, accept, and network wait. Add slow
-clients/handlers and a deliberately full queue to measure backpressure and
-tail latency. Current `ns/op` is throughput and cannot provide p95 latency.
-
-Reproduce the failed 3 s TCP parallel profile with bounded and sustained runs
-for both implementations, recording connection counts, errors, and socket/
-goroutine state on failure. Test run order/cooldown as possible factors; do
-not assume port exhaustion from a read timeout alone. Keep failure evidence.
-
-Only after this evidence, compare fewer workers, worker-local readers, or a
-dispatch alternative. A larger queue or more workers is not automatically
-faster. The high receive-side block percentage by itself is not a bottleneck.
-
-**Validation/done:** provide a throughput/latency/memory configuration table,
-a trace-supported diagnosis, and either a measured configuration/dispatch
-improvement or an explicit no-change conclusion. Preserve graceful queue
-drain, exactly-once connection close, malformed-request handling, and
-`TestTurboWorkers`/`TestTurboClose`. Run race tests for any code change.
-
-**Dependencies:** coordinate benchmark infrastructure with task 1; rebaseline
-after its harness changes. Avoid changing public defaults from one microbenchmark.
-
-### 5. [x] P1 — Reduce repeated work in the GET/HEAD header parser
-
-**Completed 2026-10-28.** Canonical/lowercase Host, Connection, and
-Content-Length names use validated constants. General canonical names combine
-token validation and casing checks in one scan; uncommon casing retains the
-standard canonicalizer after validation. Host avoids a redundant map lookup.
-Reused value arrays skip the full newline pre-scan and count remaining fields
-only on growth. Growth excludes a pending Host, preserving reuse at the
-128-value bound even with Host last. Capped value slices, reset bounds,
-immutable 1 KiB string blocks, and fallback without consuming input remain.
-No parser fields, shared state, or supported request forms were added.
-
-Measurements compare base commit `214bf58eca07af9b18edb6ba314a7d50d82e5c64`
-with identical expanded harnesses, Go 1.27.2, Darwin arm64, Apple M3,
-`GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients. Ten alternating-order
-samples use 200 ms for parser/process/Pipe and bounded 200-request TCP runs.
-Reused SmallGET parsing improves **361.1 to 290.35 ns (-19.59%)**, lowercase
-SmallGET 29.11%, the six-field set 13.39%, a 19-field browser set 9.87%, and
-escaped HEAD/browser headers 8.68% (`p<0.001` each). Larger lowercase/mixed-case
-sets improve 5.86/1.95%. Every parser/storage benchmark preserves B/op and
-objects, including SmallGET's 68 B/op in immutable blocks; its reported zero
-objects is rounded down. POST/chunked fallback parser timings are uncertain.
-
-Isolated SmallGET processing improves **834.4 to 762.8 ns (-8.58%)**, staying
-at **100 B/op, two objects**. All six original GET/HEAD process cases improve
-8.02–9.28%; browser and escaped HEAD/browser processing improve 7.66/6.86%,
-with unchanged allocation counts/bytes. The unchanged POST parser path's small
-0.75% process decrease does not establish a POST parsing optimization. Pipe
-SmallGET/HEAD serial improves 6.38/2.60% (`p<0.001`); parallel changes are
-uncertain. Every TCP timing/allocation change is uncertain, including a 3.40%
-SmallGET parallel median time increase. No TCP speedup is established. All
-final timing runs complete without request errors; the matrix has no significant
-timing or allocation regressions.
-
-Separate CPU profiles show `parseHeaders`' cumulative sampled share changing
-from 44.64 to 40.79% in reused SmallGET parsing, 42.40 to 35.34% for browser
-parsing, and 20.38 to 10.96% for SmallGET processing. Browser processing's
-share is approximately unchanged (36.29/36.00%); cumulative shares overlap
-and are not exact per-request costs. Full allocation profiles confirm identical
-`ownHeader` storage: 1,335 blocks for 20,000 SmallGETs and 20,001 owned strings
-for browser headers, including setup. Handler header allocations remain.
-
-`go test -race -count=1 ./... -timeout=2m` passes with loopback access. Both
-differential fuzzers pass 30 s runs with eight workers (2,430,840 parse and
-2,509,409 reuse cases). New tests cover all 256 bytes at key/value boundaries,
-mixed casing and duplicate framing fields, fragmentation and late fallback,
-handler appends, clone retention across growth, and retained-capacity limits.
-They also pass against the baseline parser. Raw samples, all medians,
-benchstat, metadata, profile summaries and reproduction instructions are in
-[`request/performance/get-head-parser/`](request/performance/get-head-parser/README.md).
-
-**Entry points:** `request/request.go`: `parseHeaders`, `canonicalHeaderKey`,
-`validValue`, `headerStorage`, `ownHeader`, `Parser.Reset`;
-`BenchmarkParse`/`BenchmarkOwnHeader` in `request/request_test.go`.
-
-**Evidence:** `parseHeaders` is 17.5% of isolated GET CPU. It counts newlines,
-splits fields, validates keys, calls canonicalization (which also validates),
-trims values, and performs map lookups for every header.
-
-**Work:** benchmark narrowly scoped changes: a validated common-header path
-for Host/Connection/Content-Length, avoiding duplicate token scans, and using
-retained value capacity without a full newline pre-scan when possible. Keep a
-general fallback for uncommon casing and fields. Measure realistic larger
-header sets and escaped paths, not just the three-header benchmark request.
-
-**Validation/done:** preserve exact request/error/body behavior relative to
-`http.ReadRequest` through the existing differential tests and both fuzzers.
-Cover mixed casing, duplicate Host/Content-Length, invalid tokens/values,
-fragmentation, fallback after partially parsed headers, and handler mutation.
-Keep header slices capped and owned strings immutable: `Request.Clone` is
-shallow for strings and must remain safe across worker reuse. The 1 KiB
-header blocks already amortize allocations; never reuse mutable string backing
-storage to claim zero allocations. Preserve retained-capacity bounds.
-Show parser and process CPU/time improvements without allocation regressions.
-
-**Dependencies:** coordinate parser edits with tasks 7 and 8. Does not require
-a change to supported request forms.
-
-### 6. [x] P2 — Reduce response header-map and serialization work
-
-**Completed 2026-10-28.** `populateHeaders` saves the current Connection and
-Date slices, clears the existing map in place, and restores defaults through
-the existing helper. Matching slices remain reusable; changed or aliased
-handler values are replaced without overwriting their backing arrays. There
-are no new worker fields or scratch buffers. Header commitment, Date caching,
-framing and the 16 KiB serialized-buffer retention bound remain unchanged.
-
-`Header.WriteSubset` is retained. A separate serializer prototype rebuilds
-sorted worker-local key/value scratch on every commitment, clears references
-immediately, caps scratch at 64 fields and delegates larger maps to stdlib.
-Six balanced-order samples compare original, reset-only, serializer-only and
-combined binaries. Serialization alone improves isolated SmallGET by 4.07%
-(`p=0.026`) but its SmallGET Pipe changes are uncertain. Adding it to map
-clearing has no significant difference in any of four sampled Pipe cases
-(`p>=0.132`); the extra protocol code and retained storage are not justified.
-The prototype passes exact-byte differential tests and the full race suite.
-
-Final measurements compare base commit `0b60ce0beeb0767415bfdf0106128482c7c3f15a`
-with identical original/expanded harnesses, Go 1.27.2, Darwin arm64, Apple M3,
-`GOMAXPROCS=8`, 32 workers, queue 1,024, and 1/8 clients. Ten alternating-order
-samples use 200 ms for isolated/Pipe and bounded 200-request TCP cases. The
-original handlers, including both Header.Set allocations, are unchanged.
-Isolated SmallGET improves **753.25 to 709.95 ns (-5.75%, `p=0.005`)** and
-stays **100 B/op, two objects**. Other original isolated workloads improve
-1.88–6.19%, except ImplicitGET's uncertain +0.94%. Adding 8/32/128 response
-headers improves isolated time 11.17/5.81/9.56%, with unchanged object counts.
-
-Pipe SmallGET serial improves **4.7125 to 4.5205 µs (-4.07%, `p=0.001`)**;
-its parallel difference is uncertain. HEAD/LargeGET serial improve 4.04/1.80%.
-With 32 extra response headers, Pipe serial/parallel improves 5.69/3.35%;
-128 extra headers improves 6.32/6.25%. Pipe ImplicitGET parallel regresses
-**0.87% (`p=0.037`)**. Pipe object counts are unchanged; 32-extra-header serial
-B/op rises 9 B (+0.12%) and 128-extra-header serial falls 22 B (-0.08%).
-Every TCP timing/allocation change is uncertain, including large parallel
-median increases; **no TCP speedup is established**. All final timing runs
-complete without errors. This small reset change accepts the recorded
-default-only cost in exchange for repeated SmallGET and larger-map gains.
-
-Separate SmallGET CPU profiles attribute 10.70/10.20% cumulative sampled CPU
-to `populateHeaders` before/after; 32-extra-header profiles show 10.96/2.07%.
-Shares overlap and are not exact request costs. Allocation profiles preserve
-the handler's two value-slice allocations. `go test -race -count=1 ./...
--timeout=2m` passes with loopback access. New tests cover all key/value bytes,
-invalid names, sanitization, multiple/nil values, exact-key exclusions,
-informational/bodyless statuses, small/large maps, retained clones, default
-aliasing, map/slice reuse, and the serialized-buffer bound. Existing snapshot,
-streaming, lifecycle and framing tests pass.
-
-Raw samples, benchstat reports, all medians, source/binary hashes, prototype
-source, profile summaries and reproduction scripts are locally retained in
-[`performance/response-headers/`](performance/response-headers/README.md),
-ignored by the existing `/performance` rule. Binaries/raw profiles are in
-`/tmp/turbo-response-headers`. To reproduce on a fresh checkout, archive the
-base commit there, copy `response_headers_benchmark_test.go` into it, and
-compile baseline/current tests with `go test -c`. Use `GOMAXPROCS=8`,
-`-run '^$' -bench '^(BenchmarkTurboProcess|BenchmarkResponseWriter|BenchmarkTurboProcessResponseHeaders)$' -benchmem -benchtime=200ms -count=10`
-for isolated measurements; use
-`-bench '^BenchmarkHTTP11NoKeepAlive$/^Pipe$/.*/.*/^Turbo$|^BenchmarkHTTP11ResponseHeaders$/^Pipe$/'`
-for Pipe, and replace Pipe with TCP plus `-benchtime=200x` for bounded TCP.
-Alternate before/after binary order, and collect profiles separately.
-
-**Entry points:** `response_writer.go`: `populateHeaders`, `prepareHeader`,
-`headerExclusions`, `appendFramingHeaders`; local `net/http/header.go`.
-
-**Evidence:** `Header.writeSubset` accounts for 11.7% of isolated GET CPU,
-including 7.5% in `sortedKeyValues`. `populateHeaders` also walks/deletes map
-entries on every request. Existing buffer reuse has already removed most
-serialization allocations, so fewer allocations alone is not the goal.
-
-**Work:** profile after task 3; compare default-header handling and a reusable
-serialization scratch structure against `Header.WriteSubset`. Limit scope to
-demonstrated hot work. Direct handler access to `http.Header` means the server
-cannot assume a previously serialized map is unchanged or intercept `Header.Set`.
-Keep the benchmark handler identical; its two value-slice allocations belong
-to the handler and must not disappear through benchmark-only changes.
-
-**Validation/done:** preserve invalid-name handling, CR/LF sanitization,
-multi-value headers, nil suppression, framing exclusions, informational and
-bodyless statuses, and snapshot-at-WriteHeader behavior. Test small and large
-maps and bound retained scratch memory. Run all response-writer tests and
-compare isolated plus end-to-end timings. Retain `WriteSubset` if a replacement
-cannot justify its maintenance and correctness cost with a measurable gain.
-
-**Dependencies:** implement after/rebase onto tasks 2 and 3 to avoid overlapping
-writer changes and to profile the remaining bottleneck.
-
-### 7. [x] P2 — Extend storage reuse to a narrowly defined POST fast path
-
-**Completed 2026-10-28 — no improvement retained.** The POST storage-reuse
-prototype was evaluated and reverted. Isolated POST gains came with extra
-framing/body-lifecycle code and measurable costs on fallback and GET paths;
-the tradeoff was not accepted. The existing `http.ReadRequest` POST path is
-retained, with no implementation, test, or benchmark changes for this task.
-No TCP improvement was established.
-
-**Entry points:** `request.parse`, `parseBuffered`, `Parser` in
-`request/request.go`; `Turbo.process`/`finishRequest` in `turbo.go`;
-`TestTurboRequestBodyLifecycle`, parser differential tests and fuzzers.
-
-**Evidence:** every POST currently falls back to `http.ReadRequest`; it accounts
-for 93.1% of isolated POST allocated bytes. POST remains 14 allocs/op and
-1,139 B/op versus GET's approximately 3 and 132.
-
-**Work:** first add focused parser/body lifecycle benchmarks. Prototype reuse
-for complete, validated HTTP/1.1 POST headers with a single valid Content-Length
-and a reusable bounded body reader. The body must stream beyond bytes already
-buffered. Keep chunked encoding, ambiguous/duplicate lengths, upgrades, and
-other unsupported forms on the existing stdlib fallback without consuming
-input before deciding to fall back. Do not expand scope to a complete HTTP
-parser rewrite or change rejection semantics to make the fast path simpler.
-
-**Validation/done:** differential tests must cover zero/large/truncated bodies,
-length overflow/signs, Transfer-Encoding precedence, duplicate fields, and
-fragmented headers. Preserve original-body cleanup when handlers replace
-`req.Body`; close the connection before closing an unread body to avoid hangs.
-Preserve `ErrBodyReadAfterClose`, clone/lifetime contracts, and worker reset.
-Run parser fuzzers, lifecycle/race tests, and POST process/Pipe/TCP benchmarks.
-Accept only if workload gains justify the extra protocol implementation.
-
-**Dependencies:** rebase onto task 5; higher protocol risk than Date or writes.
-
-### 8. [x] P3 — Evaluate worker-owned readers and redundant reset costs
-
-**Completed 2026-10-28 — no production change retained.** Independently
-evaluated lazy worker-owned readers and a private parser lifecycle flag that
-skips repeated clearing while preserving automatic public reset. Measurements
-use base commit `c9533b0fa6efa5e4627bda147e435a871d953ad9`, Go 1.27.2,
-Darwin arm64, Apple M3 and `GOMAXPROCS=8`. Identical harnesses compare each
-candidate with a pooled-reader/original-reset baseline; a separate unchanged
-source control finds no significant timing effect from the common internal
-signature adjustment. No combined candidate was measured.
-
-Ten balanced-order samples cover all isolated/Pipe workloads, browser/escaped
-headers, bounded TCP GET/HEAD/POST, and task 4's Pipe matrix with workers
-1/8/32, queues 0/1024 and clients 1/8/128. Worker-owned readers improve isolated
-SmallGET **735.0 to 729.55 ns (-0.74%)**, with **100 B/op and two objects**
-unchanged. Initial small LargeGET and high-client round-trip gains do not
-repeat significantly in a separate ten-sample confirmation. Confirmation
-SmallGET Pipe serial regresses **0.69% (`p=0.037`)**; eight workers/queue 1024/
-one client regresses **1.07% (`p=0.007`)**. Every TCP timing difference is
-uncertain. Bounded TCP SmallGET serial B/op rises **18.53%**, reflecting
-per-worker reader warmup; no TCP improvement is established.
-
-Forced-GC profiles with 1/8/32 workers cover cold idle, all workers active,
-warm idle and shutdown. Neither reader strategy allocates buffers before use.
-Both own **131 KiB** of readers/buffers with 32 active workers; only the
-worker-owned candidate retains those 32 pairs after becoming idle and forcing
-two GCs. Both release them at shutdown. The reset flag produces only small
-isolated gains in some workloads, uncertain SmallGET/public-parser timings,
-and no significant default Pipe round-trip gains. Neither tradeoff is accepted.
-
-The baseline and both prototypes pass `go test -race -count=1 ./...
--timeout=2m`, including lifecycle, failure, retained-clone and concurrent-worker
-tests. All three opt-in heap diagnostics pass under race detection. The reset
-prototype passes both differential fuzzers for 30 s each (4,067,404 parse and
-3,196,824 reuse executions). The final repository race suite also passes.
-Reproduction scripts, prototype patches, raw samples, all ns/op/B/op/object
-medians, benchstat reports, source/binary hashes, CPU/allocation summaries and
-worker heap evidence are locally retained in
-[`experiments/worker-lifecycle/`](experiments/worker-lifecycle/README.md).
-That directory is ignored by the `/experiments` rule; the essential results
-and measurement configuration are recorded above.
-
-**Entry points:** `requestReaders`, `work`, `process`, `finishRequest` in
-`turbo.go`; `Parser.Parse` and `Parser.Reset` in `request/request.go`.
-
-**Evidence:** a worker already owns its parser and response writer but gets and
-puts a pooled request reader every request. `process` defers `Parser.Reset`,
-and the next `Parser.Parse` resets it again. Reset is only 1.7% of isolated GET
-CPU, and reader pooling is not a leading hotspot: this is a low-priority
-experiment, not a reason to redesign ownership immediately.
-
-**Work:** compare one lazily allocated reader per worker with the global pool,
-including fixed resident memory (at least 32 × 4 KiB of read buffers at the
-current worker count) and idle-worker costs. Separately benchmark an internal
-reset/lifecycle change that avoids duplicate clearing while retaining the
-public Parser API's automatic reset and prompt reference release.
-
-**Validation/done:** preserve reset-to-nil reader references, original-body
-cleanup ordering, failure paths, and no cross-worker sharing. Keep public
-`request.Parse` ownership and retained-clone guarantees. Run lifecycle/race
-tests and evaluate both active and idle-worker heap profiles. Land each change
-only if it gives a repeatable gain without disproportionate retained memory;
-record a no-change outcome if it does not.
-
-**Dependencies:** use task 4's worker matrix; coordinate parser changes with
-tasks 5 and 7. Do not combine both experiments in one performance comparison.
-
-## Completion standard for every optimization
-
-Keep each optimization independently reviewable. Record the commit/toolchain,
-workload, worker/queue/client configuration, before/after raw samples,
-`benchstat` output, and relevant profiles. Use the same harness on both sides
-of a production-code comparison. Run `go test -race ./...` for implementation
-changes and relevant differential/fuzz tests for parser changes. Do not time
-race or full-allocation-profile runs. Report ns/op and B/op as well as objects;
-show regressions and uncertain results. Preserve correctness and the documented
-request/response lifetime contract even when it prevents an allocation shortcut.
+# Allocation optimization TODO
+
+Profiled 2026-10-29 against `7758a06` (Go 1.27.2, Darwin arm64, Apple M3).
+Production code is unchanged. The only new benchmark isolates the existing
+OpenRTB request and handler from the client and transport.
+
+## Read this first
+
+Our priorities are simplicity, low allocation churn, and bounded worker-owned
+storage reset between requests. HTTP/1.1 still serves one request per connection.
+Do not introduce shared caches, new pools, unsafe string reuse, background
+maintenance, a fork of net/http, or a general HTTP/URL parser to chase these numbers.
+
+[Local profile report and reproduction](research/allocation-review-2026-10-29/README.md)
+contains the current measurements. [Previous TODO](research/allocation-review-2026-10-29/previous-TODO.md)
+preserves earlier experiments. Detailed reports and artifacts are local-only
+under the ignored `research/` directory.
+The complete old TODO is also available with `git show 7758a06:TODO.md`.
+Read its completed tasks 7, 8, 10 and 11 before proposing overlapping work.
+
+**The top three below are ranked by flat allocated bytes in isolated OpenRTB
+processing, not cumulative stack totals or an assumed production traffic mix.**
+They are three allocation sites inside the same stdlib fallback, not three
+independent easy fixes. Body draining and the unchanged response handler are
+included; JSON parsing and auction logic are not.
+
+| Rank | Allocation site | Profile bytes/request, approximately | What allocates |
+| --- | --- | ---: | --- |
+| 1 | `net/textproto.readMIMEHeader` | 556 | Header map, map storage, value slice and value strings |
+| 2 | `net/http.readRequestLimit` (flat) | 320 | `new(http.Request)` |
+| 3 | `net/url.parse` (flat) | 144 | `new(url.URL)` |
+
+These sites together account for about 82% of the isolated allocation profile.
+Small string accounting differs between heap profiles and benchmark counters;
+use uninstrumented B/op and allocs/op to verify total savings. The current
+OpenRTB median is **1,231 B/op, 18 allocs/op**. Ranking by object count puts the
+handler's three `Header.Set` calls second; their 48 B/request are handler-owned.
+`Header()` returns a normal Go map, so Turbo cannot intercept those calls.
+
+## Shared working agreement for each fresh agent
+
+1. Read this file, the report, and the prior task outcomes. Inspect the current
+   branch/diff; earlier tasks may already have changed the baseline. Work
+   sequentially and reprofile after each accepted change.
+2. Keep the exact OpenRTB wire bytes and `openRTBHandler` unchanged. Use
+   `BenchmarkOpenRTBTurboProcess` for server attribution, and
+   `BenchmarkOpenRTBHTTP11/Pipe/Turbo` for sustained GC/throughput. Whole-process
+   Pipe/TCP allocations include the client, transport and watchdog. Improvements
+   there must be attributed to server stacks before being called a Turbo win.
+3. Record a hypothesis and the simplest candidate before implementing it.
+   Inspect the code and reject impossible approaches early: copying a request,
+   URL or headers into reusable storage **after** `http.ReadRequest` returns
+   cannot remove allocations that already happened. Public stdlib parsers do
+   not accept caller-owned destination storage.
+4. For a viable candidate, compare baseline/candidate binaries with identical
+   harnesses and Go/environment settings. Collect at least six alternating-order
+   uninstrumented samples, then allocation profiles separately. Include existing
+   GET/HEAD, POST, browser/casing, escaped, fragmented and changing-size workloads.
+   Compare repeated minute-long OpenRTB Pipe windows in fresh processes; use
+   bounded TCP samples as a separate check. One timing sample is not significance.
+5. Preserve fallback validation and input position, streaming bodies, original
+   body cleanup, retained-clone safety, and bounded idle storage. Measure live
+   heap for 1/8/32 warmed then idle workers and retained/released clones if adding
+   storage. Fewer objects must not merely mean larger retained allocations.
+6. Run `GOCACHE=/tmp/turbo-storage-go-cache GOMAXPROCS=8 go test -race -count=1 ./... -timeout=2m`
+   with loopback access. Parser changes also require both `FuzzParse` and
+   `FuzzParserReuse` separately with `-run '^$' -fuzz '^NAME$' -fuzztime=30s`
+   in `./request`, using writable cache and GOMAXPROCS=8.
+7. Finish by marking the task completed with evidence, implementation or
+   no-change decision, validation, and residual allocation costs. Keep raw
+   results and reproduction instructions under the ignored `research/` directory.
+   If there is no simple measurable win, retain production behavior and stop;
+   do not spend the complexity budget merely to check off a code change.
+
+## 1. [ ] Request header storage — decide whether POST reuse is now justified
+
+**Scope:** the largest OpenRTB site is about 556 profile B/request, plus a
+separate approximately 24 B/request for `canonicalMIMEHeaderKey`. The wire name
+`x-openrtb-version` goes through stdlib because POST falls back before Turbo's
+header canonicalizer. Extending Turbo's constant-name switch alone will not
+help this workload. GET browser names already benefit from the prior change.
+
+**Entry points:** `request/request.go`: `parse`, `parseBuffered`, `parseHeaders`,
+`headerStorage`, `ownHeader`, `Parser.Reset`; `turbo.go`: `process`,
+`finishRequest`; `openrtb_benchmark_test.go`: workload, handler and both
+benchmarks. Read local GOROOT `src/net/textproto/reader.go:readMIMEHeader` and
+`src/net/http/request.go:readRequestLimit` for attribution, not code to copy.
+
+**Do this in order:**
+
+1. Review previous task 7: its POST reuse prototype was reverted because body
+   framing/lifecycle complexity and GET/fallback costs outweighed isolated gains.
+   The new OpenRTB profile establishes workload relevance, not a reversal of
+   that decision. Write down a concrete simplification over that approach;
+   if none exists, document no-change and let tasks 2/3 close their dependent
+   OpenRTB opportunities without rebuilding the rejected prototype.
+2. Only if justified, make a small experimental extension using the existing
+   parser storage for fully buffered HTTP/1.1 headers, a simple origin target,
+   and one unambiguous fixed Content-Length. Reuse existing parsing helpers;
+   do not add a second general parser. The body must stream beyond the initial
+   read. Unsupported or ambiguous input must reach stdlib with no bytes consumed.
+   Account for all added body-reader state and allocations in the experiment.
+3. Compare canonical/lowercase/custom/changing headers, duplicate headers,
+   fragmented headers, zero/large/truncated bodies, invalid/overflow lengths,
+   Transfer-Encoding precedence, chunking, trailers and unsupported forms against
+   stdlib. Reuse existing differential tests and `TestTurboRequestBodyLifecycle`.
+   Test handler body replacement, unread-body close, read-after-close behavior,
+   metadata clones, append isolation of header value slices, and next-request reset.
+4. Measure the full candidate as one change. It may also remove the request and
+   URL allocations in tasks 2/3; explicitly report those savings here and do not
+   later claim them twice. Compare against the current 1,231 B/op/18 allocs and
+   verify sustained allocation/GC reductions without GET/fallback regressions.
+
+**Done when:** a compact implementation earns its added protocol/state complexity
+with repeatable end-to-end evidence and bounded retention, or a documented
+no-change result explains why stdlib remains the right boundary. A custom parser
+or broader body protocol implementation is outside this task's simplicity budget.
+
+## 2. [ ] Request object — reuse only before allocation, with a safe lifecycle
+
+**Dependency:** read task 1's result and reprofile. OpenRTB request reuse requires
+an accepted path that does not call `http.ReadRequest` for the eligible request.
+If task 1 stays on stdlib, this task should record the 320 B/request cost as an
+accepted boundary unless a new, simpler mechanism is demonstrated. If task 1
+already reuses `Parser.req`, validate and close this task without duplicate work.
+
+**Entry points:** `request/request.go`: `Parser.req`, `Parser.Parse`, `Reset`,
+`makeRequest`, `parseBuffered`; `turbo.go`: `work`, `process`, `finishRequest`;
+local GOROOT `src/net/http/request.go:readRequestLimit` (`req = new(Request)`).
+See `process-openrtb-lines-request.txt` in the report's results directory.
+
+**Do this in order:**
+
+1. Confirm exactly which paths still allocate the request. The existing GET/HEAD
+   fast path already reuses `Parser.req`; allocating public `request.Parse`
+   deliberately returns independently owned metadata. Do not weaken that API.
+2. If an accepted eligible POST path exists, populate the existing `Parser.req`
+   directly, without a new pool, wrapper, lifecycle flag, or second request slot.
+   Ensure fallback errors and partial parsing cannot expose stale worker fields.
+   Do not attempt to recycle a stdlib request by assigning it into `Parser.req`.
+3. Verify worker transitions POST→GET→error→POST, handler-mutated headers/URL,
+   retained `Request.Clone` metadata, and original-body cleanup even if the
+   handler replaces `req.Body`. Connection close must precede unread-body close.
+   Reset must release request/body/connection references after every outcome.
+4. Attribute the request site's bytes and objects before/after. Measure the
+   actual total delta, including any new body state, ownership copies or
+   retention. Apply the shared regression, race, fuzz and sustained checks.
+
+**Done when:** the measured request allocation is eliminated on a proven path
+without new lifecycle complexity, already eliminated by task 1, or explicitly
+retained because stdlib owns its allocation. Do not claim 320 B saved based
+solely on the size of a field reused after parsing.
+
+## 3. [ ] URL object — retain simple-target reuse and stdlib semantics
+
+**Dependency:** read both prior outcomes and reprofile. OpenRTB's target
+`/openrtb2/auction` is already eligible for Turbo's `simpleTarget` helper, but
+POST dispatch sends it to stdlib. Task 1 may remove this 144 B/request allocation
+as a side effect. Confirm that before attempting another optimization.
+
+**Entry points:** `request/request.go`: `makeRequest`, `simpleTarget`, `parseURL`,
+`Parser.url`; local GOROOT `src/net/url/url.go:parse` (`url := new(URL)`).
+Profiles: `process-openrtb-lines-url.txt` and `process-escaped-alloc_space.txt`.
+Existing regression fixtures: `BenchmarkTurboProcessHeaders/EscapedHeaders`,
+`BenchmarkParse/EscapedPath`, and both parser differential fuzzers.
+
+**Do this in order:**
+
+1. Confirm whether accepted POST reuse already routes eligible simple targets
+   through `makeRequest` and `Parser.url`. If so, record its measured benefit
+   and close the OpenRTB portion. If POST still falls back, record the dependency;
+   copying `*url.ParseRequestURI(...)` into `Parser.url` does not remove allocation.
+2. Independently inspect the escaped GET/HEAD profile: it currently adds about
+   184 B and three allocations relative to browser headers, through URL parsing,
+   unescape and escape work. Look only for redundant work avoidable with existing
+   helpers. An allocation site alone does not justify a custom unescaper/parser.
+3. Any candidate must preserve `Path`, `RawPath`, `RawQuery`, `ForceQuery`,
+   RequestURI, host handling and invalid-input behavior. Cover escaped slash,
+   space, percent, invalid escapes, empty query, absolute/authority forms and
+   retained clones through worker reset. Keep complex targets on stdlib unless
+   a narrowly scoped change is independently justified by the measurements.
+4. Compare OpenRTB, simple GET/HEAD and escaped/canonical browser cases, including
+   unknown/changing targets. Measure total allocations, live string storage and
+   end-to-end behavior; do not optimize only the literal auction URL.
+
+**Done when:** an independently justified simple change passes the shared gates,
+prior tasks already removed the eligible URL allocation, or the remaining
+stdlib URL cost is documented as the simplest correct implementation.

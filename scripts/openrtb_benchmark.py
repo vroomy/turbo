@@ -34,7 +34,7 @@ def main():
     parser.add_argument('--workload', choices=('OpenRTB', 'SmallGET'), default='OpenRTB')
     parser.add_argument('--transport', choices=('Pipe', 'TCP'), default='Pipe')
     parser.add_argument('--output', type=Path,
-                        default=REPO/'benchmarks'/'openrtb-2026-10-29')
+                        default=REPO/'research'/'openrtb-2026-10-29')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)

@@ -24,7 +24,7 @@ import subprocess
 import sys
 
 REPO = Path(__file__).resolve().parents[1]
-HERE = REPO / 'studies' / 'request-storage'
+HERE = REPO / 'research' / 'request-storage'
 TMP = Path(os.environ.get('TURBO_STORAGE_SCRATCH', '/tmp/turbo-storage-study'))
 OUT = HERE / 'results'
 ENV = dict(os.environ, GOMAXPROCS='8', GOCACHE='/tmp/turbo-storage-go-cache')

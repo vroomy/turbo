@@ -7,10 +7,10 @@ while the handler runs. To retain a request's metadata after the handler returns
 call `req.Clone(req.Context())` before returning. The clone shares the body,
 which must be consumed during the handler.
 
-See [benchmarks](benchmarks/README.md) for repeatable Turbo versus `net/http`
-comparisons, workload definitions, and recorded results.
-See the [TODO](TODO.md) for the current Pipe timeout design, its costs, and
-the revised measurement baseline.
+Benchmark tests and reusable scripts are kept with the source. Local benchmark
+results and research notes belong in `research/`, which is ignored by Git.
+See the [TODO](TODO.md) for current optimization priorities and validation
+requirements.
 
 The [standalone hello-world examples](examples/README.md) compare stdlib and
 Turbo as separate executables using the same handler and the oha load

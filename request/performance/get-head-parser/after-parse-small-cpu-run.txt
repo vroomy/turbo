@@ -1,7 +1,0 @@
-# GOMAXPROCS=8 /tmp/turbo-get-head-parser/after-request.test '-test.run=^$' '-test.bench=^BenchmarkParse$/^SmallGET$/^Reused$' -test.benchtime=3s -test.cpuprofile=/tmp/turbo-get-head-parser/after-parse-small-cpu.pprof
-goos: darwin
-goarch: arm64
-pkg: github.com/vroomy/turbo/request
-cpu: Apple M3
-BenchmarkParse/SmallGET/Reused-8  	12143518	       307.5 ns/op	      68 B/op	       0 allocs/op
-PASS
