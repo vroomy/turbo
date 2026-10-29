@@ -1,5 +1,14 @@
 # Allocation optimization TODO
 
+## Parser uniformity review — completed 2026-10-29
+
+Compared current parsing with a stdlib-only overlay inside the same Turbo server.
+Internal small-GET parsing is 2.1× faster; stdlib-only adds 0.34 µs and 890 B per
+isolated small GET. POST/OpenRTB timing is unchanged within measurement noise.
+GET/HEAD Pipe time rises 7–17%; bounded TCP timing is inconclusive. Production
+code remains unchanged. Full results, validation and implementation-effort estimates:
+[local parser uniformity report](research/parser-uniformity-2026-10-29/README.md).
+
 Profiled 2026-10-29 against `7758a06` (Go 1.27.2, Darwin arm64, Apple M3).
 Production code is unchanged. The only new benchmark isolates the existing
 OpenRTB request and handler from the client and transport.
@@ -72,7 +81,19 @@ handler's three `Header.Set` calls second; their 48 B/request are handler-owned.
    If there is no simple measurable win, retain production behavior and stop;
    do not spend the complexity budget merely to check off a code change.
 
-## 1. [ ] Request header storage — decide whether POST reuse is now justified
+## 1. [x] Request header storage — decide whether POST reuse is now justified
+
+**Completed 2026-10-29 — retain stdlib POST parsing.** No concrete simplification
+over prior task 7 was found: reusing headers before allocation still requires
+fixed-length streaming-body framing and close/lifecycle behavior. Per step 1,
+the rejected prototype was not rebuilt; production and benchmark code are unchanged.
+Six fresh OpenRTB samples confirm **1,231 B/op, 18 allocs/op**. A separate
+20,000-request profile retains approximately 556 B/request for headers, 24 for
+canonicalization, 320 for Request and 144 for URL; no savings are claimed.
+The full race suite passes with loopback access, including body lifecycle and
+Pipe/TCP contracts. Source/fixture hashes match the prior review. See the
+[decision, evidence and reproduction](research/allocation-review-2026-10-29/task1-post-header-reuse/README.md).
+Tasks 2/3 retain their dependent OpenRTB costs and remain separate reviews.
 
 **Scope:** the largest OpenRTB site is about 556 profile B/request, plus a
 separate approximately 24 B/request for `canonicalMIMEHeaderKey`. The wire name
@@ -116,7 +137,18 @@ with repeatable end-to-end evidence and bounded retention, or a documented
 no-change result explains why stdlib remains the right boundary. A custom parser
 or broader body protocol implementation is outside this task's simplicity budget.
 
-## 2. [ ] Request object — reuse only before allocation, with a safe lifecycle
+## 2. [x] Request object — reuse only before allocation, with a safe lifecycle
+
+**Completed 2026-10-29 — retain stdlib-owned POST requests.** Task 1 accepted
+no POST reuse path, and `http.ReadRequest` allocates its own Request without a
+destination argument. GET/HEAD already reuse `Parser.req`; copying a fallback
+request afterward cannot remove its allocation. Six fresh OpenRTB samples report
+**1,231–1,232 B/op, 18 allocs/op**. A separate 20,000-request profile confirms
+exactly **320 B and one Request object per request** at stdlib `new(Request)`.
+Production/benchmark code is unchanged and no savings are claimed. The full
+race suite with loopback access and a local POST→GET→error→POST lifecycle/clone
+audit pass. See the [decision, evidence and reproduction](research/allocation-review-2026-10-29/task2-request-object/README.md).
+Task 3 remains a separate review.
 
 **Dependency:** read task 1's result and reprofile. OpenRTB request reuse requires
 an accepted path that does not call `http.ReadRequest` for the eligible request.
@@ -151,7 +183,18 @@ without new lifecycle complexity, already eliminated by task 1, or explicitly
 retained because stdlib owns its allocation. Do not claim 320 B saved based
 solely on the size of a field reused after parsing.
 
-## 3. [ ] URL object — retain simple-target reuse and stdlib semantics
+## 3. [x] URL object — retain simple-target reuse and stdlib semantics
+
+**Completed 2026-10-29 — retain existing URL parsing.** Tasks 1/2 kept POST on
+stdlib; a fresh 20,000-request profile confirms **144 B and one URL per request**.
+Simple GET/HEAD already reuse `Parser.url`. Escaped targets call stdlib once;
+its unescape/default-escape work preserves `Path`/`RawPath`, and no simple
+existing-helper change avoids it. Six fresh OpenRTB samples retain **1,231 B/op,
+18 allocs/op**; escaped browser cases retain **184 extra B/op and three objects**.
+No production/benchmark changes or savings are claimed. The full race suite
+with loopback access and a local URL/input-position/clone audit pass (2,688 cases,
+2,540 retained clones). See the
+[decision, evidence and reproduction](research/allocation-review-2026-10-29/task3-url-object/README.md).
 
 **Dependency:** read both prior outcomes and reprofile. OpenRTB's target
 `/openrtb2/auction` is already eligible for Turbo's `simpleTarget` helper, but
