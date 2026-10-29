@@ -1,5 +1,12 @@
 # Allocation optimization TODO
 
+## MVP benchmark documentation — completed 2026-10-29
+
+README now compares the current stdlib-parser Turbo server with `net/http.Server`,
+including timings, B/op and allocations/op. Ten alternating-order samples per
+case pass without request errors. Full results and the PR draft are in the
+[local MVP comparison](research/mvp-stdlib-comparison-2026-10-29/README.md).
+
 ## Stdlib request parsing — implemented 2026-10-29
 
 Turbo now uses `http.ReadRequest` for every request and no longer owns custom
